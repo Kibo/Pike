@@ -9,6 +9,13 @@ var testCreate = function() {
 	assertEquals( 20, rectangle.y  );
 	assertEquals( 30, rectangle.w  );
 	assertEquals( 40, rectangle.h  );
+	
+	var rectangle2 = new pike.graphics.Rectangle();
+	assertEquals( 0, rectangle2.x  );
+	assertEquals( 0, rectangle2.y  );
+	assertEquals( 0, rectangle2.w  );
+	assertEquals( 0, rectangle2.h  );
+	
 };
 
 var testEquals = function(){

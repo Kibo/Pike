@@ -14,10 +14,10 @@ goog.provide('pike.graphics.Rectangle');
  * @constructor
  */
 pike.graphics.Rectangle = function( x, y, width, height){
-	this.x = x;
-    this.y = y;
-    this.w = width;
-    this.h = height;	
+	this.x = x || 0;
+    this.y = y || 0;
+    this.w = width || 0;
+    this.h = height || 0;	
 };
 
 /**

@@ -1,14 +1,13 @@
 # Pike v0.1
-HTML5 gamedeveloper library. 
-
+HTML5 gamedeveloper library.
 All classes in this library are based on the [Google Closure Library](https://developers.google.com/closure/library/).
 
-##About
+###About
 The basic idea is to create a library of reusable classes for game developers. 
 **This is not a framework**. Because the framework is always tied to some restrictions and rules. 
 There are no restrictions, here are the basic classes.
 
-##Covers
+###Covers
 - Resource loader (TODO)
 - Input handler (TODO)
 - Canvas renderer (TODO)
@@ -17,7 +16,7 @@ There are no restrictions, here are the basic classes.
 - Audio (TODO)
 - Math (TODO)
 
-##Feature
+###Feature
 - documented code
 - tested code
 

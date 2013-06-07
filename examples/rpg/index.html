@@ -28,12 +28,16 @@
 		</style>
 				
     <script src="../../../closure-library/closure/goog/base.js"></script>
-    <script src="../../source/rectangle.js"></script>
-	<script src="../../source/viewport.js"></script>
+    <script src="../../test/js/source-deps.js"></script>
+	<script>		
+		goog.require('pike.core.Timer');
+	</script>
 	<script>
-		window.onload = function(){
-			var view = new pike.core.Viewport( 800, 600 );
-			console.log(view);
+		window.onload = function(){		
+			var timer = new pike.core.Timer();
+			timer.start();
+			//console.log( timer );
+			timer.stop();
 		}
 	</script>
 	

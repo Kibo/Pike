@@ -110,7 +110,7 @@ pike.core.Viewport.prototype.getHandler = function(){
  * @param {number} offsetY
  */
 pike.core.Viewport.prototype.centerOn = function( rectangle, boundary ){
-	
+	//TODO
 };
 
 /**
