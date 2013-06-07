@@ -7,6 +7,7 @@ goog.provide('pike.events.ViewportChangePosition');
 goog.provide('pike.events.ViewportChangeSize');
 goog.provide('pike.events.Update');
 goog.provide('pike.events.Render');
+goog.provide('pike.events.NewEntity');
 
 goog.require('goog.events.Event');
 
@@ -105,3 +106,32 @@ goog.inherits( pike.events.Render, goog.events.Event );
  * @type {string}
  */
 pike.events.Render.EVENT_TYPE = "render";
+
+//## NewEntity #################################################################################
+/**
+* @param {numner} id - entity id
+* @param {goog.events.EventTarget} target
+* @constructor 
+* @extends {goog.events.Event}
+*/
+pike.events.NewEntity = function( id, target){
+	goog.events.Event.call(this, pike.events.NewEntity.EVENT_TYPE, target);	
+	this.id = id;	
+};
+
+goog.inherits( pike.events.NewEntity, goog.events.Event );
+
+/**
+ * Event type
+ * @const
+ * @type {string}
+ */
+pike.events.NewEntity.EVENT_TYPE = "newentity";
+
+
+
+
+
+
+
+

@@ -96,14 +96,6 @@ pike.core.Viewport.prototype.getDOMElement = function(){
 };
 
 /**
- * Get Handler
- * @returns {goog.events.EventHandler}
- */
-pike.core.Viewport.prototype.getHandler = function(){
-	return this.handler;
-};
-
-/**
  * Center the Viewport on a entity
  * @param {pike.graphics.Rectangle} rectangle
  * @param {number} offsetX

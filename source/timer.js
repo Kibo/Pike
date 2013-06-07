@@ -56,11 +56,3 @@ pike.core.Timer.prototype.tick = function(){
 	this.dispatchEvent( new pike.events.Render( new Date().getTime(), this));	
 	this.requestID_ = window.requestAnimationFrame( this.boundTick_ );
 };
-
-/**
- * Get Handler
- * @returns {goog.events.EventHandler}
- */
-pike.core.Timer.prototype.getHandler = function(){
-	return this.handler;
-};

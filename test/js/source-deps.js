@@ -2,4 +2,5 @@
 goog.addDependency("../../../Pike/source/viewport.js", ['pike.core.Viewport'], ['pike.graphics.Rectangle', 'goog.events', 'goog.events.EventTarget', 'goog.events.EventHandler']);
 goog.addDependency("../../../Pike/source/rectangle.js", ['pike.graphics.Rectangle'], []);
 goog.addDependency("../../../Pike/source/timer.js", ['pike.core.Timer'], ['goog.events.EventTarget', 'goog.events.EventHandler', 'pike.events.Update', 'pike.events.Render']);
-goog.addDependency("../../../Pike/source/events.js", ['pike.events.ViewportChangePosition', 'pike.events.ViewportChangeSize', 'pike.events.Update', 'pike.events.Render'], ['goog.events.Event']);
+goog.addDependency("../../../Pike/source/entity_manager.js", ['pike.core.EntityManager', 'pike.core.Entity'], ['pike.graphics.Rectangle', 'goog.events', 'goog.events.EventTarget', 'goog.events.EventHandler', 'goog.array']);
+goog.addDependency("../../../Pike/source/events.js", ['pike.events.ViewportChangePosition', 'pike.events.ViewportChangeSize', 'pike.events.Update', 'pike.events.Render', 'pike.events.NewEntity'], ['goog.events.Event']);

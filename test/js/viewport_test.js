@@ -52,7 +52,7 @@ var testSetPosition = function(){
 
 var testGetHandler = function(){
 	var viewport = new pike.core.Viewport(200, 10);	
-	assertTrue( viewport.getHandler() instanceof goog.events.EventHandler);
+	assertTrue( viewport.handler instanceof goog.events.EventHandler);
 };
 
 function tearDown(){}
