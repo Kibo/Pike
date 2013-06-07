@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    	<meta charset="utf-8">       
+        <title>Pike - rpg example</title>
+         <style>
+        
+	        html, body {
+				overflow: hidden;
+				width: 100%;
+				height: 100%;
+				margin:0;
+				padding:0;
+				border: 0;
+			}
+	        		
+			#pike-stage{
+				background:#eeeeee;
+				margin:0 auto;
+				border:5px solid #333;			
+			}
+			
+			.xstats {
+				position: absolute;
+				top: 0;
+				right: 0;
+			 }			
+		</style>
+				
+    <script src="../../../closure-library/closure/goog/base.js"></script>
+    <script src="../../source/rectangle.js"></script>
+	<script src="../../source/viewport.js"></script>
+	<script>
+		window.onload = function(){
+			var view = new pike.core.Viewport( 800, 600 );
+			console.log(view);
+		}
+	</script>
+	
+    </head>
+    <body>                      
+        <h1 align="center">Pike - rpg example</h1>
+               
+        <div id="pike-stage"></div>                     
+                              
+        <script src="../../libs/xstats/xstats.js"></script>
+        <script>
+        	var stats = new xStats;
+			document.body.appendChild(stats.element);	
+        </script>            
+    </body>
+</html>
