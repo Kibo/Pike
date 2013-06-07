@@ -61,7 +61,7 @@ pike.core.EntityManager.prototype.create = function( components ){
     }
 			
 	this.entities_.push( entity );
-	this.dispatchEvent( new pike.events.NewEntity( entity.id, this) ); //TODO
+	this.dispatchEvent( new pike.events.NewEntity( entity.id, this) );
 	return entity;
 };
 
@@ -90,9 +90,10 @@ pike.core.EntityManager.prototype.all = function(){
  * Unregister entity from Entity manager
  * @param {pike.core.Entity} entity
  */
-pike.core.EntityManager.prototype.destroy = function( entity ){
+pike.core.EntityManager.prototype.remove = function( entity ){
 	entity.dispose();
-	goog.array.remove(this.entities_, entity);	
+	goog.array.remove(this.entities_, entity);
+	this.dispatchEvent( new pike.events.RemoveEntity( entity.id, this));
 };
 
 /**

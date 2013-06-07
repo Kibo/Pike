@@ -26,4 +26,23 @@ function testNewEntity() {
     var entity = em.create();
 };
 
+function testRemoveEntity() {
+	var em = new pike.core.EntityManager();
+	var entity = em.create();
+	var id = entity.id;
+		
+	var event = null;
+    goog.events.listen(em, pike.events.RemoveEntity.EVENT_TYPE, function(e) {
+    	event = e;
+    });
+		  
+    waitForEvent(em, pike.events.RemoveEntity.EVENT_TYPE, function() {
+    	assertTrue( event instanceof pike.events.RemoveEntity);
+    	assertTrue( event.target === em);
+    	assertNotNull(event.id);    
+    });
+    
+    em.remove(entity);           
+};
+
 function tearDown(){}

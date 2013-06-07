@@ -59,14 +59,14 @@ var testCreateEntity = function() {
 var testGetEntity = function() {
 	var em = new pike.core.EntityManager();
 	var entity = em.create();
-	assertNotNull( entity.id )	
+	assertNotNull( entity.id );
 };
 
-var testDestroy = function() {
+var testRemove = function() {
 	var em = new pike.core.EntityManager();
 	var entity = em.create();
 	var id = entity.id;
-	em.destroy( entity );
+	em.remove( entity );
 	
 	assertUndefined( em.get(id));	
 };
