@@ -3,13 +3,12 @@
 * @author tomasjurman@gmail.com (Tomas Jurman)
 * @license Dual licensed under the MIT or GPL licenses.
 */
-goog.provide('pike.events.ViewportChangePosition');
-goog.provide('pike.events.ViewportChangeSize');
+goog.provide('pike.events.ChangePosition');
+goog.provide('pike.events.ChangeSize');
 goog.provide('pike.events.Update');
 goog.provide('pike.events.Render');
 goog.provide('pike.events.NewEntity');
 goog.provide('pike.events.RemoveEntity');
-goog.provide('pike.events.GameworldChangeSize');
 
 goog.require('goog.events.Event');
 goog.require('goog.events.EventTarget');
@@ -24,8 +23,8 @@ goog.require('goog.events.EventTarget');
 * @constructor
 * @extends {goog.events.Event}
 */
-pike.events.ViewportChangePosition = function(oldX, oldY, x, y, target){
-	goog.events.Event.call(this, pike.events.ViewportChangePosition.EVENT_TYPE, target);
+pike.events.ChangePosition = function(oldX, oldY, x, y, target){
+	goog.events.Event.call(this, pike.events.ChangePosition.EVENT_TYPE, target);
 	
 	this.oldX = oldX;
 	this.oldY = oldY;
@@ -33,14 +32,14 @@ pike.events.ViewportChangePosition = function(oldX, oldY, x, y, target){
 	this.y = y;
 };
 
-goog.inherits( pike.events.ViewportChangePosition, goog.events.Event );
+goog.inherits( pike.events.ChangePosition, goog.events.Event );
 
 /**
  * Event type
  * @const
  * @type {string}
  */
-pike.events.ViewportChangePosition.EVENT_TYPE = "viewportchangeposition";
+pike.events.ChangePosition.EVENT_TYPE = "changeposition";
 
 //## ViewportChangeSize #################################################################################
 /**
@@ -52,8 +51,8 @@ pike.events.ViewportChangePosition.EVENT_TYPE = "viewportchangeposition";
 * @constructor
 * @extends {goog.events.Event}
 */
-pike.events.ViewportChangeSize = function(oldW, oldH, width, height, target){
-	goog.events.Event.call(this, pike.events.ViewportChangeSize.EVENT_TYPE, target);
+pike.events.ChangeSize = function(oldW, oldH, width, height, target){
+	goog.events.Event.call(this, pike.events.ChangeSize.EVENT_TYPE, target);
 	
 	this.oldW = oldW;
 	this.oldH = oldH;
@@ -61,14 +60,14 @@ pike.events.ViewportChangeSize = function(oldW, oldH, width, height, target){
 	this.h = height;
 };
 
-goog.inherits( pike.events.ViewportChangeSize, goog.events.Event );
+goog.inherits( pike.events.ChangeSize, goog.events.Event );
 
 /**
  * Event type
  * @const
  * @type {string}
  */
-pike.events.ViewportChangeSize.EVENT_TYPE = "viewportchangesize";
+pike.events.ChangeSize.EVENT_TYPE = "changesize";
 
 //## Update #################################################################################
 /**
@@ -154,34 +153,43 @@ goog.inherits( pike.events.RemoveEntity, goog.events.Event );
  */
 pike.events.RemoveEntity.EVENT_TYPE = "removeentity";
 
-//## GameworldChangeSize #################################################################################
+//## Done #################################################################################
 /**
-* @param {number} oldW
-* @param {number} oldH
-* @param {number} width
-* @param {number} height
 * @param {goog.events.EventTarget} target
 * @constructor
 * @extends {goog.events.Event}
 */
-pike.events.GameworldChangeSize = function(oldW, oldH, width, height, target){
-	goog.events.Event.call(this, pike.events.GameworldChangeSize.EVENT_TYPE, target);
-	
-	this.oldW = oldW;
-	this.oldH = oldH;
-	this.w = width;
-	this.h = height;
+pike.events.Done = function(target){
+	goog.events.Event.call(this, pike.events.Done.EVENT_TYPE, target);
 };
 
-goog.inherits( pike.events.GameworldChangeSize, goog.events.Event );
+goog.inherits( pike.events.Done, goog.events.Event );
 
 /**
  * Event type
  * @const
  * @type {string}
  */
-pike.events.GameworldChangeSize.EVENT_TYPE = "gameworldchangesize";
+pike.events.Done.EVENT_TYPE = "done";
 
+//## Progress #################################################################################
+/**
+* @param {number} progress - range <0,1>
+* @param {goog.events.EventTarget} target
+* @constructor
+* @extends {goog.events.Event}
+*/
+pike.events.Progress = function( progress, target){
+	goog.events.Event.call(this, pike.events.Progress.EVENT_TYPE, target);
+	this.progress = progress;
+};
 
+goog.inherits( pike.events.Progress, goog.events.Event );
 
+/**
+ * Event type
+ * @const
+ * @type {string}
+ */
+pike.events.Progress.EVENT_TYPE = "progress";
 

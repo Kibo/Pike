@@ -26,7 +26,7 @@ pike.core.RenderManager = function(){
 	*/
 	this.handler = new goog.events.EventHandler(this);
 	
-	this.layers_ = {};	
+	this.layers_ = [];	
 };
 
 goog.inherits(pike.core.RenderManager, goog.events.EventTarget);
@@ -54,29 +54,27 @@ pike.core.RenderManager.prototype.render_ = function( layer ){};
 /**
  * onRender event handler
  * @param {pike.events.Render} e
- * @private
  */
-pike.core.RenderManager.prototype.onRender_ = function( e ){};
+pike.core.RenderManager.prototype.onRender = function( e ){
+	console.log("do render");
+};
 
 /**
  * onViewportChangeSize event handler
  * @param {pike.events.ViewportChangeSize} e
- * @private
  */
-pike.core.RenderManager.prototype.onViewportChangeSize_ = function(e){};
+pike.core.RenderManager.prototype.onViewportChangeSize = function(e){};
 
 /**
  * onViewportChangePosition event handler
  * @param {pike.events.ViewportChangePosition} e
- * @private
  */
-pike.core.RenderManager.prototype.onViewportChangePosition_ = function(e){};
+pike.core.RenderManager.prototype.onViewportChangePosition = function(e){};
 
 /**
  * onGameWorldChangeSize event handler
  * @param {pike.events.GameWorldChangeSize} e
- * @private
  */
-pike.core.RenderManager.prototype.onGameWorldChangeSize_ = function(e){};
+pike.core.RenderManager.prototype.onGameWorldChangeSize = function(e){};
 
 

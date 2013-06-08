@@ -48,7 +48,7 @@ pike.core.Viewport.ELEMENT_ID = "pike-stage";
 * Set size of Viewport
 * @param {number} width
 * @param {number} height
-* @fires {pike.events.ViewportChangeSize} event
+* @fires {pike.events.ChangeSize} event
 */
 pike.core.Viewport.prototype.setSize = function( width, height ){
 	var oldW = this.w;
@@ -59,7 +59,7 @@ pike.core.Viewport.prototype.setSize = function( width, height ){
 	this._DOMElement.style.width = this.w + "px";
 	this._DOMElement.style.height = this.h + "px";
 		
-	this.dispatchEvent( new pike.events.ViewportChangeSize(oldW, oldH, this.w, this.h, this) );
+	this.dispatchEvent( new pike.events.ChangeSize(oldW, oldH, this.w, this.h, this) );
 	if(goog.DEBUG) console.log("[pike.core.Viewport] changesize");
 };
 
@@ -67,7 +67,7 @@ pike.core.Viewport.prototype.setSize = function( width, height ){
 * Set position of Viewport
 * @param {number} x
 * @param {number} y
-* @fires {pike.events.ViewportChangePosition} event
+* @fires {pike.events.ChangePosition} event
 */
 pike.core.Viewport.prototype.setPosition = function( x, y ){
 	var oldX = this.x;
@@ -75,7 +75,7 @@ pike.core.Viewport.prototype.setPosition = function( x, y ){
 	this.x = x;
 	this.y = y;
 	
-	this.dispatchEvent(new pike.events.ViewportChangePosition(oldX, oldY, this.x, this.y, this));
+	this.dispatchEvent(new pike.events.ChangePosition(oldX, oldY, this.x, this.y, this));
 	if(goog.DEBUG) console.log("[pike.core.Viewport] changeposition");
 };
 

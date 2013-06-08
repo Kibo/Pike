@@ -1,0 +1,76 @@
+<!doctype html>
+<html>
+<head>
+<title>Test Case</title>
+</head>
+<body>
+<script src="../../closure-library/closure/goog/base.js"></script>
+<script src="../source/deps.js"></script>
+<script>
+	goog.require('goog.testing.ContinuationTestCase');	
+	goog.require('goog.testing.jsunit');	
+</script>
+<script>
+	goog.require('pike.assets.ImageManager');
+</script>
+<script>
+var testCase = new goog.testing.ContinuationTestCase('Image manager Test Case');
+testCase.autoDiscoverTests();
+
+// Standalone Closure Test Runner.
+if (typeof G_testRunner != 'undefined') {
+  G_testRunner.initialize(testCase);
+}
+
+function setUpPage() {}
+
+function setUp(){}
+
+function testLoad() {
+	var im = new pike.assets.ImageManager();
+	im.load({
+		"bg"		:"../examples/img/bg.png",
+		"entities"	:"../examples/img/entities.png"		
+	}, function(){});
+		
+	waitForTimeout(function() {	
+	    assertTrue( typeof im.get("bg") == "object" );
+	    assertTrue( typeof im.get("entities") == "object");	   
+	}, 1000);	
+};
+
+function testDone() {
+	var done;
+	var im = new pike.assets.ImageManager();
+	im.load({
+		"bg"		:"../examples/img/bg.png",
+		"entities"	:"../examples/img/entities.png"		
+	}, function(){
+		done = true;
+	});
+		
+	waitForTimeout(function() {	
+	    assertTrue( done );	
+	}, 1000);	
+};
+
+function testError() {
+	var error;
+	var im = new pike.assets.ImageManager();
+	im.load({
+		"bg"		:"../examples/img/bg.png",
+		"entities"	:"../examples/img/entities.png",
+		"error"	:"../dont_exists/path/error.png"	
+	}, function(){}, function( itemLoaded, itemTotal, key, path, success ){
+		error = success;
+	});
+		
+	waitForTimeout(function() {	
+	    assertFalse( error );	
+	}, 1000);	
+};
+
+function tearDown(){}
+</script>
+</body>
+</html>
