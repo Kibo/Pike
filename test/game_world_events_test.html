@@ -28,7 +28,7 @@ function setUpPage(){}
 function setUp(){}
 
 function testChangeSize() {
-	var gw = new pike.core.GameWorld(100, 200);
+	var gw = new pike.core.GameWorld();
 		
 	var event = null;
     goog.events.listen(gw, pike.events.ChangeSize.EVENT_TYPE, function(e) {
@@ -38,8 +38,8 @@ function testChangeSize() {
     waitForEvent(gw, pike.events.ChangeSize.EVENT_TYPE, function() {
     	assertTrue( event instanceof pike.events.ChangeSize);
     	assertTrue( event.target === gw);
-    	assertEquals(100, event.oldW);
-    	assertEquals(200, event.oldH);
+    	assertEquals(0, event.oldW);
+    	assertEquals(0, event.oldH);
     	assertEquals(2500, event.w);
     	assertEquals(1280, event.h);    
     });

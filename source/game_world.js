@@ -13,12 +13,10 @@ goog.require('goog.events.EventHandler');
 
 /**
 * Creates a new Gameworld.
-* @param {number} width
-* @param {number} height
 * @constructor
 * @extends {goog.events.EventTarget}
 */
-pike.core.GameWorld = function( width, height ){
+pike.core.GameWorld = function(){
 	goog.events.EventTarget.call(this);
 	
 	this.x = 0;
@@ -30,9 +28,7 @@ pike.core.GameWorld = function( width, height ){
 	* @type {!goog.events.EventHandler}
 	* @protected
 	*/
-	this.handler = new goog.events.EventHandler(this);
-		
-	this.setSize(width, height);		
+	this.handler = new goog.events.EventHandler(this);			
 };
 
 goog.inherits(pike.core.GameWorld, goog.events.EventTarget);

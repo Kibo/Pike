@@ -1,0 +1,54 @@
+<!doctype html>
+<html>
+<head>
+<title>Test Case</title>
+</head>
+<body>
+<script src="../../closure-library/closure/goog/base.js"></script>
+<script src="../source/deps.js"></script>
+<script>
+	goog.require('goog.testing.ContinuationTestCase');	
+	goog.require('goog.testing.jsunit');	
+</script>
+<script>
+	goog.require('pike.layers.Layer');
+	goog.require('pike.core.Entity');
+</script>
+<script>
+function setUpPage(){}
+function setUp(){}
+
+var testCreate = function() {
+	var layer = new pike.layers.Layer("entities");
+	
+	assertTrue( typeof layer.getScreen().canvas == 'object' );
+	assertTrue( typeof layer.getScreen().context == 'object' );
+	assertTrue( typeof layer.getOffScreen().canvas == 'object' );
+	assertTrue( typeof layer.getOffScreen().context == 'object' );
+};
+
+var testAddEntity = function() {
+	var layer = new pike.layers.Layer("entities");
+	var entity = new pike.core.Entity();
+	layer.addEntity( entity );
+	
+	assertTrue( entity.layer instanceof pike.layers.Layer );
+	assertEquals(entity, layer.entities_[0]);
+};
+
+var testRemoveEntity = function() {
+	
+	var layer = new pike.layers.Layer("entities");
+	var entity = new pike.core.Entity();
+	layer.addEntity( entity );
+	layer.removeEntity( entity );
+	
+	assertUndefined( entity.layer );
+	assertTrue(layer.entities_.length == 0);
+	
+};
+
+function tearDown(){}
+</script>
+</body>
+</html>

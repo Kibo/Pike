@@ -29,7 +29,7 @@ function setUpPage(){}
 function setUp(){}
 
 function testViewportEventViewportChangePosition() {
-	var viewport = new pike.core.Viewport(300, 10);
+	var viewport = new pike.core.Viewport();
 	var event = null;
     goog.events.listen(viewport, pike.events.ChangePosition.EVENT_TYPE, function(e) {
     	event = e;
@@ -48,7 +48,7 @@ function testViewportEventViewportChangePosition() {
 };
 
 function testViewportEventViewportChangeSize() {
-	var viewport = new pike.core.Viewport(300, 10);
+	var viewport = new pike.core.Viewport();
 	var event = null;
     goog.events.listen(viewport, pike.events.ChangeSize.EVENT_TYPE, function(e) {
     	event = e;
@@ -57,8 +57,8 @@ function testViewportEventViewportChangeSize() {
     waitForEvent(viewport, pike.events.ChangeSize.EVENT_TYPE, function() {
     	assertTrue( event instanceof pike.events.ChangeSize);
     	assertTrue( event.target === viewport);
-    	assertEquals(300, event.oldW);
-    	assertEquals(10, event.oldH);
+    	assertEquals(0, event.oldW);
+    	assertEquals(0, event.oldH);
     	assertEquals(100, event.w);
     	assertEquals(20, event.h);
     })

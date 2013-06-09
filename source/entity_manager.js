@@ -4,7 +4,6 @@
 * @license Dual licensed under the MIT or GPL licenses.
 */
 goog.provide('pike.core.EntityManager');
-goog.provide('pike.core.Entity');
 
 goog.require('pike.graphics.Rectangle');
 goog.require('goog.events');
@@ -139,35 +138,5 @@ pike.core.EntityManager.prototype.augment_ = function( receivingClass, givingCla
 	return receivingClass;
 };
 
-//## Entity ########################################################
-/**
-* The base class for all game entities
-* @constructor
-* @extends {goog.events.EventTarget}
-*/
-pike.core.Entity = function(){
-	goog.events.EventTarget.call(this);
-	this.id = goog.getUid(this);
-	
-	/**
-	* @type {!goog.events.EventHandler}
-	* @protected
-	*/
-	this.handler = new goog.events.EventHandler(this);
-};
 
-goog.inherits(pike.core.Entity, goog.events.EventTarget);
 
-/**
-* Get boundaries of Entity
-* @return {pike.graphics.Rectangle}
-*/
-pike.core.Entity.prototype.getBounds = function(){
-	return new pike.graphics.Rectangle(this.x, this.y, this.w, this.h);
-};
-
-/** @inheritDoc */
-pike.core.Entity.prototype.disposeInternal = function() {
-	pike.core.Entity.superClass_.disposeInternal.call(this);
-	this.handler.dispose();
-};

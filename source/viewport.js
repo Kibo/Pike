@@ -12,12 +12,10 @@ goog.require('goog.events.EventHandler');
 
 /**
 * Creates a new Viewport.
-* @param {number} width
-* @param {number} height
 * @constructor
 * @extends {goog.events.EventTarget}
 */
-pike.core.Viewport = function( width, height ){
+pike.core.Viewport = function(){
 	goog.events.EventTarget.call(this);
 	
 	this.x = 0;
@@ -31,8 +29,7 @@ pike.core.Viewport = function( width, height ){
 	*/
 	this.handler = new goog.events.EventHandler(this);
 	
-	this._createElement();
-	this.setSize(width, height);		
+	this._createElement();		
 };
 
 goog.inherits(pike.core.Viewport, goog.events.EventTarget);

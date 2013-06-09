@@ -9,7 +9,9 @@ goog.provide('pike.layers.DirtyRectangleManager');
 goog.require('goog.events');
 goog.require('goog.events.EventTarget');
 goog.require('goog.events.EventHandler');
-
+goog.require('pike.events.NewEntity');
+goog.require('pike.events.RemoveEntity');
+goog.require('pike.core.Entity');
 
 /**
  * Create a new layer
@@ -28,19 +30,24 @@ pike.layers.Layer = function( name ){
 	*/
 	this.handler = new goog.events.EventHandler(this);
 	
+	this.entities_ = [];
 	this.screen_ = {};
 	this.offScreen_ = {}; 
 	
 	this.screen_.canvas = document.createElement("canvas");
+	this.screen_.canvas.width = 0;
+	this.screen_.canvas.height = 0;
 	this.screen_.canvas.style.position  = "absolute";
 	this.screen_.canvas.style.top  = "0";
 	this.screen_.canvas.style.left  = "0";        		
 	this.screen_.context = this.screen_.canvas.getContext('2d');
-	this.screen_.isDirty = true;
+	this.screen_.isDirty = false;
 	        		        	
-	this.offScreen_.canvas = document.createElement("canvas");        		       	
+	this.offScreen_.canvas = document.createElement("canvas");  
+	this.offScreen_.canvas.width = 0;
+	this.offScreen_.canvas.height = 0;
 	this.offScreen_.context = this.offScreen_.canvas.getContext('2d');
-	this.offScreen_.isDirty = true;  
+	this.offScreen_.isDirty = false;  
 };
 
 goog.inherits(pike.layers.Layer, goog.events.EventTarget);
@@ -75,6 +82,31 @@ pike.layers.Layer.prototype.getScreen = function(){
  */
 pike.layers.Layer.prototype.getOffScreen = function(){
 	return this.offScreen_;
+};
+
+/**
+ * Add a entity to the layer
+ * @param {pike.core.Entity} entity
+ * @fires {pike.events.NewEntity} newentity
+ */
+pike.layers.Layer.prototype.addEntity = function( entity ){
+	this.entities_.push( entity );
+	entity.layer = this;
+	this.dispatchEvent( new pike.events.NewEntity( entity.id, this) );
+	if(goog.DEBUG) console.log("[pike.core.Layer] newentity");
+};
+
+/**
+ * Remove entity
+ * @param {pike.core.Entity} entity
+ * @fires {pike.events.RemoveEntity} removeentity
+ */
+pike.layers.Layer.prototype.removeEntity = function( entity ){
+	entity.dispose();
+	goog.array.remove(this.entities_, entity);
+	delete entity.layer;
+	this.dispatchEvent( new pike.events.RemoveEntity( entity.id, this));
+	if(goog.DEBUG) console.log("[pike.core.Layer] removeentity");
 };
 
 //## DirtyRectangleManager ######################################

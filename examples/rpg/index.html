@@ -37,6 +37,8 @@
 		goog.require('pike.core.RenderManager');		
 		goog.require('pike.layers.Layer');		
 		goog.require('pike.core.Timer');
+		goog.require('pike.core.Entity');
+		goog.require('pike.components.Sprite');		
 	</script>
 	<script>
 		window.onload = function(){
@@ -51,8 +53,8 @@
 			function onImageLoaded(){				
 				
 				var timer = new pike.core.Timer();
-				var viewport = new pike.core.Viewport(800,600);
-				var gameWorld = new pike.core.GameWorld(800,600);
+				var viewport = new pike.core.Viewport();
+				var gameWorld = new pike.core.GameWorld();
 																		
 				var renderManager = new pike.core.RenderManager();
 				renderManager.handler.listen(viewport, pike.events.ChangeSize.EVENT_TYPE, goog.bind(renderManager.onViewportChangeSize, renderManager));
@@ -62,7 +64,11 @@
 				
 				renderManager.addLayer( new pike.layers.Layer("entities") );
 				
-			//	timer.start();
+				viewport.setSize(600, 400);
+				//timer.start();
+				
+				var ent = new pike.core.Entity( pike.components.Sprite )
+				ent.setLayer("sss");				
 			}				
 		}
 	</script>
