@@ -43,17 +43,6 @@ var testMarkDirty = function(){
 	assertNull( dm.getDirtyRectangle() );	
 };
 
-var testGetBounds = function(){
-	var dm = new pike.layers.DirtyManager();	
-	assertObjectEquals(new pike.graphics.Rectangle(0,0,0,0), dm.getBounds());
-	
-	dm.setSize(600,400);
-	assertObjectEquals(new pike.graphics.Rectangle(0, 0, 600, 400), dm.getBounds());
-	
-	dm.setPosition(10,20);
-	assertObjectEquals(new pike.graphics.Rectangle(10, 20, 600, 400), dm.getBounds());
-};
-
 var testGetHandler = function(){
 	var dm = new pike.layers.DirtyManager();	
 	assertTrue( dm.handler instanceof goog.events.EventHandler);
@@ -61,32 +50,32 @@ var testGetHandler = function(){
 
 var testOnViewportChangeSize = function() {
 	var dm = new pike.layers.DirtyManager();
-	assertTrue(dm.x == 0);
-	assertTrue(dm.y == 0);
-	assertTrue(dm.w == 0);
-	assertTrue(dm.h == 0);
+	assertTrue(dm.viewport_.x == 0);
+	assertTrue(dm.viewport_.y == 0);
+	assertTrue(dm.viewport_.w == 0);
+	assertTrue(dm.viewport_.h == 0);
 	
 	dm.onViewportChangeSize( new pike.events.ChangeSize( 0,0,150,250,null)  );
 	
-	assertTrue(dm.x == 0);
-	assertTrue(dm.y == 0);
-	assertTrue(dm.w == 150);
-	assertTrue(dm.h == 250);		
+	assertTrue(dm.viewport_.x == 0);
+	assertTrue(dm.viewport_.y == 0);
+	assertTrue(dm.viewport_.w == 150);
+	assertTrue(dm.viewport_.h == 250);		
 };
 
 var testOnViewportChangePosition = function() {
 	var dm = new pike.layers.DirtyManager();
-	assertTrue(dm.x == 0);
-	assertTrue(dm.y == 0);
-	assertTrue(dm.w == 0);
-	assertTrue(dm.h == 0);
+	assertTrue(dm.viewport_.x == 0);
+	assertTrue(dm.viewport_.y == 0);
+	assertTrue(dm.viewport_.w == 0);
+	assertTrue(dm.viewport_.h == 0);
 	
 	dm.onViewportChangePosition( new pike.events.ChangePosition( 0,0,150,250,null)  );
 	
-	assertTrue(dm.x == 150);
-	assertTrue(dm.y == 250);
-	assertTrue(dm.w == 0);
-	assertTrue(dm.h == 0);		
+	assertTrue(dm.viewport_.x == 150);
+	assertTrue(dm.viewport_.y == 250);
+	assertTrue(dm.viewport_.w == 0);
+	assertTrue(dm.viewport_.h == 0);		
 };
 
 function tearDown(){}

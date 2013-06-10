@@ -52,6 +52,8 @@ var testViewportChangePosition = function(){
 	var e = new pike.events.ChangePosition( 0, 0, 10, 20, null)
 	rm.onViewportChangePosition(e)
 	
+	assertObjectEquals( new pike.graphics.Rectangle(10,20,0,0), rm.viewport_ )
+	
 	assertTrue( layer.getScreen().canvas.width == 0);
 	assertTrue( layer.getScreen().canvas.height == 0);
 	assertTrue( layer.getScreen().isDirty);
@@ -70,6 +72,8 @@ var testViewportChangeSize = function(){
 	var e = new pike.events.ChangeSize( 0, 0, 100, 10, null)
 	rm.onViewportChangeSize(e)
 	
+	assertObjectEquals( new pike.graphics.Rectangle(0,0,100,10), rm.viewport_ )
+	
 	assertTrue( layer.getScreen().canvas.width == 100);
 	assertTrue( layer.getScreen().canvas.height == 10);
 	assertTrue( layer.getScreen().isDirty);
@@ -87,6 +91,8 @@ var testGameWorldChangeSize = function(){
 	var e = new pike.events.ChangeSize( 0, 0, 1000, 100, null)
 	rm.onGameWorldChangeSize(e)
 	
+	assertObjectEquals( new pike.graphics.Rectangle(0,0,1000,100), rm.gameWorld_ )
+	
 	assertTrue( layer.getScreen().canvas.width == 0);
 	assertTrue( layer.getScreen().canvas.height == 0);
 	assertFalse( layer.getScreen().isDirty);
@@ -95,13 +101,6 @@ var testGameWorldChangeSize = function(){
 	assertTrue( layer.getOffScreen().canvas.height == 100);
 	assertTrue( layer.getOffScreen().isDirty);
 };
-
-
-
-
-
-
-
 
 function tearDown(){}
 </script>

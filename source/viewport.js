@@ -29,7 +29,7 @@ pike.core.Viewport = function(){
 	*/
 	this.handler = new goog.events.EventHandler(this);
 	
-	this._createElement();		
+	this.createElement_();		
 };
 
 goog.inherits(pike.core.Viewport, goog.events.EventTarget);
@@ -106,7 +106,7 @@ pike.core.Viewport.prototype.centerOn = function( rectangle, boundary ){
  * Create DOM element for Viewport
  * @private
  */
-pike.core.Viewport.prototype._createElement = function(){
+pike.core.Viewport.prototype.createElement_ = function(){
 	this._DOMElement = document.getElementById( pike.core.Viewport.ELEMENT_ID );	
 	if(!this._DOMElement){
 		this._DOMElement = document.createElement("div");
@@ -117,5 +117,13 @@ pike.core.Viewport.prototype._createElement = function(){
 	}
 	
 	this._DOMElement.style.position  = "relative";		
+};
+
+/**
+ * On add new layer handler
+ * @param {pike.events.NewLayer} e
+ */
+pike.core.Viewport.prototype.onAddNewLayer = function(e){
+	this.getDOMElement().appendChild( e.layer.getScreen().canvas );
 };
 									   

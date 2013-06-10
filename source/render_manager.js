@@ -14,12 +14,10 @@ goog.require('goog.array');
 /**
 * Render manager 
 * manages layers and render system
-* @param {pike.core.Viewport} viewport
-* @param {pike.core.GameWorld} gameWorld
 * @constructor
 * @extends {goog.events.EventTarget}
 */
-pike.core.RenderManager = function( viewport, gameWorld, timer ){
+pike.core.RenderManager = function(){
 	goog.events.EventTarget.call(this);
 	
 	/**
@@ -27,18 +25,10 @@ pike.core.RenderManager = function( viewport, gameWorld, timer ){
 	* @protected
 	*/
 	this.handler = new goog.events.EventHandler(this);
-	this.layers_ = [];
+	this.layers_ = [];		
 	
-	this.viewport = viewport;	
-	this.handler.listen(this.viewport, pike.events.ChangeSize.EVENT_TYPE, goog.bind(this.onViewportChangeSize, this));
-	this.handler.listen(this.viewport, pike.events.ChangePosition.EVENT_TYPE, goog.bind(this.onViewportChangePosition, this));
-		
-	this.gameWorld = gameWorld;
-	this.gameWorld.handler.listen(this.viewport, pike.events.ChangeSize.EVENT_TYPE, goog.bind(this.gameWorld.onViewportChangeSize, this.gameWorld));
-	this.handler.listen(this.gameWorld, pike.events.ChangeSize.EVENT_TYPE, goog.bind(this.onGameWorldChangeSize, this));
-		
-	this.timer = timer;
-	this.handler.listen(this.timer, pike.events.Render.EVENT_TYPE, goog.bind(this.onRender, this));	
+	this.viewport_ = new pike.graphics.Rectangle(0, 0, 0, 0);
+	this.gameWorld_ = new pike.graphics.Rectangle(0, 0, 0, 0);
 };
 
 goog.inherits(pike.core.RenderManager, goog.events.EventTarget);
@@ -61,8 +51,9 @@ pike.core.RenderManager.prototype.getLayer = function( name ){
  * @param {pike.layers.Layer} layer
  */
 pike.core.RenderManager.prototype.addLayer = function( layer ){
-	this.layers_.push(layer);	
-	this.viewport.getDOMElement().appendChild(layer.getScreen().canvas);	
+	this.layers_.push(layer);		
+	if(goog.DEBUG) console.log("[pike.core.RenderManager] newlayer " + layer.name);
+	this.dispatchEvent( new pike.events.NewLayer(layer, this) );	
 };
 
 /**
@@ -70,6 +61,8 @@ pike.core.RenderManager.prototype.addLayer = function( layer ){
  * @param {pike.events.ViewportChangePosition} e
  */
 pike.core.RenderManager.prototype.onViewportChangePosition = function(e){
+	this.viewport_.x = e.x;
+	this.viewport_.y = e.y;
 	for(var idx = 0; idx < this.layers_.length; idx++){
 		var screen = this.layers_[idx].getScreen();		
 		screen.isDirty = true;		
@@ -81,6 +74,8 @@ pike.core.RenderManager.prototype.onViewportChangePosition = function(e){
  * @param {pike.events.ViewportChangeSize} e
  */
 pike.core.RenderManager.prototype.onViewportChangeSize = function(e){
+	this.viewport_.w = e.w;
+	this.viewport_.h = e.h;
 	for(var idx = 0; idx < this.layers_.length; idx++){
 		var screen = this.layers_[idx].getScreen();
 		screen.canvas.width = e.w;
@@ -94,6 +89,8 @@ pike.core.RenderManager.prototype.onViewportChangeSize = function(e){
  * @param {pike.events.GameWorldChangeSize} e
  */
 pike.core.RenderManager.prototype.onGameWorldChangeSize = function(e){
+	this.gameWorld_.w = e.w;
+	this.gameWorld_.h = e.h;
 	for(var idx = 0; idx < this.layers_.length; idx++){
 		var offScreen = this.layers_[idx].getOffScreen();
 		offScreen.canvas.width = e.w;
@@ -107,7 +104,7 @@ pike.core.RenderManager.prototype.onGameWorldChangeSize = function(e){
  * @param {pike.layers.Layer} layer
  * @private
  */
-pike.core.RenderManager.prototype.render_ = function( layer ){
+pike.core.RenderManager.prototype.render_ = function( layer ){	
 	var screen = layer.getScreen();
 	var offScreen = layer.getOffScreen();
 		
@@ -123,8 +120,7 @@ pike.core.RenderManager.prototype.render_ = function( layer ){
 			);
 			
 			layer.dispatchEvent( new pike.events.Render( new Date().getTime(), this));
-			
-			
+						
 			if(!screen.isDirty){
 				screen.context.clearRect(
 					layer.dirtyManager.getDirtyRectangle().x,
@@ -140,8 +136,8 @@ pike.core.RenderManager.prototype.render_ = function( layer ){
 						layer.dirtyManager.getDirtyRectangle().w,
 						layer.dirtyManager.getDirtyRectangle().h,
 						
-						~~(layer.dirtyManager.getDirtyRectangle().x - this.viewport.x),
-						~~(layer.dirtyManager.getDirtyRectangle().y - this.viewport.y),
+						~~(layer.dirtyManager.getDirtyRectangle().x - this.viewport_.x),
+						~~(layer.dirtyManager.getDirtyRectangle().y - this.viewport_.y),
 						layer.dirtyManager.getDirtyRectangle().w,
 						layer.dirtyManager.getDirtyRectangle().h						
 				);										
@@ -152,7 +148,7 @@ pike.core.RenderManager.prototype.render_ = function( layer ){
 		
 	}else if( offScreen.isDirty ){
 		
-		offScreen.context.clearRect( 0, 0, this.gameWorld.w, this.gameWorld.h );
+		offScreen.context.clearRect( 0, 0, this.gameWorld_.w, this.gameWorld_.h );
 		layer.dispatchEvent( new pike.events.Render( new Date().getTime(), this) );
 				
 		offScreen.isDirty = false;
@@ -161,11 +157,11 @@ pike.core.RenderManager.prototype.render_ = function( layer ){
 	}
 	
 	if(layer.getScreen().isDirty){		 	
-		screen.context.clearRect( 0, 0, this.viewport.w, this.viewport.h );
+		screen.context.clearRect( 0, 0, this.viewport_.w, this.viewport_.h );
 		screen.context.drawImage(
 				layer.getOffScreen().canvas,
-				this.viewport.x, this.viewport.y, this.viewport.w, this.viewport.h,
-				0, 0, this.viewport.w, this.viewport.h
+				this.viewport_.x, this.viewport_.y, this.viewport_.w, this.viewport_.h,
+				0, 0, this.viewport_.w, this.viewport_.h
 		);					
 		screen.isDirty = false;
 		if(goog.DEBUG) console.log("[pike.core.RenderManager] " + layer.name + " redraw screen");

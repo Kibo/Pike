@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+<head>
+<title>Test Case</title>
+</head>
+<body>
+<script src="../../closure-library/closure/goog/base.js"></script>
+<script src="../source/deps.js"></script>
+<script>
+	goog.require('goog.testing.ContinuationTestCase');	
+	goog.require('goog.testing.jsunit');	
+</script>
+<script>
+	goog.require('pike.core.RenderManager');
+	goog.require('pike.layers.Layer');
+	goog.require('pike.events.NewLayer');
+</script>
+<script>
+var testCase = new goog.testing.ContinuationTestCase('RenderManager Test Case');
+testCase.autoDiscoverTests();
+
+// Standalone Closure Test Runner.
+if (typeof G_testRunner != 'undefined') {
+  G_testRunner.initialize(testCase);
+}
+function setUpPage(){}
+function setUp(){}
+
+function testNewLayer() {
+	var rm = new pike.core.RenderManager();
+	var layer = new pike.layers.Layer("Entities");
+		
+	var event = null;
+    goog.events.listen(rm, pike.events.NewLayer.EVENT_TYPE, function(e) {
+    	event = e;
+    });
+		  
+    waitForEvent(rm, pike.events.NewLayer.EVENT_TYPE, function() {
+    	assertTrue( event instanceof pike.events.NewLayer);
+    	assertTrue( event.target === rm);
+    	assertEquals(layer, event.layer);    
+    });
+         
+    rm.addLayer( layer )
+};
+
+function tearDown(){}
+
+</script>
+</body>
+</html>

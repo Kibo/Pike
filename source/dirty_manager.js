@@ -6,6 +6,7 @@
 goog.provide('pike.layers.DirtyManager');
 
 goog.require('goog.events.EventTarget');
+goog.require('pike.graphics.Rectangle');
 
 /**
  * Create a new DirtyManager
@@ -13,10 +14,9 @@ goog.require('goog.events.EventTarget');
  * @constructor
  */
 pike.layers.DirtyManager = function( allDirtyThreshold ){
-	this.x = 0;
-	this.y = 0;
-	this.w = 0;
-	this.h = 0;
+	
+	
+	this.viewport_ = new pike.graphics.Rectangle(0, 0, 0, 0);
 	
 	/**
 	* @type {!goog.events.EventHandler}
@@ -29,7 +29,7 @@ pike.layers.DirtyManager = function( allDirtyThreshold ){
 	
 	this.allDirtyThreshold_ = allDirtyThreshold == undefined ? .5 : allDirtyThreshold;
 	
-	// true when we have reached the trheshold
+	// true when we have reached the threshold
 	this.allDirty_ = true;	
 };
 
@@ -46,7 +46,7 @@ pike.layers.DirtyManager.prototype.getDirtyRectangle = function(){
  */
 pike.layers.DirtyManager.prototype.markAllDirty = function(){
 	this.allDirty_ = true;
-	this.dirtyRect_ = this.getBounds();
+	this.dirtyRect_ = this.viewport_.copy();
 };
 
 /**
@@ -59,7 +59,7 @@ pike.layers.DirtyManager.prototype.markDirty = function( rect ){
 	}
 		
 	// We are only interested in the rectangles that intersect the viewport
-	rect = this.getBounds().intersection( rect );	
+	rect = this.viewport_.intersection( rect );	
 	
 	if (!rect) {
 		return;
@@ -72,7 +72,7 @@ pike.layers.DirtyManager.prototype.markDirty = function( rect ){
 	}
 	
 	// Check for threshold. If it is reached, mark the whole screen dirty
-	if (this.dirtyRect_.w * this.dirtyRect_.h > this.allDirtyThreshold_ * this.w * this.h){	
+	if (this.dirtyRect_.w * this.dirtyRect_.h > this.allDirtyThreshold_ * this.viewport_.w * this.viewport_.h){	
 			this.markAllDirty();
 	}	
 };
@@ -94,21 +94,13 @@ pike.layers.DirtyManager.prototype.clear = function(){
 };
 
 /**
-* Get boundaries
-* @return {pike.graphics.Rectangle}
-*/
-pike.layers.DirtyManager.prototype.getBounds = function(){
-	return new pike.graphics.Rectangle(this.x, this.y, this.w, this.h);
-};
-
-/**
  * Set size
  * @param {number} width
  * @param {number} height
  */
 pike.layers.DirtyManager.prototype.setSize = function( width, height ){
-	this.w = width;
-	this.h = height;
+	this.viewport_.w = width;
+	this.viewport_.h = height;
 	this.markAllDirty();	
 };
 
@@ -118,8 +110,8 @@ pike.layers.DirtyManager.prototype.setSize = function( width, height ){
  * @param {number} y
  */
 pike.layers.DirtyManager.prototype.setPosition = function( x, y ){
-	this.x = x;
-	this.y = y;
+	this.viewport_.x = x;
+	this.viewport_.y = y;
 };
 
 /**

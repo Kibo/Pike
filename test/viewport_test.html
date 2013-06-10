@@ -16,6 +16,8 @@
 	goog.require('goog.events.EventHandler');
 	goog.require('pike.events.ChangePosition');
 	goog.require('pike.events.ChangeSize');
+	goog.require('pike.events.NewLayer');
+	goog.require('pike.layers.Layer');
 </script>
 <script>
 function setUpPage(){}
@@ -62,6 +64,20 @@ var testGetBounds = function(){
 			 && viewport.getBounds().y == 0 
 			 && viewport.getBounds().w == 200 
 			 && viewport.getBounds().h == 10);
+};
+
+var testOnAddNewLayer = function(){
+	var viewport = new pike.core.Viewport();
+	assertFalse(viewport.getDOMElement().hasChildNodes());
+	
+	var layer = new pike.layers.Layer();	
+	var e = new pike.events.NewLayer( layer, null );
+	
+	viewport.onAddNewLayer( e );
+	
+	assertTrue(viewport.getDOMElement().hasChildNodes());	
+	assertTrue(viewport.getDOMElement().querySelector('canvas').width == 0);
+	assertTrue(viewport.getDOMElement().querySelector('canvas').height == 0);
 };
 
 function tearDown(){}

@@ -10,6 +10,8 @@ goog.provide('pike.events.Render');
 goog.provide('pike.events.NewEntity');
 goog.provide('pike.events.RemoveEntity');
 
+goog.provide('pike.events.NewLayer');
+
 goog.require('goog.events.Event');
 goog.require('goog.events.EventTarget');
 
@@ -193,7 +195,26 @@ goog.inherits( pike.events.Progress, goog.events.Event );
  */
 pike.events.Progress.EVENT_TYPE = "progress";
 
+//## NewLayer #################################################################################
+/**
+* @param {pike.layers.Layer} layer
+* @param {goog.events.EventTarget} target
+* @constructor 
+* @extends {goog.events.Event}
+*/
+pike.events.NewLayer = function( layer, target){
+	goog.events.Event.call(this, pike.events.NewLayer.EVENT_TYPE, target);	
+	this.layer = layer;	
+};
 
+goog.inherits( pike.events.NewLayer, goog.events.Event );
+
+/**
+ * Event type
+ * @const
+ * @type {string}
+ */
+pike.events.NewLayer.EVENT_TYPE = "newlayer";
 
 
 
