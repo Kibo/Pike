@@ -45,8 +45,8 @@ pike.core.GameWorld.prototype.setSize = function( width, height ){
 	this.w = width;
 	this.h = height;
 	
-	this.dispatchEvent( new pike.events.ChangeSize(oldW, oldH, this.w, this.h, this) );
 	if(goog.DEBUG) console.log("[pike.core.GameWorld] changesize");
+	this.dispatchEvent( new pike.events.ChangeSize(oldW, oldH, this.w, this.h, this) );
 };
 
 /**
@@ -55,6 +55,14 @@ pike.core.GameWorld.prototype.setSize = function( width, height ){
 */
 pike.core.GameWorld.prototype.getBounds = function(){
 	return new pike.graphics.Rectangle(this.x, this.y, this.w, this.h);
+};
+
+/**
+ * Viewport change size handler
+ * @param {pike.events.ChangeSize} e
+ */
+pike.core.GameWorld.prototype.onViewportChangeSize = function(e){
+	this.setSize( Math.max(this.w, e.w), Math.max(this.h, e.h));
 };
 
 

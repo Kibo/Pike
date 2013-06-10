@@ -15,6 +15,10 @@
 	goog.require('pike.layers.Layer');	
 	goog.require('pike.events.ChangeSize');	
 	goog.require('pike.events.ChangePosition');	
+	
+	goog.require('pike.core.Viewport');	
+	goog.require('pike.core.GameWorld');
+	goog.require('pike.core.Timer');
 		
 </script>
 <script>
@@ -22,26 +26,26 @@ function setUpPage(){}
 function setUp(){}
 
 var testGetHandler = function(){
-	var rm = new pike.core.RenderManager();	
+	var rm = new pike.core.RenderManager(new pike.core.Viewport, new pike.core.GameWorld, new pike.core.Timer);	
 	assertTrue( rm.handler instanceof goog.events.EventHandler);
 };
 
 var testAddLayer = function(){
-	var rm = new pike.core.RenderManager();	
+	var rm = new pike.core.RenderManager(new pike.core.Viewport, new pike.core.GameWorld, new pike.core.Timer);	
 	var layer = new pike.layers.Layer("Entities");
 	rm.addLayer( layer );
 	assertEquals( layer, rm.layers_[0]);
 };
 
 var testGetLayer = function(){
-	var rm = new pike.core.RenderManager();	
+	var rm = new pike.core.RenderManager(new pike.core.Viewport, new pike.core.GameWorld, new pike.core.Timer);	
 	var layer = new pike.layers.Layer("Entities");
 	rm.addLayer( layer );
 	assertEquals( layer,  rm.getLayer("Entities") );
 };
 
 var testViewportChangePosition = function(){
-	var rm = new pike.core.RenderManager();	
+	var rm = new pike.core.RenderManager(new pike.core.Viewport, new pike.core.GameWorld, new pike.core.Timer);	
 	var layer = new pike.layers.Layer("Entities");
 	rm.addLayer( layer );
 			
@@ -59,7 +63,7 @@ var testViewportChangePosition = function(){
 };
 
 var testViewportChangeSize = function(){
-	var rm = new pike.core.RenderManager();	
+	var rm = new pike.core.RenderManager(new pike.core.Viewport, new pike.core.GameWorld, new pike.core.Timer);		
 	var layer = new pike.layers.Layer("Entities");
 	rm.addLayer( layer );
 			
@@ -76,7 +80,7 @@ var testViewportChangeSize = function(){
 };
 
 var testGameWorldChangeSize = function(){
-	var rm = new pike.core.RenderManager();	
+	var rm = new pike.core.RenderManager(new pike.core.Viewport, new pike.core.GameWorld, new pike.core.Timer);		
 	var layer = new pike.layers.Layer("Entities");
 	rm.addLayer( layer );
 		

@@ -4,7 +4,6 @@
 * @license Dual licensed under the MIT or GPL licenses.
 */
 goog.provide('pike.layers.Layer');
-goog.provide('pike.layers.DirtyRectangleManager');
 
 goog.require('goog.events');
 goog.require('goog.events.EventTarget');
@@ -54,7 +53,7 @@ goog.inherits(pike.layers.Layer, goog.events.EventTarget);
 
 /**
  * Set dirty manager 
- * @param {pike.layers.DirtyRectangleManager} dirtyManager
+ * @param {pike.layers.DirtyManager} dirtyManager
  */
 pike.layers.Layer.prototype.setDirtyManager = function( dirtyManager ){
 	this.dirtyManager = dirtyManager;
@@ -109,13 +108,8 @@ pike.layers.Layer.prototype.removeEntity = function( entity ){
 	if(goog.DEBUG) console.log("[pike.core.Layer] removeentity");
 };
 
-//## DirtyRectangleManager ######################################
 
-/**
- * Create a new DirtyRectangleManager
- * @constructor
- */
-pike.layers.DirtyRectangleManager = function(){};
+
 
 
 

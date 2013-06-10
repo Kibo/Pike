@@ -14,10 +14,12 @@ goog.require('goog.array');
 /**
 * Render manager 
 * manages layers and render system
+* @param {pike.core.Viewport} viewport
+* @param {pike.core.GameWorld} gameWorld
 * @constructor
 * @extends {goog.events.EventTarget}
 */
-pike.core.RenderManager = function(){
+pike.core.RenderManager = function( viewport, gameWorld, timer ){
 	goog.events.EventTarget.call(this);
 	
 	/**
@@ -25,8 +27,18 @@ pike.core.RenderManager = function(){
 	* @protected
 	*/
 	this.handler = new goog.events.EventHandler(this);
+	this.layers_ = [];
 	
-	this.layers_ = [];	
+	this.viewport = viewport;	
+	this.handler.listen(this.viewport, pike.events.ChangeSize.EVENT_TYPE, goog.bind(this.onViewportChangeSize, this));
+	this.handler.listen(this.viewport, pike.events.ChangePosition.EVENT_TYPE, goog.bind(this.onViewportChangePosition, this));
+		
+	this.gameWorld = gameWorld;
+	this.gameWorld.handler.listen(this.viewport, pike.events.ChangeSize.EVENT_TYPE, goog.bind(this.gameWorld.onViewportChangeSize, this.gameWorld));
+	this.handler.listen(this.gameWorld, pike.events.ChangeSize.EVENT_TYPE, goog.bind(this.onGameWorldChangeSize, this));
+		
+	this.timer = timer;
+	this.handler.listen(this.timer, pike.events.Render.EVENT_TYPE, goog.bind(this.onRender, this));	
 };
 
 goog.inherits(pike.core.RenderManager, goog.events.EventTarget);
@@ -49,7 +61,8 @@ pike.core.RenderManager.prototype.getLayer = function( name ){
  * @param {pike.layers.Layer} layer
  */
 pike.core.RenderManager.prototype.addLayer = function( layer ){
-	this.layers_.push(layer);
+	this.layers_.push(layer);	
+	this.viewport.getDOMElement().appendChild(layer.getScreen().canvas);	
 };
 
 /**
@@ -95,8 +108,68 @@ pike.core.RenderManager.prototype.onGameWorldChangeSize = function(e){
  * @private
  */
 pike.core.RenderManager.prototype.render_ = function( layer ){
-	console.log("render layer " + layer.name);
-	//TODO
+	var screen = layer.getScreen();
+	var offScreen = layer.getOffScreen();
+		
+	if(layer.hasDirtyManager()){
+		
+		if(!layer.dirtyManager.isClean()){
+			
+			offScreen.context.clearRect(
+					layer.dirtyManager.getDirtyRectangle().x,
+					layer.dirtyManager.getDirtyRectangle().y,
+					layer.dirtyManager.getDirtyRectangle().w,
+					layer.dirtyManager.getDirtyRectangle().h
+			);
+			
+			layer.dispatchEvent( new pike.events.Render( new Date().getTime(), this));
+			
+			
+			if(!screen.isDirty){
+				screen.context.clearRect(
+					layer.dirtyManager.getDirtyRectangle().x,
+					layer.dirtyManager.getDirtyRectangle().y,
+					layer.dirtyManager.getDirtyRectangle().w,
+					layer.dirtyManager.getDirtyRectangle().h						
+				);
+				
+				screen.context.drawImage(
+						offScreen.canvas,
+						layer.dirtyManager.getDirtyRectangle().x,
+						layer.dirtyManager.getDirtyRectangle().y,
+						layer.dirtyManager.getDirtyRectangle().w,
+						layer.dirtyManager.getDirtyRectangle().h,
+						
+						~~(layer.dirtyManager.getDirtyRectangle().x - this.viewport.x),
+						~~(layer.dirtyManager.getDirtyRectangle().y - this.viewport.y),
+						layer.dirtyManager.getDirtyRectangle().w,
+						layer.dirtyManager.getDirtyRectangle().h						
+				);										
+			}
+								
+			layer.dirtyManager.clear();			
+		}
+		
+	}else if( offScreen.isDirty ){
+		
+		offScreen.context.clearRect( 0, 0, this.gameWorld.w, this.gameWorld.h );
+		layer.dispatchEvent( new pike.events.Render( new Date().getTime(), this) );
+				
+		offScreen.isDirty = false;
+		screen.isDirty = true;
+		if(goog.DEBUG) console.log("[pike.core.RenderManager] " + layer.name + " redraw offScreen");		
+	}
+	
+	if(layer.getScreen().isDirty){		 	
+		screen.context.clearRect( 0, 0, this.viewport.w, this.viewport.h );
+		screen.context.drawImage(
+				layer.getOffScreen().canvas,
+				this.viewport.x, this.viewport.y, this.viewport.w, this.viewport.h,
+				0, 0, this.viewport.w, this.viewport.h
+		);					
+		screen.isDirty = false;
+		if(goog.DEBUG) console.log("[pike.core.RenderManager] " + layer.name + " redraw screen");
+	}	
 };
 
 /**

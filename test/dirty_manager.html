@@ -1,0 +1,95 @@
+<!doctype html>
+<html>
+<head>
+<title>Test Case</title>
+</head>
+<body>
+<script src="../../closure-library/closure/goog/base.js"></script>
+<script src="../source/deps.js"></script>
+<script>
+	goog.require('goog.testing.ContinuationTestCase');	
+	goog.require('goog.testing.jsunit');	
+</script>
+<script>
+	goog.require('pike.layers.DirtyManager');
+	goog.require('pike.graphics.Rectangle');
+	goog.require('pike.events.ChangeSize');
+	goog.require('pike.events.ChangePosition');
+</script>
+<script>
+function setUpPage(){}
+function setUp(){}
+
+var testMarkDirty = function(){
+	var dm = new pike.layers.DirtyManager();	
+	dm.setPosition(100,200);
+	dm.setSize(800,600);
+	dm.clear();
+		
+	dm.markDirty( new pike.graphics.Rectangle(0, 0, 500, 400))
+	assertObjectEquals (new pike.graphics.Rectangle(100, 200, 400, 200), dm.getDirtyRectangle());
+	
+	dm.markDirty( new pike.graphics.Rectangle(0, 0, 500, 500))
+	assertObjectEquals (new pike.graphics.Rectangle(100, 200, 400, 300), dm.getDirtyRectangle());
+	
+	dm.markDirty( new pike.graphics.Rectangle(100, 200, 800, 500))
+	assertObjectEquals (new pike.graphics.Rectangle(100, 200, 800, 600), dm.getDirtyRectangle());
+	
+	assertTrue( dm.allDirty_ )
+	
+	dm.clear();
+	
+	assertFalse( dm.allDirty_ )
+	assertNull( dm.getDirtyRectangle() );	
+};
+
+var testGetBounds = function(){
+	var dm = new pike.layers.DirtyManager();	
+	assertObjectEquals(new pike.graphics.Rectangle(0,0,0,0), dm.getBounds());
+	
+	dm.setSize(600,400);
+	assertObjectEquals(new pike.graphics.Rectangle(0, 0, 600, 400), dm.getBounds());
+	
+	dm.setPosition(10,20);
+	assertObjectEquals(new pike.graphics.Rectangle(10, 20, 600, 400), dm.getBounds());
+};
+
+var testGetHandler = function(){
+	var dm = new pike.layers.DirtyManager();	
+	assertTrue( dm.handler instanceof goog.events.EventHandler);
+};
+
+var testOnViewportChangeSize = function() {
+	var dm = new pike.layers.DirtyManager();
+	assertTrue(dm.x == 0);
+	assertTrue(dm.y == 0);
+	assertTrue(dm.w == 0);
+	assertTrue(dm.h == 0);
+	
+	dm.onViewportChangeSize( new pike.events.ChangeSize( 0,0,150,250,null)  );
+	
+	assertTrue(dm.x == 0);
+	assertTrue(dm.y == 0);
+	assertTrue(dm.w == 150);
+	assertTrue(dm.h == 250);		
+};
+
+var testOnViewportChangePosition = function() {
+	var dm = new pike.layers.DirtyManager();
+	assertTrue(dm.x == 0);
+	assertTrue(dm.y == 0);
+	assertTrue(dm.w == 0);
+	assertTrue(dm.h == 0);
+	
+	dm.onViewportChangePosition( new pike.events.ChangePosition( 0,0,150,250,null)  );
+	
+	assertTrue(dm.x == 150);
+	assertTrue(dm.y == 250);
+	assertTrue(dm.w == 0);
+	assertTrue(dm.h == 0);		
+};
+
+function tearDown(){}
+</script>
+</body>
+</html>

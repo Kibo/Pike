@@ -13,26 +13,65 @@ goog.require('goog.events.EventHandler');
  */
 pike.components.Sprite = function(){
 	
-	this.x = 0;
-	this.y = 0;
-	this.w = 0;
-	this.h = 0;	
+	this.x = 100;
+	this.y = 100;
+	this.w = 32;
+	this.h = 32;
 	
-	this.init = function(){ 
-		console.log('init');
+	/**
+	 * Set sprite
+	 * 
+	 * @param {Object} image
+	 * @param {number} sx - x position on source image
+	 * @param {number} sy - y position on source image
+	 * @param {number} sw - width on source image
+	 * @param {number} sh - height on source image
+	 * @param {number} numberOfFrames
+	 * @param {numner} time - ms
+	 * @return this
+	 */
+	this.setSprite = function( image, sx, sy, sw, sh, numberOfFrames, time ){
+		this.spriteSource={x:sx, y:sy, w:sw, h:sh};
+		this.spriteSource.image = image;		
+		this.spriteSource.numberOfFrames = numberOfFrames ? numberOfFrames : 1;
+		this.spriteSource.currentFrame = 0;
+		//TODO
+						
+		return this;
 	};
 	
-	this.setLayer = function(name){
-		console.log(name);
-	}; 
-	this.onSpriteRender = function(e){
-		console.log('render');
-	};
+	/**
+	 * On update handler
+	 * @param {pike.events.Update} e
+	 */
 	this.onSpriteUpdate = function(e){
-		console.log('update');
+		//TODO
+		this.setDirty(this.getBounds());		
 	};
-		
-	this.init();	
+	
+	/**
+	 * On render handler
+	 * @param {pike.events.Render} e
+	 */
+	this.onSpriteRender = function(e){		
+		this.layer.getOffScreen().context.drawImage(
+				this.spriteSource.image, 
+				this.spriteSource.x, this.spriteSource.y, this.spriteSource.w, this.spriteSource.h,
+				~~this.x, ~~this.y, this.w, this.h				
+		);			
+	};
+	
+	/**
+	 * Set dirty ares
+	 * @param {{pike.graphics.Rectangle} rect
+	 */
+	this.setDirty = function(rect){
+		if(this.layer.hasDirtyManager()){
+			this.layer.dirtyManager.markDirty( rect );			
+		}else{		
+			this.layer.getOffScreen().isDirty = true;
+		}
+	};
 };
 
 

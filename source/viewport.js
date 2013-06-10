@@ -55,9 +55,9 @@ pike.core.Viewport.prototype.setSize = function( width, height ){
 	
 	this._DOMElement.style.width = this.w + "px";
 	this._DOMElement.style.height = this.h + "px";
-		
-	this.dispatchEvent( new pike.events.ChangeSize(oldW, oldH, this.w, this.h, this) );
+	
 	if(goog.DEBUG) console.log("[pike.core.Viewport] changesize");
+	this.dispatchEvent( new pike.events.ChangeSize(oldW, oldH, this.w, this.h, this) );	
 };
 
 /**
@@ -72,8 +72,8 @@ pike.core.Viewport.prototype.setPosition = function( x, y ){
 	this.x = x;
 	this.y = y;
 	
-	this.dispatchEvent(new pike.events.ChangePosition(oldX, oldY, this.x, this.y, this));
 	if(goog.DEBUG) console.log("[pike.core.Viewport] changeposition");
+	this.dispatchEvent(new pike.events.ChangePosition(oldX, oldY, this.x, this.y, this));	
 };
 
 /**
