@@ -1,0 +1,123 @@
+<!doctype html>
+<html>
+<head>
+<title>Test Case</title>
+</head>
+<body>
+<script src="../../closure-library/closure/goog/base.js"></script>
+<script src="../source/deps.js"></script>
+<script>
+	goog.require('goog.testing.ContinuationTestCase');	
+	goog.require('goog.testing.jsunit');	
+</script>
+<script>
+	goog.require('pike.core.Stage');
+	goog.require('pike.layers.Layer');
+	goog.require('pike.graphics.Rectangle');
+</script>
+<script>
+function setUpPage(){}
+function setUp(){}
+
+var testCreate = function() {
+	var stage = new pike.core.Stage(800,10);
+	var element = document.getElementById( pike.core.Stage.ELEMENT_ID );
+	assertNotNull( element );
+	assertEquals( element, stage.getRootElement());
+	assertTrue( element.getAttribute("id") === pike.core.Stage.ELEMENT_ID );
+	
+	assertObjectEquals( new pike.graphics.Rectangle(0,0,800,10), stage.viewport_ );
+	assertObjectEquals( new pike.graphics.Rectangle(0,0,800,10), stage.gameWorld_ );
+};
+
+var testGetHandler = function(){
+	var stage = new pike.core.Stage(800,10);	
+	assertTrue( stage.handler instanceof goog.events.EventHandler);
+};
+
+var testViewportSize = function() {
+	var stage = new pike.core.Stage(800,10);
+	stage.setViewportSize(900,20);
+	
+	assertObjectEquals( new pike.graphics.Rectangle(0,0,900,20), stage.viewport_ );
+	assertObjectEquals( new pike.graphics.Rectangle(0,0,900,20), stage.gameWorld_ );
+};
+
+var testViewportPosition = function() {
+	var stage = new pike.core.Stage(800,10);
+	stage.setViewportPosition(10,20);
+	
+	assertObjectEquals( new pike.graphics.Rectangle(10,20,800,10), stage.viewport_ );
+	assertObjectEquals( new pike.graphics.Rectangle(0,0,800,10), stage.gameWorld_ );
+};
+
+var testGameworldSize = function() {
+	var stage = new pike.core.Stage(800,10);
+	stage.setGameWorldSize(900,20);
+	
+	assertObjectEquals( new pike.graphics.Rectangle(0,0,800,10), stage.viewport_ );
+	assertObjectEquals( new pike.graphics.Rectangle(0,0,900,20), stage.gameWorld_ );	
+	
+	stage.setViewportSize(800,15);
+	stage.setViewportPosition(10,20);
+	
+	assertObjectEquals( new pike.graphics.Rectangle(10,20,800,15), stage.viewport_ );
+	assertObjectEquals( new pike.graphics.Rectangle(0,0,900,20), stage.gameWorld_ );
+	
+};
+
+var testGetLayer = function() {
+	var stage = new pike.core.Stage(800,10);
+	var layer = new pike.layers.Layer("Entities");
+	stage.addLayer(layer);
+	assertEquals(layer, stage.getLayer("Entities") )
+}; 
+
+var testAddNewLayerSize = function() {
+	var stage = new pike.core.Stage(800,10);
+	var layer = new pike.layers.Layer("Entities");
+	stage.addLayer(layer);
+		
+	assertTrue(stage.getLayer("Entities").getScreen().canvas.width == 800);
+	assertTrue(stage.getLayer("Entities").getScreen().canvas.height == 10);	
+	assertTrue(stage.getLayer("Entities").getScreen().isDirty);
+	
+	assertTrue(stage.getLayer("Entities").getOffScreen().canvas.width == 800);
+	assertTrue(stage.getLayer("Entities").getOffScreen().canvas.height == 10);	
+	assertTrue(stage.getLayer("Entities").getOffScreen().isDirty);
+	
+	stage.setViewportSize(810,15);
+	
+	assertTrue(stage.getLayer("Entities").getScreen().canvas.width == 810);
+	assertTrue(stage.getLayer("Entities").getScreen().canvas.height == 15);	
+	assertTrue(stage.getLayer("Entities").getScreen().isDirty);
+	
+	assertTrue(stage.getLayer("Entities").getOffScreen().canvas.width == 810);
+	assertTrue(stage.getLayer("Entities").getOffScreen().canvas.height == 15);	
+	assertTrue(stage.getLayer("Entities").getOffScreen().isDirty);
+	
+	stage.setGameWorldSize(900,20);
+	
+	assertTrue(stage.getLayer("Entities").getScreen().canvas.width == 810);
+	assertTrue(stage.getLayer("Entities").getScreen().canvas.height == 15);	
+	assertTrue(stage.getLayer("Entities").getScreen().isDirty);
+	
+	assertTrue(stage.getLayer("Entities").getOffScreen().canvas.width == 900);
+	assertTrue(stage.getLayer("Entities").getOffScreen().canvas.height == 20);	
+	assertTrue(stage.getLayer("Entities").getOffScreen().isDirty);		
+};
+
+var testAddNewLayerElement = function() {
+	var stage = new pike.core.Stage(800,10);
+	var layer = new pike.layers.Layer("Entities");
+	stage.addLayer(layer);
+	
+	assertTrue(stage.getRootElement().hasChildNodes());	
+	assertTrue(stage.getRootElement().querySelector('canvas').width == 800);
+	assertTrue(stage.getRootElement().querySelector('canvas').height == 10);	
+}
+
+function tearDown(){}
+</script>
+</body>
+</html>

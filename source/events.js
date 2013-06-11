@@ -3,73 +3,88 @@
 * @author tomasjurman@gmail.com (Tomas Jurman)
 * @license Dual licensed under the MIT or GPL licenses.
 */
-goog.provide('pike.events.ChangePosition');
-goog.provide('pike.events.ChangeSize');
+
+goog.provide('pike.events.ViewportChangePosition');
+goog.provide('pike.events.ViewportChangeSize');
+goog.provide('pike.events.GameWorldChangeSize');
+
 goog.provide('pike.events.Update');
 goog.provide('pike.events.Render');
 goog.provide('pike.events.NewEntity');
 goog.provide('pike.events.RemoveEntity');
-
-goog.provide('pike.events.NewLayer');
 
 goog.require('goog.events.Event');
 goog.require('goog.events.EventTarget');
 
 //## ViewportChangePosition #################################################################################
 /**
-* @param {number} oldX
-* @param {number} oldY
 * @param {number} x
 * @param {number} y
 * @param {goog.events.EventTarget} target
 * @constructor
 * @extends {goog.events.Event}
 */
-pike.events.ChangePosition = function(oldX, oldY, x, y, target){
-	goog.events.Event.call(this, pike.events.ChangePosition.EVENT_TYPE, target);
-	
-	this.oldX = oldX;
-	this.oldY = oldY;
+pike.events.ViewportChangePosition = function( x, y, target){
+	goog.events.Event.call(this, pike.events.ViewportChangePosition.EVENT_TYPE, target);	
 	this.x = x;
 	this.y = y;
 };
 
-goog.inherits( pike.events.ChangePosition, goog.events.Event );
+goog.inherits( pike.events.ViewportChangePosition, goog.events.Event );
 
 /**
  * Event type
  * @const
  * @type {string}
  */
-pike.events.ChangePosition.EVENT_TYPE = "changeposition";
+pike.events.ViewportChangePosition.EVENT_TYPE = "viewportchangeposition";
 
 //## ViewportChangeSize #################################################################################
 /**
-* @param {number} oldW
-* @param {number} oldH
 * @param {number} width
 * @param {number} height
 * @param {goog.events.EventTarget} target
 * @constructor
 * @extends {goog.events.Event}
 */
-pike.events.ChangeSize = function(oldW, oldH, width, height, target){
-	goog.events.Event.call(this, pike.events.ChangeSize.EVENT_TYPE, target);
-	
-	this.oldW = oldW;
-	this.oldH = oldH;
+pike.events.ViewportChangeSize = function( width, height, target){
+	goog.events.Event.call(this, pike.events.ViewportChangeSize.EVENT_TYPE, target);	
 	this.w = width;
 	this.h = height;
 };
 
-goog.inherits( pike.events.ChangeSize, goog.events.Event );
+goog.inherits( pike.events.ViewportChangeSize, goog.events.Event );
 
 /**
  * Event type
  * @const
  * @type {string}
  */
-pike.events.ChangeSize.EVENT_TYPE = "changesize";
+pike.events.ViewportChangeSize.EVENT_TYPE = "viewportchangesize";
+
+
+//## GameWorldChangeSize #################################################################################
+/**
+* @param {number} width
+* @param {number} height
+* @param {goog.events.EventTarget} target
+* @constructor
+* @extends {goog.events.Event}
+*/
+pike.events.GameWorldChangeSize = function( width, height, target){
+	goog.events.Event.call(this, pike.events.GameWorldChangeSize.EVENT_TYPE, target);	
+	this.w = width;
+	this.h = height;
+};
+
+goog.inherits( pike.events.GameWorldChangeSize, goog.events.Event );
+
+/**
+ * Event type
+ * @const
+ * @type {string}
+ */
+pike.events.GameWorldChangeSize.EVENT_TYPE = "gameworldchangesize";
 
 //## Update #################################################################################
 /**
@@ -115,14 +130,14 @@ pike.events.Render.EVENT_TYPE = "render";
 
 //## NewEntity #################################################################################
 /**
-* @param {number} id - entity id
+* @param {pike.core.Entity} entity
 * @param {goog.events.EventTarget} target
 * @constructor 
 * @extends {goog.events.Event}
 */
-pike.events.NewEntity = function( id, target){
+pike.events.NewEntity = function( entity, target){
 	goog.events.Event.call(this, pike.events.NewEntity.EVENT_TYPE, target);	
-	this.id = id;	
+	this.entity = entity;	
 };
 
 goog.inherits( pike.events.NewEntity, goog.events.Event );
@@ -136,14 +151,14 @@ pike.events.NewEntity.EVENT_TYPE = "newentity";
 
 //## RemoveEntity #################################################################################
 /**
-* @param {number} id - entity id
+* @param {pike.core.Entity} entity
 * @param {goog.events.EventTarget} target
 * @constructor 
 * @extends {goog.events.Event}
 */
-pike.events.RemoveEntity = function( id, target){
+pike.events.RemoveEntity = function( entity, target){
 	goog.events.Event.call(this, pike.events.RemoveEntity.EVENT_TYPE, target);	
-	this.id = id;	
+	this.entity = entity;	
 };
 
 goog.inherits( pike.events.RemoveEntity, goog.events.Event );
@@ -154,70 +169,5 @@ goog.inherits( pike.events.RemoveEntity, goog.events.Event );
  * @type {string}
  */
 pike.events.RemoveEntity.EVENT_TYPE = "removeentity";
-
-//## Done #################################################################################
-/**
-* @param {goog.events.EventTarget} target
-* @constructor
-* @extends {goog.events.Event}
-*/
-pike.events.Done = function(target){
-	goog.events.Event.call(this, pike.events.Done.EVENT_TYPE, target);
-};
-
-goog.inherits( pike.events.Done, goog.events.Event );
-
-/**
- * Event type
- * @const
- * @type {string}
- */
-pike.events.Done.EVENT_TYPE = "done";
-
-//## Progress #################################################################################
-/**
-* @param {number} progress - range <0,1>
-* @param {goog.events.EventTarget} target
-* @constructor
-* @extends {goog.events.Event}
-*/
-pike.events.Progress = function( progress, target){
-	goog.events.Event.call(this, pike.events.Progress.EVENT_TYPE, target);
-	this.progress = progress;
-};
-
-goog.inherits( pike.events.Progress, goog.events.Event );
-
-/**
- * Event type
- * @const
- * @type {string}
- */
-pike.events.Progress.EVENT_TYPE = "progress";
-
-//## NewLayer #################################################################################
-/**
-* @param {pike.layers.Layer} layer
-* @param {goog.events.EventTarget} target
-* @constructor 
-* @extends {goog.events.Event}
-*/
-pike.events.NewLayer = function( layer, target){
-	goog.events.Event.call(this, pike.events.NewLayer.EVENT_TYPE, target);	
-	this.layer = layer;	
-};
-
-goog.inherits( pike.events.NewLayer, goog.events.Event );
-
-/**
- * Event type
- * @const
- * @type {string}
- */
-pike.events.NewLayer.EVENT_TYPE = "newlayer";
-
-
-
-
 
 

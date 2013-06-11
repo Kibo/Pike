@@ -1,0 +1,72 @@
+<!doctype html>
+<html>
+<head>
+<title>Test Case</title>
+</head>
+<body>
+<script src="../../closure-library/closure/goog/base.js"></script>
+<script src="../source/deps.js"></script>
+<script>
+	goog.require('goog.testing.ContinuationTestCase');	
+	goog.require('goog.testing.jsunit');	
+</script>
+<script>
+	goog.require('pike.core.Entity');
+	goog.require('pike.layers.Layer');
+	goog.require('pike.events.NewEntity');
+	goog.require('pike.events.RemoveEntity');	
+</script>
+<script>
+var testCase = new goog.testing.ContinuationTestCase('Layer Test Case');
+testCase.autoDiscoverTests();
+
+// Standalone Closure Test Runner.
+if (typeof G_testRunner != 'undefined') {
+  G_testRunner.initialize(testCase);
+}
+function setUpPage(){}
+function setUp(){}
+
+function testNewEntity() {	
+	var layer = new pike.layers.Layer("Entities");
+	var entity = new pike.core.Entity();
+	
+		
+	var event = null;
+    goog.events.listen(layer, pike.events.NewEntity.EVENT_TYPE, function(e) {
+    	event = e;
+    });
+		  
+    waitForEvent(layer, pike.events.NewEntity.EVENT_TYPE, function() {
+    	assertTrue( event instanceof pike.events.NewEntity);
+    	assertTrue( event.target === layer);
+    	assertEquals(entity, event.entity);    
+    });
+         
+    layer.addEntity( entity );
+};
+
+function testRemoveEntity() {	
+	var layer = new pike.layers.Layer("Entities");
+	var entity = new pike.core.Entity();
+	
+		
+	var event = null;
+    goog.events.listen(layer, pike.events.RemoveEntity.EVENT_TYPE, function(e) {
+    	event = e;
+    });
+		  
+    waitForEvent(layer, pike.events.RemoveEntity.EVENT_TYPE, function() {
+    	assertTrue( event instanceof pike.events.RemoveEntity);
+    	assertTrue( event.target === layer);
+    	assertEquals(entity, event.entity);    
+    });
+         
+    layer.removeEntity( entity );
+};
+
+function tearDown(){}
+
+</script>
+</body>
+</html>

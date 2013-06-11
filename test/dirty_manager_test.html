@@ -13,8 +13,8 @@
 <script>
 	goog.require('pike.layers.DirtyManager');
 	goog.require('pike.graphics.Rectangle');
-	goog.require('pike.events.ChangeSize');
-	goog.require('pike.events.ChangePosition');
+	goog.require('pike.events.ViewportChangeSize');
+	goog.require('pike.events.ViewportChangePosition');
 </script>
 <script>
 function setUpPage(){}
@@ -55,7 +55,7 @@ var testOnViewportChangeSize = function() {
 	assertTrue(dm.viewport_.w == 0);
 	assertTrue(dm.viewport_.h == 0);
 	
-	dm.onViewportChangeSize( new pike.events.ChangeSize( 0,0,150,250,null)  );
+	dm.onViewportChangeSize( new pike.events.ViewportChangeSize( 150,250,null)  );
 	
 	assertTrue(dm.viewport_.x == 0);
 	assertTrue(dm.viewport_.y == 0);
@@ -70,7 +70,7 @@ var testOnViewportChangePosition = function() {
 	assertTrue(dm.viewport_.w == 0);
 	assertTrue(dm.viewport_.h == 0);
 	
-	dm.onViewportChangePosition( new pike.events.ChangePosition( 0,0,150,250,null)  );
+	dm.onViewportChangePosition( new pike.events.ViewportChangePosition( 150,250,null)  );
 	
 	assertTrue(dm.viewport_.x == 150);
 	assertTrue(dm.viewport_.y == 250);

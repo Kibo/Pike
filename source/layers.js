@@ -91,7 +91,7 @@ pike.layers.Layer.prototype.getOffScreen = function(){
 pike.layers.Layer.prototype.addEntity = function( entity ){
 	this.entities_.push( entity );
 	entity.layer = this;
-	this.dispatchEvent( new pike.events.NewEntity( entity.id, this) );
+	this.dispatchEvent( new pike.events.NewEntity( entity, this) );
 	if(goog.DEBUG) console.log("[pike.core.Layer] newentity");
 };
 
@@ -104,15 +104,8 @@ pike.layers.Layer.prototype.removeEntity = function( entity ){
 	entity.dispose();
 	goog.array.remove(this.entities_, entity);
 	delete entity.layer;
-	this.dispatchEvent( new pike.events.RemoveEntity( entity.id, this));
+	this.dispatchEvent( new pike.events.RemoveEntity( entity, this));
 	if(goog.DEBUG) console.log("[pike.core.Layer] removeentity");
 };
-
-
-
-
-
-
-
 
 

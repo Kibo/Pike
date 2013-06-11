@@ -79,8 +79,7 @@ pike.input.InputHandlerBase.prototype.getInputCoordinates = function(e){
 	return {
 		posX: (e.pageX - rec.left) + Pike.viewport.x,
 		posY: (e.pageY - rec.top) + Pike.viewport.y
-	};
-	
+	};	
 };
 
 
