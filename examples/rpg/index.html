@@ -30,11 +30,8 @@
     <script src="../../../closure-library/closure/goog/base.js"></script>
     <script src="../../source/deps.js"></script>
 	<script>
-		goog.require('pike.assets.ImageManager');		
-		goog.require('pike.core.Viewport');
-		goog.require('pike.core.GameWorld');
-		goog.require('pike.core.EntityManager');
-		goog.require('pike.core.RenderManager');
+		goog.require('pike.assets.ImageManager');	
+		goog.require('pike.core.Stage');
 		goog.require('pike.layers.DirtyManager');			
 		goog.require('pike.layers.Layer');		
 		goog.require('pike.core.Timer');
@@ -52,36 +49,22 @@
 			}, onImageLoaded);
 			
 			function onImageLoaded(){	
-				
-				var viewport = new pike.core.Viewport();
-				var gameWorld = new pike.core.GameWorld();
-				gameWorld.handler.listen(viewport, pike.events.ChangeSize.EVENT_TYPE, goog.bind(gameWorld.onViewportChangeSize, gameWorld));
-				
+				var WIDTH = 600; 
+				var HEIGHT = 400;
 				var timer = new pike.core.Timer();
-																											
-				var renderManager = new pike.core.RenderManager();
-				viewport.handler.listen(renderManager, pike.events.NewLayer.EVENT_TYPE, goog.bind(viewport.onAddNewLayer, viewport) )
-				
-				renderManager.handler.listen(viewport, pike.events.ChangeSize.EVENT_TYPE, goog.bind(renderManager.onViewportChangeSize, renderManager));
-				renderManager.handler.listen(viewport, pike.events.ChangePosition.EVENT_TYPE, goog.bind(renderManager.onViewportChangePosition, renderManager));			
-				renderManager.handler.listen(gameWorld, pike.events.ChangeSize.EVENT_TYPE, goog.bind(renderManager.onGameWorldChangeSize, renderManager));
-				
-				renderManager.handler.listen(timer, pike.events.Render.EVENT_TYPE, goog.bind(renderManager.onRender, renderManager));	
-				
-				renderManager.addLayer( new pike.layers.Layer("entities") );
-				
-				var dirtyManager = new pike.layers.DirtyManager();
-				dirtyManager.handler.listen(viewport, pike.events.ChangeSize.EVENT_TYPE, goog.bind( dirtyManager.onViewportChangeSize, dirtyManager));
-				dirtyManager.handler.listen(viewport, pike.events.ChangePosition.EVENT_TYPE, goog.bind( dirtyManager.onViewportChangePosition, dirtyManager));				
-				renderManager.getLayer('entities').setDirtyManager(dirtyManager );
+				var stage = new pike.core.Stage(WIDTH, HEIGHT);			
+				stage.handler.listen(timer, pike.events.Render.EVENT_TYPE, goog.bind(stage.onRender, stage));	
+																							
+				var layerEnt = new pike.layers.Layer("entities");
+				layerEnt.setDirtyManager( new pike.layers.DirtyManager() );
+				stage.addLayer( layerEnt );
 								
 				var hero = new pike.core.Entity( pike.components.Sprite );				
 				hero.setSprite( imageManager.get("entities"), 0, 0, 32, 32, 3, 300);																					
 				hero.handler.listen(timer, pike.events.Update.EVENT_TYPE, goog.bind(hero.onSpriteUpdate, hero));
-				hero.handler.listen(renderManager.getLayer('entities'), pike.events.Render.EVENT_TYPE, goog.bind(hero.onSpriteRender, hero));
-				renderManager.getLayer('entities').addEntity( hero );
-								
-				viewport.setSize(600, 400);			
+				hero.handler.listen(stage.getLayer('entities'), pike.events.Render.EVENT_TYPE, goog.bind(hero.onSpriteRender, hero));
+				stage.getLayer('entities').addEntity( hero );
+													
 				timer.start();										
 			}				
 		}

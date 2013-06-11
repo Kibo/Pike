@@ -14,8 +14,7 @@ goog.require('pike.graphics.Rectangle');
  * @constructor
  */
 pike.layers.DirtyManager = function( allDirtyThreshold ){
-	
-	
+		
 	this.viewport_ = new pike.graphics.Rectangle(0, 0, 0, 0);
 	
 	/**
@@ -30,7 +29,9 @@ pike.layers.DirtyManager = function( allDirtyThreshold ){
 	this.allDirtyThreshold_ = allDirtyThreshold == undefined ? .5 : allDirtyThreshold;
 	
 	// true when we have reached the threshold
-	this.allDirty_ = true;	
+	this.allDirty_ = true;
+	
+	this.markAllDirty();
 };
 
 /**

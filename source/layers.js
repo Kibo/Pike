@@ -55,8 +55,8 @@ goog.inherits(pike.layers.Layer, goog.events.EventTarget);
  * Set dirty manager 
  * @param {pike.layers.DirtyManager} dirtyManager
  */
-pike.layers.Layer.prototype.setDirtyManager = function( dirtyManager ){
-	this.dirtyManager = dirtyManager;
+pike.layers.Layer.prototype.setDirtyManager = function( dirtyManager ){	
+	this.dirtyManager = dirtyManager;	
 };
 
 /**

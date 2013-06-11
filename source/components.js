@@ -44,7 +44,7 @@ pike.components.Sprite = function(){
 	 * On update handler
 	 * @param {pike.events.Update} e
 	 */
-	this.onSpriteUpdate = function(e){
+	this.onSpriteUpdate = function(e){		
 		//TODO
 		this.setDirty(this.getBounds());		
 	};

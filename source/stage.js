@@ -68,6 +68,14 @@ pike.core.Stage.prototype.getLayer = function( name ){
  */
 pike.core.Stage.prototype.addLayer = function( layer ){
 	this.setLayerSize_( layer );
+	
+	if(layer.hasDirtyManager()){
+		layer.dirtyManager.setPosition( this.viewport_.x, this.viewport_.y);
+		layer.dirtyManager.setSize( this.viewport_.w, this.viewport_.h );
+		layer.dirtyManager.handler.listen(this, pike.events.ViewportChangeSize.EVENT_TYPE, goog.bind( layer.dirtyManager.onViewportChangeSize, layer.dirtyManager));
+		layer.dirtyManager.handler.listen(this, pike.events.ViewportChangePosition.EVENT_TYPE, goog.bind( layer.dirtyManager.onViewportChangePosition, layer.dirtyManager));						
+	}
+		
 	this.layers_.push(layer);		
 	this.getRootElement().appendChild( layer.getScreen().canvas );	
 };
@@ -164,13 +172,13 @@ pike.core.Stage.prototype.onRender = function( e ){
  * @param {pike.layers.Layer} layer
  * @private
  */
-pike.core.Stage.prototype.render_ = function( layer ){	
+pike.core.Stage.prototype.render_ = function( layer ){		
 	var screen = layer.getScreen();
 	var offScreen = layer.getOffScreen();
 		
 	if(layer.hasDirtyManager()){
 		
-		if(!layer.dirtyManager.isClean()){
+		if(!layer.dirtyManager.isClean()){	
 			
 			offScreen.context.clearRect(
 					layer.dirtyManager.getDirtyRectangle().x,
@@ -213,7 +221,7 @@ pike.core.Stage.prototype.render_ = function( layer ){
 				
 		offScreen.isDirty = false;
 		screen.isDirty = true;
-		if(goog.DEBUG) console.log("[pike.core.RenderManager] " + layer.name + " redraw offScreen");		
+		if(goog.DEBUG) console.log("[pike.core.Stage] " + layer.name + " redraw offScreen");		
 	}
 	
 	if(layer.getScreen().isDirty){		 	
@@ -224,7 +232,7 @@ pike.core.Stage.prototype.render_ = function( layer ){
 				0, 0, this.viewport_.w, this.viewport_.h
 		);					
 		screen.isDirty = false;
-		if(goog.DEBUG) console.log("[pike.core.RenderManager] " + layer.name + " redraw screen");
+		if(goog.DEBUG) console.log("[pike.core.Stage] " + layer.name + " redraw screen");
 	}	
 };
 

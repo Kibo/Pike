@@ -14,6 +14,7 @@
 	goog.require('pike.core.Stage');
 	goog.require('pike.layers.Layer');
 	goog.require('pike.graphics.Rectangle');
+	goog.require('pike.layers.DirtyManager');
 </script>
 <script>
 function setUpPage(){}
@@ -115,6 +116,29 @@ var testAddNewLayerElement = function() {
 	assertTrue(stage.getRootElement().hasChildNodes());	
 	assertTrue(stage.getRootElement().querySelector('canvas').width == 800);
 	assertTrue(stage.getRootElement().querySelector('canvas').height == 10);	
+}
+
+var testSetDirtyManager = function() {
+	var stage = new pike.core.Stage(800,10);
+	var layer = new pike.layers.Layer("Entities");
+	layer.setDirtyManager(new pike.layers.DirtyManager());
+	stage.addLayer(layer);
+	
+	assertObjectEquals(
+			new pike.graphics.Rectangle(0,0,800,10), 
+			stage.getLayer("Entities").dirtyManager.viewport_ );
+	
+	stage.setViewportPosition(10,20);
+	
+	assertObjectEquals(
+			new pike.graphics.Rectangle(10,20,800,10), 
+			stage.getLayer("Entities").dirtyManager.viewport_ );
+	
+	stage.setViewportSize(900,20);
+	
+	assertObjectEquals(
+			new pike.graphics.Rectangle(10,20,900,20), 
+			stage.getLayer("Entities").dirtyManager.viewport_ );	
 }
 
 function tearDown(){}
