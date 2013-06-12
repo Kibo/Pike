@@ -16,12 +16,10 @@ goog.require('goog.array');
 
 /**
 * Stage 
-* @param {number} width
-* @param {number} height
 * @constructor
 * @extends {goog.events.EventTarget}
 */
-pike.core.Stage = function( width, height ){
+pike.core.Stage = function(){
 	goog.events.EventTarget.call(this);
 	
 	/**
@@ -35,9 +33,7 @@ pike.core.Stage = function( width, height ){
 	this.viewport_ = new pike.graphics.Rectangle(0, 0, 0, 0);
 	this.gameWorld_ = new pike.graphics.Rectangle(0, 0, 0, 0);
 		
-	this.createRootElement_();
-	
-	this.setViewportSize(width, height);	
+	this.createRootElement_();	
 };
 
 goog.inherits(pike.core.Stage, goog.events.EventTarget);
@@ -60,6 +56,8 @@ pike.core.Stage.prototype.getLayer = function( name ){
 			return this.layers_[idx]; 
 		}		
 	}
+	
+	throw new Error("Layer with name " + name + " does not exist.");
 };
 
 /**
@@ -67,86 +65,9 @@ pike.core.Stage.prototype.getLayer = function( name ){
  * @param {pike.layers.Layer} layer
  */
 pike.core.Stage.prototype.addLayer = function( layer ){
-	this.setLayerSize_( layer );
-	
-	if(layer.hasDirtyManager()){
-		layer.dirtyManager.setPosition( this.viewport_.x, this.viewport_.y);
-		layer.dirtyManager.setSize( this.viewport_.w, this.viewport_.h );
-		layer.dirtyManager.handler.listen(this, pike.events.ViewportChangeSize.EVENT_TYPE, goog.bind( layer.dirtyManager.onViewportChangeSize, layer.dirtyManager));
-		layer.dirtyManager.handler.listen(this, pike.events.ViewportChangePosition.EVENT_TYPE, goog.bind( layer.dirtyManager.onViewportChangePosition, layer.dirtyManager));						
-	}
-		
-	this.layers_.push(layer);		
+	this.setLayerSize_( layer );	
+	this.layers_.push(layer); //TODO		
 	this.getRootElement().appendChild( layer.getScreen().canvas );	
-};
-
-/**
-* Set position of the Viewport
-* @param {number} x
-* @param {number} y
-* @fires {pike.events.ViewportChangePosition} event
-*/
-pike.core.Stage.prototype.setViewportPosition = function(x, y){	
-	this.viewport_.x = x;
-	this.viewport_.y = y;
-	
-	for(var idx = 0; idx < this.layers_.length; idx++){
-		var screen = this.layers_[idx].getScreen();		
-		screen.isDirty = true;		
-	}
-	
-	if(goog.DEBUG) console.log("[pike.core.Stage] changeposition");
-	this.dispatchEvent(new pike.events.ViewportChangePosition( this.viewport_.x, this.viewport_.y, this));
-};
-
-/**
-* Set size of the Viewport
-* @param {number} width
-* @param {number} height
-* @fires {pike.events.ChangeSize} event
-*/
-pike.core.Stage.prototype.setViewportSize = function(width, height){
-	if(this.viewport_.w == width 
-	&& this.viewport_.h == height){
-		return
-	}
-	
-	this.viewport_.w = width;
-	this.viewport_.h = height;
-	
-	this.rootElement_.style.width = this.viewport_.w + "px";
-	this.rootElement_.style.height = this.viewport_.h + "px";
-	
-	if(this.gameWorld_.w < width 
-	|| this.gameWorld_.h < height ){
-		this.setGameWorldSize(width, height);
-	}
-	
-	for(var idx = 0; idx < this.layers_.length; idx++){
-		this.setLayerSize_(this.layers_[idx]);
-	}
-		
-	if(goog.DEBUG) console.log("[pike.core.Stage] viewportchangesize");
-	this.dispatchEvent( new pike.events.ViewportChangeSize( this.viewport_.w, this.viewport_.h, this) );		
-};
-
-/**
-* Set size of the GameWorld
-* @param {number} width
-* @param {number} height
-* @fires {pike.events.GameWorldChangeSize} event
-*/
-pike.core.Stage.prototype.setGameWorldSize = function(width, height){
-		
-	this.gameWorld_.w = Math.max(width, this.viewport_.w);
-	this.gameWorld_.h = Math.max(height, this.viewport_.h);
-	
-	for(var idx = 0; idx < this.layers_.length; idx++){
-		this.setLayerSize_(this.layers_[idx]);
-	}
-	
-	if(goog.DEBUG) console.log("[pike.core.Stage] gameworldchangesize");
-	this.dispatchEvent( new pike.events.GameWorldChangeSize( this.gameWorld_.w, this.gameWorld_.h, this) );
 };
 
 /**
@@ -165,6 +86,32 @@ pike.core.Stage.prototype.onRender = function( e ){
 	for(var idx = 0; idx < this.layers_.length; idx++){
 		this.render_( this.layers_[idx] );			
 	}
+};
+
+/**
+ * on Viewport change size handler
+ * @param {pike.events.ChangeSize} e
+ */
+pike.core.Stage.prototype.onViewportChangeSize = function(e){
+	this.setViewportSize_(e.w, e.h);
+};
+
+
+
+/**
+ * on Viewport change position handler
+ * @param {pike.events.ChangePosition} e
+ */
+pike.core.Stage.prototype.onViewportChangePosition = function(e){
+	this.setViewportPosition_(e.x, e.y);
+};
+
+/**
+ * on GameWorld change size handler
+ * @param {pike.events.ChangeSize} e
+ */
+pike.core.Stage.prototype.onGameWorldChangeSize = function(e){
+	this.setGameWorldSize_(e.w, e.h);
 };
 
 /**
@@ -268,5 +215,73 @@ pike.core.Stage.prototype.setLayerSize_ = function(layer){
 	offScreen.canvas.width = this.gameWorld_.w;
 	offScreen.canvas.height = this.gameWorld_.h;
 	offScreen.isDirty = true;	
+	
+	if(layer.hasDirtyManager()){
+		layer.dirtyManager.setPosition( this.viewport_.x, this.viewport_.y);
+		layer.dirtyManager.setSize( this.viewport_.w, this.viewport_.h );
+	}
+};
+
+/**
+ * Set internal viewport size
+ * @param {number} width
+ * @param {number} height
+ * @private
+ */
+pike.core.Stage.prototype.setViewportSize_ = function(width, height){
+	if(this.viewport_.w == width
+	&& this.viewport_.h == height){
+		return
+	}
+	
+	this.viewport_.w = width;
+	this.viewport_.h = height;
+	
+	this.rootElement_.style.width = this.viewport_.w + "px";
+	this.rootElement_.style.height = this.viewport_.h + "px";
+	
+	if(this.gameWorld_.w < width 
+	|| this.gameWorld_.h < height ){
+		this.setGameWorldSize_( width, height);
+	}
+	
+	for(var idx = 0; idx < this.layers_.length; idx++){
+		this.setLayerSize_(this.layers_[idx]);
+	}
+};
+
+/**
+ * Set internal gameWorld size
+ * @param {number} width
+ * @param {number} height
+ * @private
+ */
+pike.core.Stage.prototype.setGameWorldSize_ = function(width, height){
+	this.gameWorld_.w = Math.max(width, this.viewport_.w);
+	this.gameWorld_.h = Math.max(height, this.viewport_.h);
+	
+	for(var idx = 0; idx < this.layers_.length; idx++){
+		this.setLayerSize_(this.layers_[idx]);
+	}
+};
+
+/**
+ * Set internal viewport position
+ * @param {number} x
+ * @param {number} y
+ * @private
+ */
+pike.core.Stage.prototype.setViewportPosition_ = function(x,y){
+	this.viewport_.x = x;
+	this.viewport_.y = y;
+	
+	for(var idx = 0; idx < this.layers_.length; idx++){
+		var screen = this.layers_[idx].getScreen();		
+		screen.isDirty = true;	
+		
+		if(this.layers_[idx].hasDirtyManager()){
+			this.layers_[idx].dirtyManager.setPosition( this.viewport_.x, this.viewport_.y);			
+		}		
+	}
 };
 

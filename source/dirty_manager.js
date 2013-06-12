@@ -115,18 +115,3 @@ pike.layers.DirtyManager.prototype.setPosition = function( x, y ){
 	this.viewport_.y = y;
 };
 
-/**
- * On viewport change position handler
- * @param {pike.events.ChangeSize} e
- */
-pike.layers.DirtyManager.prototype.onViewportChangePosition = function(e){
-	this.setPosition(e.x, e.y);
-};
-
-/**
- * On viewport change size handler
- * @param {pike.events.ChangeSize} e
- */
-pike.layers.DirtyManager.prototype.onViewportChangeSize = function(e){
-	this.setSize(e.w, e.h);
-};

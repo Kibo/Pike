@@ -1,0 +1,68 @@
+<!doctype html>
+<html>
+<head>
+<title>Test Case</title>
+</head>
+<body>
+<script src="../../closure-library/closure/goog/base.js"></script>
+<script src="../source/deps.js"></script>
+<script>
+	goog.require('goog.testing.ContinuationTestCase');	
+	goog.require('goog.testing.jsunit');	
+</script>
+<script>
+	goog.require('pike.core.Viewport');
+	goog.require('pike.events.ChangePosition');
+	goog.require('pike.events.ChangeSize');
+	goog.require('goog.events.EventTarget');
+</script>
+<script>
+var testCase = new goog.testing.ContinuationTestCase('Viewport Test Case');
+testCase.autoDiscoverTests();
+
+// Standalone Closure Test Runner.
+if (typeof G_testRunner != 'undefined') {
+  G_testRunner.initialize(testCase);
+}
+
+function setUpPage(){}
+function setUp(){}
+
+function testViewportEventViewportChangePosition() {
+	var viewport = new pike.core.Viewport();
+	var event = null;
+    goog.events.listen(viewport, pike.events.ChangePosition.EVENT_TYPE, function(e) {
+    	event = e;
+    });
+    
+    waitForEvent(viewport, pike.events.ChangePosition.EVENT_TYPE, function() {
+    	assertTrue( event instanceof pike.events.ChangePosition);
+    	assertTrue( event.target === viewport);    	
+    	assertEquals(100, event.x);
+    	assertEquals(200, event.y);
+    })
+         
+    viewport.setPosition(100, 200);
+};
+
+function testViewportEventViewportChangeSize() {
+	var viewport = new pike.core.Viewport();
+	var event = null;
+    goog.events.listen(viewport, pike.events.ChangeSize.EVENT_TYPE, function(e) {
+    	event = e;
+    });
+    
+    waitForEvent(viewport, pike.events.ChangeSize.EVENT_TYPE, function() {
+    	assertTrue( event instanceof pike.events.ChangeSize);
+    	assertTrue( event.target === viewport);    	
+    	assertEquals(100, event.w);
+    	assertEquals(20, event.h);
+    })
+         
+    viewport.setSize(100, 20);
+};
+
+function tearDown(){}
+</script>
+</body>
+</html>

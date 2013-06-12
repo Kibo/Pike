@@ -6,7 +6,10 @@
 goog.provide('pike.components.Sprite');
 
 goog.require('goog.events.EventHandler');
+goog.require('pike.graphics.Rectangle');
+goog.require('pike.events.ViewportChangePosition');
 
+//## Sprite #################################
 /**
  * Sprite
  * @constructor
@@ -72,6 +75,97 @@ pike.components.Sprite = function(){
 			this.layer.getOffScreen().isDirty = true;
 		}
 	};
+};
+
+//## Background #################################
+/**
+ * Background
+ * @constructor
+ */
+pike.components.Image = function(){
+	
+	this.x = 0;
+	this.y = 0;
+	this.w = 0;
+	this.h = 0;
+	
+	this.setImage = function( image ){
+		this.image = image;
+		this.w = image.width;
+		this.h = image.height;
+	};	
+	
+	this.onImageRender = function(e){
+		this.layer.getOffScreen().context.drawImage(
+				this.image,
+				0, 0, this.w, this.h,
+				0, 0, this.w, this.h				
+		);
+	};		
+};
+
+
+//## Watch #################################
+/**
+ * Watch
+ * @constructor
+ */
+pike.components.Watch = function(){
+		
+	this.watchMe = function( viewport, gameWorld ){
+		
+		var oldX = viewport.x;	
+		var oldY = viewport.y;
+		
+		if(this.x < this.leftInnerBoundary( viewport )){					
+			viewport.x = Math.max(0, Math.min(
+				Math.floor(this.x - (viewport.w * 0.25)),
+				gameWorld.w - viewport.w
+				));										    					
+		}
+					
+		if(this.x + this.w > this.rightInnerBoundary(viewport)){				   				  
+		    viewport.x = Math.max(0, Math.min(
+				Math.floor(this.x + this.w - (viewport.w * 0.75)),
+				gameWorld.w - viewport.w
+				));			    		  
+		}
+							
+		if( oldX != viewport.x || oldY != viewport.y ){			
+			this.dispathEvent( new pike.events.ViewportChangePosition( this.viewport.x, this.viewport.y, this) );
+		}
+	};	
+		
+	this.rightInnerBoundary = function( viewport ){
+  		return viewport.x + ( viewport.w * 0.75);
+	};
+
+	this.leftInnerBoundary = function( viewport ){
+  		return viewport.x + ( viewport.w * 0.25);
+	};
+	
+	this.topInnerBoundary = function( viewport ){
+  		return viewport.y + (viewport.h * 0.25);
+	};
+	
+	this.bottomInnerBoundary = function( viewport ){
+  		return viewport.y + (viewport.h * 0.75);
+	};		
+};
+
+//## Mouse #################################
+/**
+ * Mouse
+ * @constructor
+ */
+pike.components.Mouse = function(){
+	
+	this.setMouseHandler = function( mouseHandler ){
+		this.mousehandler = mouseHandler;
+		this.handler.listen( this.mousehandler, pike.events.Down.EVENT_TYPE, goog.bind( this.onMouseDown ,this) );
+	};	
+	
+	//this.onMouseDown = function(e){};
 };
 
 

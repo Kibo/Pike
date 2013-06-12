@@ -21,14 +21,14 @@ function setUpPage(){}
 function setUp(){}
 
 var testCreate = function() {
-	var stage = new pike.core.Stage(800,10);
+	var stage = new pike.core.Stage();
 	var element = document.getElementById( pike.core.Stage.ELEMENT_ID );
 	assertNotNull( element );
 	assertEquals( element, stage.getRootElement());
 	assertTrue( element.getAttribute("id") === pike.core.Stage.ELEMENT_ID );
 	
-	assertObjectEquals( new pike.graphics.Rectangle(0,0,800,10), stage.viewport_ );
-	assertObjectEquals( new pike.graphics.Rectangle(0,0,800,10), stage.gameWorld_ );
+	assertObjectEquals( new pike.graphics.Rectangle(0,0,0,0), stage.viewport_ );
+	assertObjectEquals( new pike.graphics.Rectangle(0,0,0,0), stage.gameWorld_ );
 };
 
 var testGetHandler = function(){
@@ -36,31 +36,32 @@ var testGetHandler = function(){
 	assertTrue( stage.handler instanceof goog.events.EventHandler);
 };
 
-var testViewportSize = function() {
-	var stage = new pike.core.Stage(800,10);
-	stage.setViewportSize(900,20);
+var testOnViewportChangeSize = function() {
+	var stage = new pike.core.Stage();
+	stage.onViewportChangeSize({w:900, h:20});
 	
 	assertObjectEquals( new pike.graphics.Rectangle(0,0,900,20), stage.viewport_ );
 	assertObjectEquals( new pike.graphics.Rectangle(0,0,900,20), stage.gameWorld_ );
 };
 
-var testViewportPosition = function() {
-	var stage = new pike.core.Stage(800,10);
-	stage.setViewportPosition(10,20);
+var testOnViewportChangePosition = function() {
+	var stage = new pike.core.Stage();
+	stage.onViewportChangePosition({x:10, y:20});
 	
-	assertObjectEquals( new pike.graphics.Rectangle(10,20,800,10), stage.viewport_ );
-	assertObjectEquals( new pike.graphics.Rectangle(0,0,800,10), stage.gameWorld_ );
+	assertObjectEquals( new pike.graphics.Rectangle(10,20,0,0), stage.viewport_ );
+	assertObjectEquals( new pike.graphics.Rectangle(0,0,0,0), stage.gameWorld_ );
 };
 
-var testGameworldSize = function() {
-	var stage = new pike.core.Stage(800,10);
-	stage.setGameWorldSize(900,20);
+var testOnGameworldChangeSize = function() {
+	var stage = new pike.core.Stage();
+	stage.onViewportChangeSize({w:800, h:10});
+	stage.onGameWorldChangeSize({w:900, h:20});
 	
 	assertObjectEquals( new pike.graphics.Rectangle(0,0,800,10), stage.viewport_ );
 	assertObjectEquals( new pike.graphics.Rectangle(0,0,900,20), stage.gameWorld_ );	
 	
-	stage.setViewportSize(800,15);
-	stage.setViewportPosition(10,20);
+	stage.onViewportChangeSize({w:800, h:15});
+	stage.onViewportChangePosition({x:10, y:20});
 	
 	assertObjectEquals( new pike.graphics.Rectangle(10,20,800,15), stage.viewport_ );
 	assertObjectEquals( new pike.graphics.Rectangle(0,0,900,20), stage.gameWorld_ );
@@ -68,14 +69,15 @@ var testGameworldSize = function() {
 };
 
 var testGetLayer = function() {
-	var stage = new pike.core.Stage(800,10);
+	var stage = new pike.core.Stage();
 	var layer = new pike.layers.Layer("Entities");
 	stage.addLayer(layer);
 	assertEquals(layer, stage.getLayer("Entities") )
 }; 
 
 var testAddNewLayerSize = function() {
-	var stage = new pike.core.Stage(800,10);
+	var stage = new pike.core.Stage();
+	stage.onViewportChangeSize({w:800, h:10});
 	var layer = new pike.layers.Layer("Entities");
 	stage.addLayer(layer);
 		
@@ -86,8 +88,8 @@ var testAddNewLayerSize = function() {
 	assertTrue(stage.getLayer("Entities").getOffScreen().canvas.width == 800);
 	assertTrue(stage.getLayer("Entities").getOffScreen().canvas.height == 10);	
 	assertTrue(stage.getLayer("Entities").getOffScreen().isDirty);
-	
-	stage.setViewportSize(810,15);
+		
+	stage.onViewportChangeSize({w:810, h:15});
 	
 	assertTrue(stage.getLayer("Entities").getScreen().canvas.width == 810);
 	assertTrue(stage.getLayer("Entities").getScreen().canvas.height == 15);	
@@ -96,8 +98,8 @@ var testAddNewLayerSize = function() {
 	assertTrue(stage.getLayer("Entities").getOffScreen().canvas.width == 810);
 	assertTrue(stage.getLayer("Entities").getOffScreen().canvas.height == 15);	
 	assertTrue(stage.getLayer("Entities").getOffScreen().isDirty);
-	
-	stage.setGameWorldSize(900,20);
+		
+	stage.onGameWorldChangeSize({w:900, h:20});
 	
 	assertTrue(stage.getLayer("Entities").getScreen().canvas.width == 810);
 	assertTrue(stage.getLayer("Entities").getScreen().canvas.height == 15);	
@@ -109,7 +111,8 @@ var testAddNewLayerSize = function() {
 };
 
 var testAddNewLayerElement = function() {
-	var stage = new pike.core.Stage(800,10);
+	var stage = new pike.core.Stage();
+	stage.onViewportChangeSize({w:800, h:10});
 	var layer = new pike.layers.Layer("Entities");
 	stage.addLayer(layer);
 	
@@ -118,8 +121,9 @@ var testAddNewLayerElement = function() {
 	assertTrue(stage.getRootElement().querySelector('canvas').height == 10);	
 }
 
-var testSetDirtyManager = function() {
-	var stage = new pike.core.Stage(800,10);
+var testLayerDirtyManager = function() {
+	var stage = new pike.core.Stage();
+	stage.onViewportChangeSize({w:800, h:10});
 	var layer = new pike.layers.Layer("Entities");
 	layer.setDirtyManager(new pike.layers.DirtyManager());
 	stage.addLayer(layer);
@@ -127,14 +131,14 @@ var testSetDirtyManager = function() {
 	assertObjectEquals(
 			new pike.graphics.Rectangle(0,0,800,10), 
 			stage.getLayer("Entities").dirtyManager.viewport_ );
-	
-	stage.setViewportPosition(10,20);
+		
+	stage.onViewportChangePosition({x:10, y:20});
 	
 	assertObjectEquals(
 			new pike.graphics.Rectangle(10,20,800,10), 
 			stage.getLayer("Entities").dirtyManager.viewport_ );
-	
-	stage.setViewportSize(900,20);
+		
+	stage.onViewportChangeSize({w:900, h:20});
 	
 	assertObjectEquals(
 			new pike.graphics.Rectangle(10,20,900,20), 

@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+<head>
+<title>Test Case</title>
+</head>
+<body>
+<script src="../../closure-library/closure/goog/base.js"></script>
+<script src="../source/deps.js"></script>
+<script>
+	goog.require('goog.testing.ContinuationTestCase');	
+	goog.require('goog.testing.jsunit');	
+</script>
+<script>
+	goog.require('pike.core.GameWorld');
+	goog.require('goog.events');
+	goog.require('goog.events.EventHandler');
+	goog.require('pike.events.ChangeSize');
+</script>
+<script>
+function setUpPage(){}
+function setUp(){}
+
+var testGetHandler = function(){
+	var gw = new pike.core.GameWorld();	
+	assertTrue( gw.handler instanceof goog.events.EventHandler);
+};
+
+var testGetBounds = function(){
+	var gw = new pike.core.GameWorld();	
+	gw.setSize(400, 20);
+	assertTrue( gw.getBounds().x == 0 
+			 && gw.getBounds().y == 0 
+			 && gw.getBounds().w == 400 
+			 && gw.getBounds().h == 20);
+};
+
+var testSetSize = function(){
+	var gw = new pike.core.GameWorld();
+	gw.setSize(800, 20);
+	
+	assertTrue( gw.viewport_.x == 0 
+			 && gw.viewport_.y == 0 
+			 && gw.viewport_.w == 800
+			 && gw.viewport_.h == 20);	
+};
+
+function tearDown(){}
+
+</script>
+</body>
+</html>

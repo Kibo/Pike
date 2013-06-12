@@ -48,36 +48,6 @@ var testGetHandler = function(){
 	assertTrue( dm.handler instanceof goog.events.EventHandler);
 };
 
-var testOnViewportChangeSize = function() {
-	var dm = new pike.layers.DirtyManager();
-	assertTrue(dm.viewport_.x == 0);
-	assertTrue(dm.viewport_.y == 0);
-	assertTrue(dm.viewport_.w == 0);
-	assertTrue(dm.viewport_.h == 0);
-	
-	dm.onViewportChangeSize( new pike.events.ViewportChangeSize( 150,250,null)  );
-	
-	assertTrue(dm.viewport_.x == 0);
-	assertTrue(dm.viewport_.y == 0);
-	assertTrue(dm.viewport_.w == 150);
-	assertTrue(dm.viewport_.h == 250);		
-};
-
-var testOnViewportChangePosition = function() {
-	var dm = new pike.layers.DirtyManager();
-	assertTrue(dm.viewport_.x == 0);
-	assertTrue(dm.viewport_.y == 0);
-	assertTrue(dm.viewport_.w == 0);
-	assertTrue(dm.viewport_.h == 0);
-	
-	dm.onViewportChangePosition( new pike.events.ViewportChangePosition( 150,250,null)  );
-	
-	assertTrue(dm.viewport_.x == 150);
-	assertTrue(dm.viewport_.y == 250);
-	assertTrue(dm.viewport_.w == 0);
-	assertTrue(dm.viewport_.h == 0);		
-};
-
 function tearDown(){}
 </script>
 </body>

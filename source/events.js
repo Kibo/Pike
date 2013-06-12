@@ -8,6 +8,9 @@ goog.provide('pike.events.ViewportChangePosition');
 goog.provide('pike.events.ViewportChangeSize');
 goog.provide('pike.events.GameWorldChangeSize');
 
+goog.provide('pike.events.ChangeSize');
+goog.provide('pike.events.ChangePosition');
+
 goog.provide('pike.events.Update');
 goog.provide('pike.events.Render');
 
@@ -255,4 +258,51 @@ goog.inherits( pike.events.Move, goog.events.Event );
  * @type {string}
  */
 pike.events.Move.EVENT_TYPE = "move";
+
+
+//## ChangePosition #################################################################################
+/**
+* @param {number} x
+* @param {number} y
+* @param {goog.events.EventTarget} target
+* @constructor
+* @extends {goog.events.Event}
+*/
+pike.events.ChangePosition = function( x, y, target){
+	goog.events.Event.call(this, pike.events.ChangePosition.EVENT_TYPE, target);	
+	this.x = x;
+	this.y = y;
+};
+
+goog.inherits( pike.events.ChangePosition, goog.events.Event );
+
+/**
+ * Event type
+ * @const
+ * @type {string}
+ */
+pike.events.ChangePosition.EVENT_TYPE = "changeposition";
+
+//## ChangeSize #################################################################################
+/**
+* @param {number} width
+* @param {number} height
+* @param {goog.events.EventTarget} target
+* @constructor
+* @extends {goog.events.Event}
+*/
+pike.events.ChangeSize = function( width, height, target){
+	goog.events.Event.call(this, pike.events.ChangeSize.EVENT_TYPE, target);	
+	this.w = width;
+	this.h = height;
+};
+
+goog.inherits( pike.events.ChangeSize, goog.events.Event );
+
+/**
+ * Event type
+ * @const
+ * @type {string}
+ */
+pike.events.ChangeSize.EVENT_TYPE = "changesize";
 
