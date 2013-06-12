@@ -10,8 +10,13 @@ goog.provide('pike.events.GameWorldChangeSize');
 
 goog.provide('pike.events.Update');
 goog.provide('pike.events.Render');
+
 goog.provide('pike.events.NewEntity');
 goog.provide('pike.events.RemoveEntity');
+
+goog.provide('pike.events.Down');
+goog.provide('pike.events.Up');
+goog.provide('pike.events.Move');
 
 goog.require('goog.events.Event');
 goog.require('goog.events.EventTarget');
@@ -170,4 +175,84 @@ goog.inherits( pike.events.RemoveEntity, goog.events.Event );
  */
 pike.events.RemoveEntity.EVENT_TYPE = "removeentity";
 
+//## Down #################################################################################
+/**
+* @param {number} posX
+* @param {number} posY
+* @param {Object} domEvent - DOM event object
+* @param {goog.events.EventTarget} target
+* @constructor 
+* @extends {goog.events.Event}
+*/
+pike.events.Down = function( posX, posY, domEvent, target){
+	goog.events.Event.call(this, pike.events.Down.EVENT_TYPE, target);	
+	this.posX = posX;
+	this.posY = posY;
+	this.domEvent = domEvent;
+};
+
+goog.inherits( pike.events.Down, goog.events.Event );
+
+/**
+ * Event type
+ * @const
+ * @type {string}
+ */
+pike.events.Down.EVENT_TYPE = "down";
+
+//## Up #################################################################################
+/**
+* @param {number} posX
+* @param {number} posY
+* @param {boolean} isMoving
+* @param {Object} domEvent - DOM event object
+* @param {goog.events.EventTarget} target
+* @constructor 
+* @extends {goog.events.Event}
+*/
+pike.events.Up = function( posX, posY, isMoving, domEvent, target){
+	goog.events.Event.call(this, pike.events.Up.EVENT_TYPE, target);	
+	this.posX = posX;
+	this.posY = posY;
+	this.isMoving = isMoving;
+	this.domEvent = domEvent;
+};
+
+goog.inherits( pike.events.Up, goog.events.Event );
+
+/**
+ * Event type
+ * @const
+ * @type {string}
+ */
+pike.events.Up.EVENT_TYPE = "up";
+
+//## Move #################################################################################
+/**
+* @param {number} posX
+* @param {number} posY
+* @param {number} deltaX
+* @param {number} deltaY
+* @param {Object} domEvent - DOM event object
+* @param {goog.events.EventTarget} target
+* @constructor 
+* @extends {goog.events.Event}
+*/
+pike.events.Move = function( posX, posY, deltaX, deltaY, domEvent, target){
+	goog.events.Event.call(this, pike.events.Move.EVENT_TYPE, target);	
+	this.posX = posX;
+	this.posY = posY;
+	this.deltaX = deltaX;
+	this.deltaY = deltaY;	
+	this.domEvent = domEvent;
+};
+
+goog.inherits( pike.events.Move, goog.events.Event );
+
+/**
+ * Event type
+ * @const
+ * @type {string}
+ */
+pike.events.Move.EVENT_TYPE = "move";
 
