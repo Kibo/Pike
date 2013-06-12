@@ -1,0 +1,106 @@
+<!doctype html>
+<html>
+<head>
+<title>Test Case</title>
+</head>
+<body>
+<script src="../../closure-library/closure/goog/base.js"></script>
+<script src="../source/deps.js"></script>
+<script>
+	goog.require('goog.testing.ContinuationTestCase');	
+	goog.require('goog.testing.jsunit');	
+</script>
+<script>
+	goog.require('pike.input.InputHandlerBase');
+	goog.require('pike.input.MouseInputHandler');
+	goog.require('pike.input.TouchInputHandler');
+	goog.require('goog.events.EventTarget');
+	goog.require('goog.events.Event');
+	goog.require('goog.events.EventType');
+	goog.require('pike.events.Down');
+	goog.require('pike.events.Up');
+	goog.require('pike.events.Move');
+</script>
+<script>
+var testCase = new goog.testing.ContinuationTestCase('InputHandler Test Case');
+testCase.autoDiscoverTests();
+
+// Standalone Closure Test Runner.
+if (typeof G_testRunner != 'undefined') {
+  G_testRunner.initialize(testCase);
+}
+function setUpPage(){}
+function setUp(){}
+
+function testMouseInputHandler_Down() {	
+	var source = new goog.events.EventTarget();
+	var mh = new pike.input.MouseInputHandler( source );	
+	var event = null;
+			
+	goog.events.listen(mh, pike.events.Down.EVENT_TYPE, function(e){
+		event = e;			
+	});
+	
+    waitForEvent(mh, pike.events.Down.EVENT_TYPE, function() {    	
+    	assertTrue( event instanceof pike.events.Down); 
+    	assertTrue( event.posX == 100);
+    	assertTrue( event.posY == 150);
+    });
+    
+    var DOMEvent = new goog.events.Event(goog.events.EventType.MOUSEDOWN)
+    DOMEvent.offsetX = 100;
+    DOMEvent.offsetY = 150;
+    goog.events.dispatchEvent( source, DOMEvent );      
+};
+
+function testMouseInputHandler_Up() {	
+	var source = new goog.events.EventTarget();
+	var mh = new pike.input.MouseInputHandler( source );	
+	var event = null;
+			
+	goog.events.listen(mh, pike.events.Up.EVENT_TYPE, function(e){
+		event = e;			
+	});
+	
+    waitForEvent(mh, pike.events.Up.EVENT_TYPE, function() {    	
+    	assertTrue( event instanceof pike.events.Up); 
+    	assertTrue( event.posX == 100);
+    	assertTrue( event.posY == 150);
+    });
+    
+    var DOMEvent = new goog.events.Event(goog.events.EventType.MOUSEUP)
+    DOMEvent.offsetX = 100;
+    DOMEvent.offsetY = 150;
+    goog.events.dispatchEvent( source, DOMEvent );      
+};
+
+function testMouseInputHandler_Move() {	
+	var source = new goog.events.EventTarget();
+	var mh = new pike.input.MouseInputHandler( source );	
+	var event = null;
+			
+	goog.events.listen(mh, pike.events.Move.EVENT_TYPE, function(e){
+		event = e;		
+	});
+	
+    waitForEvent(mh, pike.events.Move.EVENT_TYPE, function() {    	
+    	assertTrue( event instanceof pike.events.Move); 
+    	assertTrue( event.posX == 100);
+    	assertTrue( event.posY == 150);
+    	assertTrue( event.deltaX == 10);
+    	assertTrue( event.deltaY == 10);
+    });
+    
+    mh.lastMoveCoordinates_ = {posX:90, posY:140};
+    mh.mouseDown_ = true;
+    var DOMEvent = new goog.events.Event(goog.events.EventType.MOUSEMOVE )
+    DOMEvent.offsetX = 100;
+    DOMEvent.offsetY = 150;
+    goog.events.dispatchEvent( source, DOMEvent );      
+};
+
+function tearDown(){}
+
+</script>
+</body>
+</html>

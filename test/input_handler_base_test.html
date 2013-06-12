@@ -1,0 +1,71 @@
+<!doctype html>
+<html>
+<head>
+<title>Test Case</title>
+</head>
+<body>
+<script src="../../closure-library/closure/goog/base.js"></script>
+<script src="../source/deps.js"></script>
+<script>
+	goog.require('goog.testing.ContinuationTestCase');	
+	goog.require('goog.testing.jsunit');	
+</script>
+<script>
+	goog.require('pike.input.InputHandlerBase');
+	goog.require('pike.input.MouseInputHandler');
+	goog.require('pike.input.TouchInputHandler');
+	goog.require('goog.events.EventTarget');
+	goog.require('goog.events.Event');
+	goog.require('goog.events.EventType');
+	goog.require('pike.events.Down');
+	goog.require('pike.events.Up');
+	goog.require('pike.events.Move');
+</script>
+<script>
+var testCase = new goog.testing.ContinuationTestCase('InputHandler Test Case');
+testCase.autoDiscoverTests();
+
+// Standalone Closure Test Runner.
+if (typeof G_testRunner != 'undefined') {
+  G_testRunner.initialize(testCase);
+}
+function setUpPage(){}
+function setUp(){}
+
+function testGetInputCoordinates_() {
+	
+	var hb = new pike.input.InputHandlerBase();
+		
+	waitForTimeout(function() {
+		var coord = hb.getInputCoordinates_({offsetX:10, offsetY:20});
+		assertTrue( coord.posX == 10);
+		assertTrue( coord.posY == 20);	 
+		
+		hb.viewport_.x = 100;
+		hb.viewport_.y = 200;		
+		
+		var coord = hb.getInputCoordinates_({offsetX:10, offsetY:20});		
+		assertTrue( coord.posX == 110);
+		assertTrue( coord.posY == 220);				
+	}, 0);			
+}
+
+function testOnViewportChangePosition(){
+	var hb = new pike.input.InputHandlerBase();	
+	waitForTimeout(function() {
+		assertTrue( hb.viewport_.x == 0);
+		assertTrue( hb.viewport_.y == 0);
+		
+		hb.onViewportChangePosition({x:100, y:200});
+		
+		assertTrue( hb.viewport_.x == 100);
+		assertTrue( hb.viewport_.y == 200);
+		
+	}, 0);	
+}
+
+function tearDown(){}
+
+</script>
+</body>
+</html>

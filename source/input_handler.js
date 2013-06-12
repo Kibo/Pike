@@ -11,6 +11,8 @@ goog.require('pike.graphics.Rectangle');
 goog.require('pike.events.Down');
 goog.require('pike.events.Up');
 goog.require('pike.events.Move');
+goog.require('goog.events.EventTarget');
+
 
 //## InputHandlerBase ###############################################
 /**
@@ -118,10 +120,6 @@ pike.input.InputHandlerBase.prototype.onViewportChangePosition = function(e){
 	this.viewport_.y = e.y;
 };
 
-pike.input.InputHandlerBase.prototype.tomas = function(){
-	console.log("tomas");
-};
-
 //## MouseInputHandler ###############################################
 /**
  * MouseInputHandler
@@ -137,7 +135,6 @@ pike.input.MouseInputHandler = function(element){
 };
 
 goog.inherits(pike.input.MouseInputHandler, pike.input.InputHandlerBase );
-console.log( pike.input.MouseInputHandler.prototype )
 
 /**
  * Attach the listeners to the mouseXXX DOM events
