@@ -34,7 +34,8 @@ function setUp(){}
 
 function testMouseInputHandler_Down() {	
 	var source = new goog.events.EventTarget();
-	var mh = new pike.input.MouseInputHandler( source );	
+	var mh = new pike.input.MouseInputHandler();	
+	mh.setEventTarget(source)
 	var event = null;
 			
 	goog.events.listen(mh, pike.events.Down.EVENT_TYPE, function(e){
@@ -55,7 +56,8 @@ function testMouseInputHandler_Down() {
 
 function testMouseInputHandler_Up() {	
 	var source = new goog.events.EventTarget();
-	var mh = new pike.input.MouseInputHandler( source );	
+	var mh = new pike.input.MouseInputHandler();
+	mh.setEventTarget(source)
 	var event = null;
 			
 	goog.events.listen(mh, pike.events.Up.EVENT_TYPE, function(e){
@@ -76,7 +78,8 @@ function testMouseInputHandler_Up() {
 
 function testMouseInputHandler_Move() {	
 	var source = new goog.events.EventTarget();
-	var mh = new pike.input.MouseInputHandler( source );	
+	var mh = new pike.input.MouseInputHandler();
+	mh.setEventTarget(source)
 	var event = null;
 			
 	goog.events.listen(mh, pike.events.Move.EVENT_TYPE, function(e){

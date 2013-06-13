@@ -22,18 +22,18 @@ goog.require('goog.array');
 pike.core.Stage = function(){
 	goog.events.EventTarget.call(this);
 	
+	this.viewport_ = new pike.graphics.Rectangle(0, 0, 0, 0);
+	this.gameWorld_ = new pike.graphics.Rectangle(0, 0, 0, 0);
+	
+	this.layers_ = [];
+	
+	this.createRootElement_();	
+	
 	/**
 	* @type {!goog.events.EventHandler}
 	* @protected
 	*/
-	this.handler = new goog.events.EventHandler(this);
-	
-	this.layers_ = [];		
-	
-	this.viewport_ = new pike.graphics.Rectangle(0, 0, 0, 0);
-	this.gameWorld_ = new pike.graphics.Rectangle(0, 0, 0, 0);
-		
-	this.createRootElement_();	
+	this.handler = new goog.events.EventHandler(this);	
 };
 
 goog.inherits(pike.core.Stage, goog.events.EventTarget);
@@ -96,8 +96,6 @@ pike.core.Stage.prototype.onViewportChangeSize = function(e){
 	this.setViewportSize_(e.w, e.h);
 };
 
-
-
 /**
  * on Viewport change position handler
  * @param {pike.events.ChangePosition} e
@@ -126,7 +124,7 @@ pike.core.Stage.prototype.render_ = function( layer ){
 	if(layer.hasDirtyManager()){
 		
 		if(!layer.dirtyManager.isClean()){	
-			
+								
 			offScreen.context.clearRect(
 					layer.dirtyManager.getDirtyRectangle().x,
 					layer.dirtyManager.getDirtyRectangle().y,
@@ -135,11 +133,11 @@ pike.core.Stage.prototype.render_ = function( layer ){
 			);
 			
 			layer.dispatchEvent( new pike.events.Render( new Date().getTime(), this));
-						
+											
 			if(!screen.isDirty){
 				screen.context.clearRect(
-					layer.dirtyManager.getDirtyRectangle().x,
-					layer.dirtyManager.getDirtyRectangle().y,
+					~~(layer.dirtyManager.getDirtyRectangle().x - this.viewport_.x),
+					~~(layer.dirtyManager.getDirtyRectangle().y - this.viewport_.y),
 					layer.dirtyManager.getDirtyRectangle().w,
 					layer.dirtyManager.getDirtyRectangle().h						
 				);

@@ -54,17 +54,21 @@
 			
 			function onImageLoaded(){				
 				var timer = new pike.core.Timer();
-				var viewport = new pike.core.Viewport();
 				var gameWorld = new pike.core.GameWorld();
+				var viewport = new pike.core.Viewport();
 				
-				var stage = new pike.core.Stage();			
+				var stage = new pike.core.Stage();
 				stage.handler.listen(timer, pike.events.Render.EVENT_TYPE, goog.bind(stage.onRender, stage));
+				stage.handler.listen(gameWorld, pike.events.ChangeSize.EVENT_TYPE, goog.bind(stage.onGameWorldChangeSize, stage));
 				stage.handler.listen(viewport, pike.events.ChangeSize.EVENT_TYPE, goog.bind(stage.onViewportChangeSize, stage));
 				stage.handler.listen(viewport, pike.events.ChangePosition.EVENT_TYPE, goog.bind(stage.onViewportChangePosition, stage));
-				stage.handler.listen(gameWorld, pike.events.ChangeSize.EVENT_TYPE, goog.bind(stage.onGameWorldChangeSize, stage));
-				
+
+				var mouse = new pike.input.MouseInputHandler();
+				mouse.handler.listen(viewport, pike.events.ChangePosition.EVENT_TYPE, goog.bind(mouse.onViewportChangePosition, mouse));
+							
 				viewport.setSize(600,400);
-				
+				gameWorld.setSize(1280, 1280);
+											
 				//background						
 				stage.addLayer( new pike.layers.Layer("background") );
 								
@@ -73,41 +77,42 @@
 				bgEntity.handler.listen(stage.getLayer('background'), pike.events.Render.EVENT_TYPE, goog.bind(bgEntity.onImageRender, bgEntity));				
 				
 				stage.getLayer('background').addEntity( bgEntity );
-				
-				
+								
 				//Entities
 				var layerEnt = new pike.layers.Layer("entities");
 				layerEnt.setDirtyManager( new pike.layers.DirtyManager() );
 				stage.addLayer( layerEnt );
 																			
-				var hero = new pike.core.Entity( pike.components.Sprite );
+				var hero = new pike.core.Entity( pike.components.Sprite, pike.components.Watch );
 				hero.setSprite( imageManager.get("entities"), 0, 0, 32, 32, 3, 300);
 				hero.onMouseDown = function(e){
+					
 					this.setDirty(this.getBounds());
 					this.x = e.posX;
 					this.y = e.posY;
-					this.setDirty(this.getBounds());								
+					this.setDirty(this.getBounds());
+					
+					this.watchMe(viewport, gameWorld);
 				};
 													
-				hero.handler.listen(timer, pike.events.Update.EVENT_TYPE, goog.bind(hero.onSpriteUpdate, hero));
-				hero.handler.listen(stage.getLayer('entities'), pike.events.Render.EVENT_TYPE, goog.bind(hero.onSpriteRender, hero));				
+				//hero.handler.listen(timer, pike.events.Update.EVENT_TYPE, goog.bind(hero.onSpriteUpdate, hero));
+				hero.handler.listen(stage.getLayer('entities'), pike.events.Render.EVENT_TYPE, goog.bind(hero.onSpriteRender, hero));
+				hero.handler.listen( mouse, pike.events.Down.EVENT_TYPE, goog.bind( hero.onMouseDown, hero) );
 											
 				stage.getLayer('entities').addEntity( hero );
 				
 				
 				//Foreground					
 				stage.addLayer( new pike.layers.Layer("foreground"));
+				mouse.setEventTarget( stage.getLayer('foreground').getScreen().canvas );
 								
 				var fgEntity = new pike.core.Entity( pike.components.Image );
 				fgEntity.setImage( imageManager.get("fg") );				
-				fgEntity.handler.listen(stage.getLayer('foreground'), pike.events.Render.EVENT_TYPE, goog.bind(fgEntity.onImageRender, fgEntity));				
+				fgEntity.handler.listen(stage.getLayer('foreground'), pike.events.Render.EVENT_TYPE, goog.bind(fgEntity.onImageRender, fgEntity));											
 				
 				stage.getLayer('foreground').addEntity( fgEntity );
-																
-				var mouse = new pike.input.MouseInputHandler( stage.getLayer('foreground').getScreen().canvas );
-				hero.handler.listen( mouse, pike.events.Down.EVENT_TYPE, goog.bind( hero.onMouseDown, hero) );
-				
-				timer.start();										
+																																
+				timer.start();						
 			}				
 		}
 	</script>

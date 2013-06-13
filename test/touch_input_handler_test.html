@@ -34,7 +34,8 @@ function setUp(){}
 
 function testTouchInputHandler_Down() {	
 	var source = new goog.events.EventTarget();
-	var mh = new pike.input.TouchInputHandler( source );	
+	var mh = new pike.input.TouchInputHandler();
+	mh.setEventTarget(source)
 	var event = null;
 			
 	goog.events.listen(mh, pike.events.Down.EVENT_TYPE, function(e){
@@ -55,7 +56,8 @@ function testTouchInputHandler_Down() {
 
 function testTouchInputHandler_Up() {	
 	var source = new goog.events.EventTarget();
-	var mh = new pike.input.TouchInputHandler( source );	
+	var mh = new pike.input.TouchInputHandler();
+	mh.setEventTarget(source)
 	var event = null;
 			
 	goog.events.listen(mh, pike.events.Up.EVENT_TYPE, function(e){
@@ -77,7 +79,8 @@ function testTouchInputHandler_Up() {
 
 function testTouchInputHandler_Move() {	
 	var source = new goog.events.EventTarget();
-	var mh = new pike.input.TouchInputHandler( source );	
+	var mh = new pike.input.TouchInputHandler();
+	mh.setEventTarget(source)
 	var event = null;
 			
 	goog.events.listen(mh, pike.events.Move.EVENT_TYPE, function(e){

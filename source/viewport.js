@@ -64,3 +64,4 @@ pike.core.Viewport.prototype.setPosition = function( x, y ){
 pike.core.Viewport.prototype.getBounds = function(){
 	return this.viewport_.copy();
 };
+

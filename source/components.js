@@ -4,10 +4,11 @@
 * @license Dual licensed under the MIT or GPL licenses.
 */
 goog.provide('pike.components.Sprite');
+goog.provide('pike.components.Watch');
+goog.provide('pike.components.Image');
 
 goog.require('goog.events.EventHandler');
 goog.require('pike.graphics.Rectangle');
-goog.require('pike.events.ViewportChangePosition');
 
 //## Sprite #################################
 /**
@@ -70,7 +71,7 @@ pike.components.Sprite = function(){
 	 */
 	this.setDirty = function(rect){
 		if(this.layer.hasDirtyManager()){
-			this.layer.dirtyManager.markDirty( rect );			
+			this.layer.dirtyManager.markDirty( rect );				
 		}else{		
 			this.layer.getOffScreen().isDirty = true;
 		}
@@ -79,7 +80,7 @@ pike.components.Sprite = function(){
 
 //## Background #################################
 /**
- * Background
+ * Draws image
  * @constructor
  */
 pike.components.Image = function(){
@@ -104,35 +105,53 @@ pike.components.Image = function(){
 	};		
 };
 
-
 //## Watch #################################
 /**
- * Watch
+ * Watches a entity on the viewport
  * @constructor
  */
 pike.components.Watch = function(){
 		
 	this.watchMe = function( viewport, gameWorld ){
 		
-		var oldX = viewport.x;	
-		var oldY = viewport.y;
+		var viewportBounds = viewport.getBounds();
+		var gameWorldBounds = gameWorld.getBounds();
 		
-		if(this.x < this.leftInnerBoundary( viewport )){					
-			viewport.x = Math.max(0, Math.min(
-				Math.floor(this.x - (viewport.w * 0.25)),
-				gameWorld.w - viewport.w
+		var currentX = viewportBounds.x;	
+		var currentY = viewportBounds.y;
+		
+		
+		if(this.x < this.leftInnerBoundary( viewportBounds )){					
+			viewportBounds.x = Math.max(0, Math.min(
+				Math.floor(this.x - (viewportBounds.w * 0.25)),
+				gameWorldBounds.w - viewportBounds.w
 				));										    					
 		}
 					
-		if(this.x + this.w > this.rightInnerBoundary(viewport)){				   				  
-		    viewport.x = Math.max(0, Math.min(
-				Math.floor(this.x + this.w - (viewport.w * 0.75)),
-				gameWorld.w - viewport.w
+		if(this.x + this.w > this.rightInnerBoundary( viewportBounds )){				   				  
+			viewportBounds.x = Math.max(0, Math.min(
+				Math.floor(this.x + this.w - (viewportBounds.w * 0.75)),
+				gameWorldBounds.w - viewportBounds.w
 				));			    		  
 		}
+		
+		if(this.y < this.topInnerBoundary( viewportBounds )){				    					    				  
+			viewportBounds.y = Math.max(0, Math.min(
+				Math.floor(this.y - (viewportBounds.h * 0.25)),
+				gameWorldBounds.h - viewportBounds.h	
+				));				    		 			   
+		}
+		
+		if(this.y + this.h > this.bottomInnerBoundary( viewportBounds )){				   				  
+			viewportBounds.y = Math.max(0, Math.min(
+				Math.floor(this.y + this.h - (viewportBounds.h * 0.75)),
+				gameWorldBounds.h - viewportBounds.h	
+				));				    
+		}
+		
 							
-		if( oldX != viewport.x || oldY != viewport.y ){			
-			this.dispathEvent( new pike.events.ViewportChangePosition( this.viewport.x, this.viewport.y, this) );
+		if( currentX != viewportBounds.x || currentY != viewportBounds.y ){			
+			viewport.setPosition(viewportBounds.x, viewportBounds.y);
 		}
 	};	
 		
@@ -152,22 +171,4 @@ pike.components.Watch = function(){
   		return viewport.y + (viewport.h * 0.75);
 	};		
 };
-
-//## Mouse #################################
-/**
- * Mouse
- * @constructor
- */
-pike.components.Mouse = function(){
-	
-	this.setMouseHandler = function( mouseHandler ){
-		this.mousehandler = mouseHandler;
-		this.handler.listen( this.mousehandler, pike.events.Down.EVENT_TYPE, goog.bind( this.onMouseDown ,this) );
-	};	
-	
-	//this.onMouseDown = function(e){};
-};
-
-
-
 

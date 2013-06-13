@@ -71,7 +71,7 @@ pike.layers.DirtyManager.prototype.markDirty = function( rect ){
 	} else {					
 		this.dirtyRect_ = rect;		
 	}
-	
+		
 	// Check for threshold. If it is reached, mark the whole screen dirty
 	if (this.dirtyRect_.w * this.dirtyRect_.h > this.allDirtyThreshold_ * this.viewport_.w * this.viewport_.h){	
 			this.markAllDirty();

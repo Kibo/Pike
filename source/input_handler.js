@@ -21,7 +21,7 @@ goog.require('goog.events.EventTarget');
  * @constructor
  * @extends {goog.events.EventTarget}
  */
-pike.input.InputHandlerBase = function( element ){
+pike.input.InputHandlerBase = function(){
 	goog.events.EventTarget.call(this);
 	
 	/**
@@ -33,7 +33,7 @@ pike.input.InputHandlerBase = function( element ){
 	this.viewport_ = new pike.graphics.Rectangle(0,0,0,0);
 	
 	// The DOM element
-	this.element_ = element;
+	this.element_ = null;
 	
     this.moving_ = false;
     this.lastMoveCoordinates_ = null;
@@ -123,18 +123,24 @@ pike.input.InputHandlerBase.prototype.onViewportChangePosition = function(e){
 //## MouseInputHandler ###############################################
 /**
  * MouseInputHandler
- * @param {Object} element - DOM element 
  * @constructor
  * @extends {pike.input.InputHandlerBase}
  */
-pike.input.MouseInputHandler = function(element){	
-	pike.input.InputHandlerBase.call(this, element);
-		
-	this.mouseDown_ = false;
-    this.attachDomListeners_();	
+pike.input.MouseInputHandler = function(){	
+	pike.input.InputHandlerBase.call(this);		
+	this.mouseDown_ = false;    	
 };
 
 goog.inherits(pike.input.MouseInputHandler, pike.input.InputHandlerBase );
+
+/**
+ * 
+ * @param {Object} eventTarget - DOM element
+ */
+pike.input.MouseInputHandler.prototype.setEventTarget = function( eventTarget ){
+	this.element_ = eventTarget;
+	this.attachDomListeners_();
+};
 
 /**
  * Attach the listeners to the mouseXXX DOM events
@@ -171,17 +177,24 @@ pike.input.MouseInputHandler.prototype.onMouseOut = function(){
 //## TouchInputHandler ###############################################
 /**
  * MouseInputHandler
- * @param {Object} element - DOM element 
  * @constructor
  * @extends {pike.input.InputHandlerBase}
  */
-pike.input.TouchInputHandler = function(element) {    
-    pike.input.InputHandlerBase.call(this, element);
+pike.input.TouchInputHandler = function() {    
+    pike.input.InputHandlerBase.call(this);
     this.lastInteractionCoordinates_ = null;
-    this.attachDomListeners_();       
 };
 
 goog.inherits(pike.input.TouchInputHandler, pike.input.InputHandlerBase);
+
+/**
+ * 
+ * @param {Object} eventTarget - DOM element
+ */
+pike.input.TouchInputHandler.prototype.setEventTarget = function( eventTarget ){
+	this.element_ = eventTarget;
+	this.attachDomListeners_();
+};
 
 /**
  * Attach the listeners to the touchXXX DOM events
