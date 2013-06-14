@@ -12,6 +12,7 @@ goog.require('goog.events.EventHandler');
 goog.require('pike.events.NewEntity');
 goog.require('pike.events.RemoveEntity');
 goog.require('pike.core.Entity');
+goog.require('pike.graphics.Cluster');
 
 /**
  * Create a new layer
@@ -177,13 +178,15 @@ pike.layers.Layer.prototype.dispatchEvent = function( e ){
 pike.layers.ClusterLayer = function( name, clusterSize ){
 	pike.layers.Layer.call(this, name);
 	
-	this.clusterSize_ = clusterSize;
+	//this.clusterSize_ = clusterSize;
 		
 	/* the clusters arranged into the grid*/
-    this.clusters_ = [];
+    //this.clusters_ = [];
 
     /* object id to Rect - the cluster bounds */
-    this.idToClusterBounds_ = {};
+    //this.idToClusterBounds_ = {};
+    
+    this.clusters_ = new pike.graphics.Cluster(clusterSize, 0, 0);
 
     /* currently visible clusters */
     this.visibleClusterBounds_ = {};
@@ -214,7 +217,7 @@ pike.layers.ClusterLayer.prototype.dispatchEvent = function( e ){
 	
 	for (var i = 0; i < this.cache_.length; i++) {
 		var entity = this.cache_[i];
-		if (entity.getBounds().intersect(this.viewport_)) {
+		if (entity.getBounds().intersects(this.viewport_)) {
 			entity.dispatchEvent(e);
 		}
 	}
@@ -233,39 +236,15 @@ pike.layers.ClusterLayer.prototype.addEntity = function( entity ){
 	this.handler.listen(entity, pike.events.ChangePosition.EVENT_TYPE, goog.bind( this.onEntityMove, this ));
 		
 	//Cluster will build after attached to stage
-	if( this.clusters_.length == 0 ){
+	if( this.clusters_.getClusters().length == 0 ){
 		return
 	}
-	
-	var clusters = this.addToClusters_( entity );
-	if (clusters.intersect(this.visibleClusterBounds_)) {			
+		
+	var clusters = this.clusters_.addToClusters( entity );
+	if (clusters.intersects(this.visibleClusterBounds_)) {			
 		this.cache_.push( entity );
 		this.cacheUnsorted_ = true;			
 	}
-};
-
-/**
- * Add entity to the cluster
- * @param {pike.core.Entity} entity
- * @returns {pike.graphics.Rectangle}
- * @private
- */
-pike.layers.ClusterLayer.prototype.addToClusters_ = function(entity){	
-	var clusterBounds = entity.getBounds().getOverlappingGridCells(
-        this.clusterSize_, 
-        this.clusterSize_, 
-        this.clusters_[0].length, 
-        this.clusters_.length);
-		 
-    for (var clusterY = clusterBounds.y; clusterY < clusterBounds.y + clusterBounds.h; clusterY++) {
-        for (var clusterX = clusterBounds.x; clusterX < clusterBounds.x + clusterBounds.w; clusterX++) {
-            this.clusters_[clusterY][clusterX].push( entity );           
-        }
-    }
-    //save bounds in cluster
-    this.idToClusterBounds_[entity.id] = clusterBounds;
-    if(goog.DEBUG) console.log("[pike.layers.ClusterLayer] entity " +  entity.id +" is added to cluster " + clusterBounds);
-    return clusterBounds;
 };
 
 /**
@@ -275,32 +254,15 @@ pike.layers.ClusterLayer.prototype.addToClusters_ = function(entity){
  * @override
  */
 pike.layers.ClusterLayer.prototype.removeEntity = function( entity ){
-	this.removeFromClusters_( entity );
+	this.clusters_.removeFromClusters(entity);	
 	pike.layers.Layer.prototype.removeEntity.call(this, entity);
-};
-
-/**
- * Remove entity from the cluster
- * @param {pike.core.Entity} entity
- * @returns {pike.graphics.Rectangle}
- * @private
- */
-pike.layers.ClusterLayer.prototype.removeFromClusters_ = function(entity){
-	var clusterBounds = this.idToClusterBounds_[entity.id];
-    for (var clusterY = clusterBounds.y; clusterY < clusterBounds.y + clusterBounds.h; clusterY++) {
-        for (var clusterX = clusterBounds.x; clusterX < clusterBounds.x + clusterBounds.w; clusterX++) {            
-            goog.array.remove(this.clusters_[clusterY][clusterX], entity);            
-        }
-    }
-    
-    if(goog.DEBUG) console.log("[pike.layers.ClusterLayer] entity " + entity.id + " is removed from cluster " + clusterBounds);
 };
 
 pike.layers.ClusterLayer.prototype.resetCache_ = function(){
 	var cache = this.cache_ = [];
     for (var i = this.visibleClusterBounds_.y; i < this.visibleClusterBounds_.y + this.visibleClusterBounds_.h; i++) {
         for (var j = this.visibleClusterBounds_.x; j < this.visibleClusterBounds_.x + this.visibleClusterBounds_.w; j++) {
-            var cluster = this.clusters_[i][j];
+            var cluster = this.clusters_.getClusters()[i][j];
             for (var k = 0; k < cluster.length; k++) {
                 if (cache.indexOf(cluster[k]) == -1) {                	
                     cache.push(cluster[k]);
@@ -316,6 +278,9 @@ pike.layers.ClusterLayer.prototype.resetCache_ = function(){
     this.cacheUnsorted_ = false;    
 };
 
+/**
+ * @private
+ */
 pike.layers.ClusterLayer.prototype.sortCache_ = function() {
     this.cache_.sort(function(a, b) {
         var aBounds = a.getBounds();
@@ -332,29 +297,23 @@ pike.layers.ClusterLayer.prototype.sortCache_ = function() {
  * Recreate the clusters
  * @private
  */
-pike.layers.ClusterLayer.prototype.resetClusters_ = function(){
-	this.clusters_ = [];	
-	for (var i = 0; i < Math.ceil(this.gameWorld_.h/this.clusterSize_); i++) {		
-        this.clusters_[i] = [];        
-        for (var j = 0; j < Math.ceil(this.gameWorld_.w/this.clusterSize_); j++) {
-            this.clusters_[i][j] = [];            
-        }
-    }
-	
+pike.layers.ClusterLayer.prototype.resetClusters_ = function(){		
+	this.clusters_.build();
+		
 	if(goog.DEBUG) console.log("[pike.layers.ClusterLayer] resetcluster");
 	
-	for (i = 0; i < this.entities_.length; i++) {
-        var entity = this.entities_[i];        
-        this.addToClusters_( entity );        
+	for (var i=0; i < this.entities_.length; i++) {
+        var entity = this.entities_[i];  
+        this.clusters_.addToClusters(entity); 
     }		
 };
 
 pike.layers.ClusterLayer.prototype.updateVisibleClusters_ = function(){
 	var newRect = this.viewport_.getOverlappingGridCells(
-			this.clusterSize_, 
-			this.clusterSize_,
-            this.clusters_[0].length, 
-            this.clusters_.length);
+			this.clusters_.getClusterSize(),
+			this.clusters_.getClusterSize(),
+			this.clusters_.getClusters()[0].length,
+			this.clusters_.getClusters().length);
 
     if (!newRect.equals(this.visibleClusterBounds_)) {
         this.visibleClusterBounds_ = newRect;
@@ -397,6 +356,7 @@ pike.layers.ClusterLayer.prototype.setViewportPosition = function(x, y) {
  */
 pike.layers.ClusterLayer.prototype.setGameWorldSize = function(width, height) {	
 	pike.layers.Layer.prototype.setGameWorldSize.call(this, width, height);	
+	this.clusters_.setSize(width, height);
 	this.resetClusters_();	
 };
 
@@ -407,29 +367,29 @@ pike.layers.ClusterLayer.prototype.setGameWorldSize = function(width, height) {
 pike.layers.ClusterLayer.prototype.onEntityMove = function(e){	
 	var entity = e.target;
 	var newClusters = entity.getBounds().getOverlappingGridCells(
-			this.clusterSize_, 
-			this.clusterSize_,
-			this.clusters_[0].length, 
-			this.clusters_.length);
+			this.clusters_.getClusterSize(),
+			this.clusters_.getClusterSize(),
+			this.clusters_.getClusters()[0].length,
+			this.clusters_.getClusters().length);
 	
-	var oldClusters = this.idToClusterBounds_[entity.id];
+	var oldClusters = this.clusters_.getIdToClusterBounds(entity.id);
 	
 	if (!oldClusters.equals(newClusters)) {
 		this.moveObjectBetweenClusters_(entity, oldClusters, newClusters);		
 	}
 		
-	if (newClusters.intersect(this.visibleClusterBounds_) && e.y != e.oldY) {
+	if (newClusters.intersects(this.visibleClusterBounds_) && e.y != e.oldY) {
 		this.cacheUnsorted_ = true;		
 	}	
 };
 
 pike.layers.ClusterLayer.prototype.moveObjectBetweenClusters_ = function( entity, oldClusters, newClusters) {
-	this.removeFromClusters_(entity, oldClusters);
-	this.addToClusters_(entity, newClusters);
-	this.idToClusterBounds_[entity.id] = newClusters;
+	this.clusters_.removeFromClusters(entity, oldClusters);
+	this.clusters_.addToClusters(entity, newClusters);
+	this.clusters_.setIdToClusterBounds(entity.id, newClusters);
 	
 	// If object has left the screen, remove from cache
-	if (newClusters.intersect(this.visibleClusterBounds_)) {
+	if (newClusters.intersects(this.visibleClusterBounds_)) {
 		
 		if(!goog.array.contains(this.cache_, entity)){
 			this.cache_.push(entity);

@@ -19,7 +19,7 @@ goog.require('goog.events.EventHandler');
 pike.core.GameWorld = function(){
 	goog.events.EventTarget.call(this);
 
-	this.viewport_ = new pike.graphics.Rectangle(0,0,0,0); 	
+	this.bounds_ = new pike.graphics.Rectangle(0,0,0,0); 	
 
 	/**
 	* @type {!goog.events.EventHandler}
@@ -37,13 +37,13 @@ goog.inherits(pike.core.GameWorld, goog.events.EventTarget);
 * @fires {pike.events.ChangeSize} event
 */
 pike.core.GameWorld.prototype.setSize = function( width, height ){	
-	var oldW = this.viewport_.w;
-	var oldH = this.viewport_.h;
-	this.viewport_.w = width;
-	this.viewport_.h = height;
+	var oldW = this.bounds_.w;
+	var oldH = this.bounds_.h;
+	this.bounds_.w = width;
+	this.bounds_.h = height;
 
 	if(goog.DEBUG) console.log("[pike.core.GameWorld] changesize");
-	this.dispatchEvent( new pike.events.ChangeSize(this.viewport_.w, this.viewport_.h, oldW, oldH, this) );
+	this.dispatchEvent( new pike.events.ChangeSize(this.bounds_.w, this.bounds_.h, oldW, oldH, this) );
 };
 
 /**
@@ -51,5 +51,5 @@ pike.core.GameWorld.prototype.setSize = function( width, height ){
 * @return {pike.graphics.Rectangle}
 */
 pike.core.GameWorld.prototype.getBounds = function(){
-	return this.viewport_.copy();
+	return this.bounds_.copy();
 };

@@ -42,8 +42,8 @@ var testEquals = function(){
 var testIntersect = function() {
 	var rectangle1 = new pike.graphics.Rectangle(0, 0, 500, 100);
 	
-	assertTrue( rectangle1.intersect(new pike.graphics.Rectangle(499, 100, 10, 10)) );
-	assertFalse( rectangle1.intersect(new pike.graphics.Rectangle(600, 100, 30, 40)) );	
+	assertTrue( rectangle1.intersects(new pike.graphics.Rectangle(499, 100, 10, 10)) );
+	assertFalse( rectangle1.intersects(new pike.graphics.Rectangle(600, 100, 30, 40)) );	
 };
 
 var testIntersection = function() {

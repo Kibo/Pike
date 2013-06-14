@@ -53,7 +53,7 @@ pike.graphics.Rectangle.prototype.toString = function(){
  * @param {pike.graphics.Rectangle} r2 - rectangle
  * @return {boolean}
  */
-pike.graphics.Rectangle.prototype.intersect = function( r2 ){
+pike.graphics.Rectangle.prototype.intersects = function( r2 ){
 	return (this.x <= r2.x + r2.w 
 			&& this.x + this.w >= r2.x 
 			&& this.y <= r2.y + r2.h 

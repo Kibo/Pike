@@ -21,12 +21,14 @@ function setUp(){}
 
 function testBuildClusters(){
 	var clusters = new pike.graphics.Cluster(10,100,100);
+	clusters.build();
 	assertTrue( clusters.clusters_.length == 10 )
 	assertTrue( clusters.clusters_[0].length == 10 )
 };
 
 function testAddToClusters(){
 	var clusters = new pike.graphics.Cluster(10,100,100);
+	clusters.build();
 	var ent = new pike.core.Entity();
 	ent.w = 9;
 	ent.h = 9;
@@ -47,6 +49,7 @@ function testAddToClusters(){
 
 function testDeleteFromClusters(){
 	var clusters = new pike.graphics.Cluster(10,100,100);
+	clusters.build();
 	var ent = new pike.core.Entity();
 	ent.w = 9;
 	ent.h = 9;
@@ -59,6 +62,26 @@ function testDeleteFromClusters(){
 	clusters.removeFromClusters( ent )
 	assertTrue( clusters.clusters_[0][0].length == 0 );	
 };
+
+function testGetIdToClusterBounds(){	
+	var clusters = new pike.graphics.Cluster(10,100,100);
+	clusters.build();
+	var ent = new pike.core.Entity();
+	ent.w = 9;
+	ent.h = 9;
+	
+	ent.x = 0,
+	ent.y = 0;		
+	assertObjectEquals( new pike.graphics.Rectangle(0, 0, 1, 1), clusters.addToClusters( ent ) )
+	assertObjectEquals( new pike.graphics.Rectangle(0, 0, 1, 1), clusters.getIdToClusterBounds( ent.id ) );	
+}
+
+function testSetIdToClusterBounds(){	
+	var clusters = new pike.graphics.Cluster(10,100,100);
+	var bounds = new pike.graphics.Rectangle(4, 2, 1, 1);
+	clusters.setIdToClusterBounds( 18,  bounds );
+	assertObjectEquals( bounds, clusters.getIdToClusterBounds( 18 ) );		
+}
 
 function tearDown(){}
 </script>

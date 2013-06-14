@@ -9,9 +9,9 @@ goog.require('pike.graphics.Rectangle');
 
 /**
 * Cluster 
-* @param {number} clusterSize
-* @param {number} width
-* @param {number} height
+* @param {number} clusterSize - side of the square in px
+* @param {number} width - total width of the clusters
+* @param {number} height - total height of the clusters
 * @constructor
 */
 pike.graphics.Cluster = function( clusterSize, width, height ){
@@ -23,31 +23,70 @@ pike.graphics.Cluster = function( clusterSize, width, height ){
 	this.clusters_= [];
 
     /* object id to Rect - the cluster bounds */
-    this.idToClusterBounds_ = {}; 
-    
-    this.buildClusters();
+    this.idToClusterBounds_ = {};        
 };
 
 /**
- * Build a cluster
+ * Set size
+ * @param {number} width - total width of the clusters
+ * @param {number} height - total height of the clusters
  */
-pike.graphics.Cluster.prototype.buildClusters = function(){
+pike.graphics.Cluster.prototype.setSize = function(width, height){
+	this.bounds_.w = width;
+	this.bounds_.h = height;
+};
+
+/**
+ * Clusters
+ * @return {Array.<Array>}
+ */
+pike.graphics.Cluster.prototype.getClusters = function(){
+	return this.clusters_;
+};
+
+/**
+ * Get cluster size
+ * @return {number}
+ */
+pike.graphics.Cluster.prototype.getClusterSize = function(){
+	return this.clusterSize_;
+};
+
+/**
+ * Gets a entity bounds in clusters 
+ * @param {number} id
+ * @return {pike.graphics.Rectangle} - entity bounds in clusters
+ */
+pike.graphics.Cluster.prototype.getIdToClusterBounds = function(id){ 
+	return this.idToClusterBounds_[id];
+};
+
+
+pike.graphics.Cluster.prototype.setIdToClusterBounds = function(id, bounds){
+	this.idToClusterBounds_[id] = bounds;
+};
+
+/**
+ * Build a clusters
+ */
+pike.graphics.Cluster.prototype.build = function(){
 	this.clusters_ = [];	
 	for (var i = 0; i < Math.ceil(this.bounds_.h/this.clusterSize_); i++) {		
         this.clusters_[i] = [];        
         for (var j = 0; j < Math.ceil(this.bounds_.w/this.clusterSize_); j++) {
             this.clusters_[i][j] = [];            
         }
-    }
+    }	
 };
 
 /**
- * Add entity to the clusters
+ * Adds an entity to the clusters
  * @param {pike.core.Entity} entity
+ 	* @param {?pike.graphics.Rectangle} clusterBounds
  * @returns {pike.graphics.Rectangle}
  */
-pike.graphics.Cluster.prototype.addToClusters = function( entity ){
-	var clusterBounds = entity.getBounds().getOverlappingGridCells(
+pike.graphics.Cluster.prototype.addToClusters = function( entity, clusterBounds ){
+	clusterBounds = clusterBounds || entity.getBounds().getOverlappingGridCells(
         this.clusterSize_, 
         this.clusterSize_, 
         this.clusters_[0].length, 
@@ -64,13 +103,13 @@ pike.graphics.Cluster.prototype.addToClusters = function( entity ){
     return clusterBounds;	
 };
 
-
 /**
- * Add entity from the clusters
+ * Removes an entity from the clusters
  * @param {pike.core.Entity} entity
+ * @param {?pike.graphics.Rectangle} clusterBounds
  */
-pike.graphics.Cluster.prototype.removeFromClusters = function( entity ){
-	var clusterBounds = this.idToClusterBounds_[entity.id];
+pike.graphics.Cluster.prototype.removeFromClusters = function( entity, clusterBounds ){
+	clusterBounds = clusterBounds || this.idToClusterBounds_[entity.id];
     for (var clusterY = clusterBounds.y; clusterY < clusterBounds.y + clusterBounds.h; clusterY++) {
         for (var clusterX = clusterBounds.x; clusterX < clusterBounds.x + clusterBounds.w; clusterX++) {            
             goog.array.remove(this.clusters_[clusterY][clusterX], entity);            

@@ -38,10 +38,10 @@ var testSetSize = function(){
 	var gw = new pike.core.GameWorld();
 	gw.setSize(800, 20);
 	
-	assertTrue( gw.viewport_.x == 0 
-			 && gw.viewport_.y == 0 
-			 && gw.viewport_.w == 800
-			 && gw.viewport_.h == 20);	
+	assertTrue( gw.bounds_.x == 0 
+			 && gw.bounds_.y == 0 
+			 && gw.bounds_.w == 800
+			 && gw.bounds_.h == 20);	
 };
 
 function tearDown(){}
