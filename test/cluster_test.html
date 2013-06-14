@@ -1,0 +1,66 @@
+<!doctype html>
+<html>
+<head>
+<title>Test Case</title>
+</head>
+<body>
+<script src="../../closure-library/closure/goog/base.js"></script>
+<script src="../source/deps.js"></script>
+<script>
+	goog.require('goog.testing.ContinuationTestCase');	
+	goog.require('goog.testing.jsunit');	
+</script>
+<script>
+	goog.require('pike.graphics.Cluster');
+	goog.require('pike.core.Entity');
+	goog.require('pike.graphics.Rectangle');	
+</script>
+<script>
+function setUpPage(){}
+function setUp(){}
+
+function testBuildClusters(){
+	var clusters = new pike.graphics.Cluster(10,100,100);
+	assertTrue( clusters.clusters_.length == 10 )
+	assertTrue( clusters.clusters_[0].length == 10 )
+};
+
+function testAddToClusters(){
+	var clusters = new pike.graphics.Cluster(10,100,100);
+	var ent = new pike.core.Entity();
+	ent.w = 9;
+	ent.h = 9;
+	
+	ent.x = 0,
+	ent.y = 0;		
+	assertObjectEquals( new pike.graphics.Rectangle(0, 0, 1, 1), clusters.addToClusters( ent ) )
+	
+	ent.x = 0,
+	ent.y = 15;		
+	assertObjectEquals( new pike.graphics.Rectangle(0, 1, 1, 2), clusters.addToClusters( ent ) )
+	
+	ent.x = 5,
+	ent.y = 5;		
+	assertObjectEquals( new pike.graphics.Rectangle(0, 0, 2, 2), clusters.addToClusters( ent ) )	
+};
+
+
+function testDeleteFromClusters(){
+	var clusters = new pike.graphics.Cluster(10,100,100);
+	var ent = new pike.core.Entity();
+	ent.w = 9;
+	ent.h = 9;
+	
+	ent.x = 0,
+	ent.y = 0;	
+	clusters.addToClusters( ent )
+	assertEquals( clusters.clusters_[0][0][0], ent);
+	
+	clusters.removeFromClusters( ent )
+	assertTrue( clusters.clusters_[0][0].length == 0 );	
+};
+
+function tearDown(){}
+</script>
+</body>
+</html>

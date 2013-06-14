@@ -6,9 +6,6 @@
 goog.provide('pike.core.Stage');
 
 goog.require('pike.graphics.Rectangle');
-goog.require('pike.events.ViewportChangePosition');
-goog.require('pike.events.ViewportChangeSize');
-goog.require('pike.events.GameWorldChangeSize');
 goog.require('goog.events');
 goog.require('goog.events.EventTarget');
 goog.require('goog.events.EventHandler');
@@ -203,21 +200,10 @@ pike.core.Stage.prototype.createRootElement_ = function(){
  * @param {pike.layers.Layer} layer
  * @private
  */
-pike.core.Stage.prototype.setLayerSize_ = function(layer){
-	var screen = layer.getScreen();	
-	screen.canvas.width = this.viewport_.w;
-	screen.canvas.height = this.viewport_.h;
-	screen.isDirty = true;
-	
-	var offScreen = layer.getOffScreen();
-	offScreen.canvas.width = this.gameWorld_.w;
-	offScreen.canvas.height = this.gameWorld_.h;
-	offScreen.isDirty = true;	
-	
-	if(layer.hasDirtyManager()){
-		layer.dirtyManager.setPosition( this.viewport_.x, this.viewport_.y);
-		layer.dirtyManager.setSize( this.viewport_.w, this.viewport_.h );
-	}
+pike.core.Stage.prototype.setLayerSize_ = function(layer){	
+	layer.setViewportSize( this.viewport_.w, this.viewport_.h );
+	layer.setViewportPosition( this.viewport_.x, this.viewport_.y );
+	layer.setGameWorldSize( this.gameWorld_.w, this.gameWorld_.h );
 };
 
 /**
@@ -274,6 +260,9 @@ pike.core.Stage.prototype.setViewportPosition_ = function(x,y){
 	this.viewport_.y = y;
 	
 	for(var idx = 0; idx < this.layers_.length; idx++){
+		
+		this.layers_[idx].setViewportPosition(this.viewport_.x, this.viewport_.y);
+		
 		var screen = this.layers_[idx].getScreen();		
 		screen.isDirty = true;	
 		

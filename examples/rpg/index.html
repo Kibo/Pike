@@ -40,7 +40,7 @@
 		goog.require('pike.core.Timer');
 		goog.require('pike.core.Entity');
 		goog.require('pike.components.Sprite');		
-		goog.require('pike.events.ViewportChangePosition');	
+		goog.require('pike.events.ChangePosition');	
 	</script>
 	<script>
 		window.onload = function(){
@@ -74,32 +74,42 @@
 								
 				var bgEntity = new pike.core.Entity( pike.components.Image );
 				bgEntity.setImage( imageManager.get("bg") );				
-				bgEntity.handler.listen(stage.getLayer('background'), pike.events.Render.EVENT_TYPE, goog.bind(bgEntity.onImageRender, bgEntity));				
+				bgEntity.handler.listen(bgEntity, pike.events.Render.EVENT_TYPE, goog.bind(bgEntity.onImageRender, bgEntity));				
 				
 				stage.getLayer('background').addEntity( bgEntity );
 								
-				//Entities
-				var layerEnt = new pike.layers.Layer("entities");
-				layerEnt.setDirtyManager( new pike.layers.DirtyManager() );
-				stage.addLayer( layerEnt );
-																			
+																						
 				var hero = new pike.core.Entity( pike.components.Sprite, pike.components.Watch );
 				hero.setSprite( imageManager.get("entities"), 0, 0, 32, 32, 3, 300);
 				hero.onMouseDown = function(e){
 					
 					this.setDirty(this.getBounds());
+					var oldX = this.x;
+					var oldY = this.y;
 					this.x = e.posX;
 					this.y = e.posY;
 					this.setDirty(this.getBounds());
 					
+					this.dispatchEvent( new pike.events.ChangePosition(this.x, this.y, oldX, oldY, null, this) );
+					
 					this.watchMe(viewport, gameWorld);
-				};
-													
+				};												
 				//hero.handler.listen(timer, pike.events.Update.EVENT_TYPE, goog.bind(hero.onSpriteUpdate, hero));
-				hero.handler.listen(stage.getLayer('entities'), pike.events.Render.EVENT_TYPE, goog.bind(hero.onSpriteRender, hero));
+				hero.handler.listen(hero, pike.events.Render.EVENT_TYPE, goog.bind(hero.onSpriteRender, hero));
 				hero.handler.listen( mouse, pike.events.Down.EVENT_TYPE, goog.bind( hero.onMouseDown, hero) );
-											
-				stage.getLayer('entities').addEntity( hero );
+				
+				var enemy =  new pike.core.Entity( pike.components.Sprite );
+				enemy.x = 150;
+				enemy.y = 200;
+				enemy.setSprite( imageManager.get("entities"), 0, 0, 32, 32, 3, 300);
+				enemy.handler.listen(enemy, pike.events.Render.EVENT_TYPE, goog.bind(enemy.onSpriteRender, enemy));										
+								
+				
+				var clustaLayer = new pike.layers.ClusterLayer("Clusta", 640);
+				clustaLayer.setDirtyManager( new pike.layers.DirtyManager() );				
+				clustaLayer.addEntity( hero );	
+				clustaLayer.addEntity( enemy );				
+				stage.addLayer( clustaLayer );
 				
 				
 				//Foreground					
@@ -108,7 +118,7 @@
 								
 				var fgEntity = new pike.core.Entity( pike.components.Image );
 				fgEntity.setImage( imageManager.get("fg") );				
-				fgEntity.handler.listen(stage.getLayer('foreground'), pike.events.Render.EVENT_TYPE, goog.bind(fgEntity.onImageRender, fgEntity));											
+				fgEntity.handler.listen(fgEntity, pike.events.Render.EVENT_TYPE, goog.bind(fgEntity.onImageRender, fgEntity));											
 				
 				stage.getLayer('foreground').addEntity( fgEntity );
 																																

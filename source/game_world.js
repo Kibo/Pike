@@ -37,11 +37,13 @@ goog.inherits(pike.core.GameWorld, goog.events.EventTarget);
 * @fires {pike.events.ChangeSize} event
 */
 pike.core.GameWorld.prototype.setSize = function( width, height ){	
+	var oldW = this.viewport_.w;
+	var oldH = this.viewport_.h;
 	this.viewport_.w = width;
 	this.viewport_.h = height;
 
 	if(goog.DEBUG) console.log("[pike.core.GameWorld] changesize");
-	this.dispatchEvent( new pike.events.ChangeSize(this.viewport_.w, this.viewport_.h, this) );
+	this.dispatchEvent( new pike.events.ChangeSize(this.viewport_.w, this.viewport_.h, oldW, oldH, this) );
 };
 
 /**

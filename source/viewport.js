@@ -36,11 +36,13 @@ goog.inherits(pike.core.Viewport, goog.events.EventTarget);
 * @fires {pike.events.ChangeSize} event
 */
 pike.core.Viewport.prototype.setSize = function( width, height ){
+	var oldW = this.viewport_.w;
+	var oldH = this.viewport_.h;
 	this.viewport_.w = width;
 	this.viewport_.h = height;
 		
 	if(goog.DEBUG) console.log("[pike.core.Viewport] changesize");
-	this.dispatchEvent( new pike.events.ChangeSize( this.viewport_.w, this.viewport_.h, this) );
+	this.dispatchEvent( new pike.events.ChangeSize( this.viewport_.w, this.viewport_.h, oldW, oldH, this) );
 };
 
 /**
@@ -50,11 +52,13 @@ pike.core.Viewport.prototype.setSize = function( width, height ){
 * @fires {pike.events.ChangePosition} event
 */
 pike.core.Viewport.prototype.setPosition = function( x, y ){
+	var oldX = this.viewport_.x;
+	var oldY = this.viewport_.y;
 	this.viewport_.x = x;
 	this.viewport_.y = y;
 	
 	if(goog.DEBUG) console.log("[pike.core.Viewport] changeposition");
-	this.dispatchEvent(new pike.events.ChangePosition( this.viewport_.x, this.viewport_.y, this));
+	this.dispatchEvent(new pike.events.ChangePosition( this.viewport_.x, this.viewport_.y, oldX, oldY, this));
 };
 
 /**
