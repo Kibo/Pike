@@ -1,0 +1,64 @@
+<!doctype html>
+<html>
+<head>
+<title>Test Case</title>
+</head>
+<body>
+<script src="../../closure-library/closure/goog/base.js"></script>
+<script src="../source/deps.js"></script>
+<script>
+	goog.require('goog.testing.ContinuationTestCase');	
+	goog.require('goog.testing.jsunit');	
+</script>
+<script>
+	goog.require('pike.animation.Animator');
+</script>
+<script>
+function setUpPage(){}
+function setUp(){}
+
+var testDuration= function() {
+	var animator = new pike.animation.Animator(1000);	
+	assertEquals(1000, animator.getDuration());
+};
+
+var testRepeatCount= function() {
+	var animator = new pike.animation.Animator(1000);
+	animator.setRepeatCount(10);	
+	assertEquals(10, animator.getRepeatCount());
+	
+	animator.setRepeatCount(pike.animation.Animator.INFINITE);	
+	assertEquals(pike.animation.Animator.INFINITE, animator.getRepeatCount());	
+};
+
+var testRepeatBehavior= function() {
+	var animator = new pike.animation.Animator(1000);
+	animator.setRepeatBehavior( pike.animation.Animator.RepeatBehavior.LOOP )	
+	assertEquals(pike.animation.Animator.RepeatBehavior.LOOP, animator.getRepeatBehavior());
+	
+	animator.setRepeatBehavior( pike.animation.Animator.RepeatBehavior.REVERSE )	
+	assertEquals(pike.animation.Animator.RepeatBehavior.REVERSE, animator.getRepeatBehavior());	
+};
+
+var testUpdate= function() {
+	var animator = new pike.animation.Animator(1000);	
+	animator.setRepeatCount(2);
+	animator.setRepeatBehavior( pike.animation.Animator.RepeatBehavior.REVERSE );
+	animator.start();
+	
+	assertEquals(0, animator.update(0));	
+	assertEquals(0.1, animator.update(100));
+	assertEquals(0.5, animator.update(400));
+	assertEquals(0.99999999999999, animator.update(500));	
+	assertEquals(0.79999999999999, animator.update(200));	
+	assertEquals(0.39999999999999003, animator.update(400));	
+};
+
+
+
+
+
+function tearDown(){}
+</script>
+</body>
+</html>

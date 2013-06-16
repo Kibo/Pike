@@ -9,6 +9,7 @@ goog.provide('pike.components.Image');
 
 goog.require('goog.events.EventHandler');
 goog.require('pike.graphics.Rectangle');
+goog.require('pike.animation.Animator');
 
 //## Sprite #################################
 /**
@@ -22,6 +23,8 @@ pike.components.Sprite = function(){
 	this.w = 32;
 	this.h = 32;
 	
+	this.spriteSource = {};
+	
 	/**
 	 * Set sprite
 	 * 
@@ -31,16 +34,20 @@ pike.components.Sprite = function(){
 	 * @param {number} sw - width on source image
 	 * @param {number} sh - height on source image
 	 * @param {number} numberOfFrames
-	 * @param {numner} time - ms
+	 * @param {number} duration - the duration of the one loop of the animation in milliseconds.
 	 * @return this
 	 */
-	this.setSprite = function( image, sx, sy, sw, sh, numberOfFrames, time ){
-		this.spriteSource={x:sx, y:sy, w:sw, h:sh};
-		this.spriteSource.image = image;		
-		this.spriteSource.numberOfFrames = numberOfFrames ? numberOfFrames : 1;
-		this.spriteSource.currentFrame = 0;
-		//TODO
-						
+	this.setSprite = function( image, sx, sy, sw, sh, numberOfFrames, duration ){
+		this.spriteSource.image = image;
+		this.spriteSource.x = sx;
+		this.spriteSource.y = sy;
+		this.spriteSource.w = sw;
+		this.spriteSource.h = sh;					
+		this.spriteSource.numberOfFrames = numberOfFrames || 1;
+		this.spriteSource.currentFrame = 0;				
+		this.spriteSource.animator = new pike.animation.Animator( duration || 1000 );
+		this.spriteSource.animator.start();
+		this.spriteSource.lastUpdate = new Date().getTime();						
 		return this;
 	};
 	
@@ -48,8 +55,13 @@ pike.components.Sprite = function(){
 	 * On update handler
 	 * @param {pike.events.Update} e
 	 */
-	this.onSpriteUpdate = function(e){		
-		//TODO
+	this.onSpriteUpdate = function(e){	
+		var now = e.now;
+		var deltaTime = now - this.spriteSource.lastUpdate;
+		this.spriteSource.lastUpdate = now;		
+		var fraction = this.spriteSource.animator.update(deltaTime);			
+		this.spriteSource.currentFrame = Math.floor(fraction * this.spriteSource.numberOfFrames);
+							
 		this.setDirty(this.getBounds());		
 	};
 	
@@ -59,8 +71,8 @@ pike.components.Sprite = function(){
 	 */
 	this.onSpriteRender = function(e){		
 		this.layer.getOffScreen().context.drawImage(
-				this.spriteSource.image, 
-				this.spriteSource.x, this.spriteSource.y, this.spriteSource.w, this.spriteSource.h,
+				this.spriteSource.image,			
+				this.spriteSource.x + (this.spriteSource.currentFrame * this.spriteSource.w ), this.spriteSource.y, this.spriteSource.w, this.spriteSource.h,
 				~~this.x, ~~this.y, this.w, this.h				
 		);			
 	};
@@ -78,7 +90,7 @@ pike.components.Sprite = function(){
 	};
 };
 
-//## Background #################################
+//## Image #################################
 /**
  * Draws image
  * @constructor

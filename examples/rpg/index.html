@@ -66,7 +66,7 @@
 				var mouse = new pike.input.MouseInputHandler();
 				mouse.handler.listen(viewport, pike.events.ChangePosition.EVENT_TYPE, goog.bind(mouse.onViewportChangePosition, mouse));
 							
-				viewport.setSize(600,400);
+				viewport.setSize(800,600);
 				gameWorld.setSize(1280, 1280);
 											
 				//background						
@@ -77,8 +77,7 @@
 				bgEntity.handler.listen(bgEntity, pike.events.Render.EVENT_TYPE, goog.bind(bgEntity.onImageRender, bgEntity));				
 				
 				stage.getLayer('background').addEntity( bgEntity );
-								
-																						
+																													
 				var hero = new pike.core.Entity( pike.components.Sprite, pike.components.Watch );
 				hero.setSprite( imageManager.get("entities"), 0, 0, 32, 32, 3, 300);
 				hero.onMouseDown = function(e){
@@ -94,14 +93,14 @@
 					
 					this.watchMe(viewport, gameWorld);
 				};												
-				//hero.handler.listen(timer, pike.events.Update.EVENT_TYPE, goog.bind(hero.onSpriteUpdate, hero));
+				hero.handler.listen(timer, pike.events.Update.EVENT_TYPE, goog.bind(hero.onSpriteUpdate, hero));
 				hero.handler.listen(hero, pike.events.Render.EVENT_TYPE, goog.bind(hero.onSpriteRender, hero));
 				hero.handler.listen( mouse, pike.events.Down.EVENT_TYPE, goog.bind( hero.onMouseDown, hero) );
 				
 				var enemy =  new pike.core.Entity( pike.components.Sprite );
 				enemy.x = 150;
 				enemy.y = 200;
-				enemy.setSprite( imageManager.get("entities"), 0, 0, 32, 32, 3, 300);
+				enemy.setSprite( imageManager.get("entities"), 96, 0, 32, 32, 3, 300);
 				enemy.handler.listen(enemy, pike.events.Render.EVENT_TYPE, goog.bind(enemy.onSpriteRender, enemy));										
 								
 				
