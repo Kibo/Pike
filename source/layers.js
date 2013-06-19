@@ -177,15 +177,7 @@ pike.layers.Layer.prototype.dispatchEvent = function( e ){
  */
 pike.layers.ClusterLayer = function( name, clusterSize ){
 	pike.layers.Layer.call(this, name);
-	
-	//this.clusterSize_ = clusterSize;
-		
-	/* the clusters arranged into the grid*/
-    //this.clusters_ = [];
-
-    /* object id to Rect - the cluster bounds */
-    //this.idToClusterBounds_ = {};
-    
+		   
     this.clusters_ = new pike.graphics.Cluster(clusterSize, 0, 0);
 
     /* currently visible clusters */
@@ -203,6 +195,15 @@ pike.layers.ClusterLayer = function( name, clusterSize ){
 };
 
 goog.inherits(pike.layers.ClusterLayer, pike.layers.Layer);
+
+
+/**
+ * Cluster instance attached to this layer
+ * @return {pike.graphics.Cluster} 
+ */
+pike.layers.ClusterLayer.prototype.getCluster = function(){
+	return this.clusters_;
+};
 
 /**
  * @override

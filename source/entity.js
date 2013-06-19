@@ -22,7 +22,7 @@ goog.require('goog.events.EventHandler');
 pike.core.Entity = function( components ){
 	goog.events.EventTarget.call(this);
 	this.id = goog.getUid(this);
-	
+		
 	/**
 	* @type {!goog.events.EventHandler}
 	* @protected

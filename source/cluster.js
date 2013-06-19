@@ -94,7 +94,7 @@ pike.graphics.Cluster.prototype.addToClusters = function( entity, clusterBounds 
 		 
     for (var clusterY = clusterBounds.y; clusterY < clusterBounds.y + clusterBounds.h; clusterY++) {
         for (var clusterX = clusterBounds.x; clusterX < clusterBounds.x + clusterBounds.w; clusterX++) {
-            this.clusters_[clusterY][clusterX].push( entity );           
+            this.clusters_[clusterY][clusterX].push( entity );              
         }
     }
     //save bounds in cluster

@@ -39,7 +39,8 @@
 		goog.require('pike.layers.Layer');		
 		goog.require('pike.core.Timer');
 		goog.require('pike.core.Entity');
-		goog.require('pike.components.Sprite');		
+		goog.require('pike.components.Sprite');	
+		goog.require('pike.components.Collision');
 		goog.require('pike.events.ChangePosition');	
 	</script>
 	<script>
@@ -78,8 +79,9 @@
 				
 				stage.getLayer('background').addEntity( bgEntity );
 																													
-				var hero = new pike.core.Entity( pike.components.Sprite, pike.components.Watch );
+				var hero = new pike.core.Entity( pike.components.Sprite, pike.components.Watch, pike.components.Collision );
 				hero.setSprite( imageManager.get("entities"), 0, 0, 32, 32, 3, 300);
+				hero.setCollisionBounds(0,30,0,30);
 				hero.onMouseDown = function(e){
 					
 					this.setDirty(this.getBounds());
@@ -95,12 +97,13 @@
 				};												
 				hero.handler.listen(timer, pike.events.Update.EVENT_TYPE, goog.bind(hero.onSpriteUpdate, hero));
 				hero.handler.listen(hero, pike.events.Render.EVENT_TYPE, goog.bind(hero.onSpriteRender, hero));
-				hero.handler.listen( mouse, pike.events.Down.EVENT_TYPE, goog.bind( hero.onMouseDown, hero) );
+				hero.handler.listen( mouse, pike.events.Down.EVENT_TYPE, goog.bind( hero.onMouseDown, hero) );				
 				
-				var enemy =  new pike.core.Entity( pike.components.Sprite );
+				var enemy =  new pike.core.Entity( pike.components.Sprite, pike.components.Collision);
 				enemy.x = 150;
 				enemy.y = 200;
 				enemy.setSprite( imageManager.get("entities"), 96, 0, 32, 32, 3, 300);
+				enemy.setCollisionBounds(0,30,0,30);
 				enemy.handler.listen(enemy, pike.events.Render.EVENT_TYPE, goog.bind(enemy.onSpriteRender, enemy));										
 								
 				
