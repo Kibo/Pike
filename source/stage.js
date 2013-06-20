@@ -133,8 +133,8 @@ pike.core.Stage.prototype.render_ = function( layer ){
 											
 			if(!screen.isDirty){
 				screen.context.clearRect(
-					~~(layer.dirtyManager.getDirtyRectangle().x - this.viewport_.x),
-					~~(layer.dirtyManager.getDirtyRectangle().y - this.viewport_.y),
+					(layer.dirtyManager.getDirtyRectangle().x - this.viewport_.x),
+					(layer.dirtyManager.getDirtyRectangle().y - this.viewport_.y),
 					layer.dirtyManager.getDirtyRectangle().w,
 					layer.dirtyManager.getDirtyRectangle().h						
 				);
@@ -146,8 +146,8 @@ pike.core.Stage.prototype.render_ = function( layer ){
 						layer.dirtyManager.getDirtyRectangle().w,
 						layer.dirtyManager.getDirtyRectangle().h,
 						
-						~~(layer.dirtyManager.getDirtyRectangle().x - this.viewport_.x),
-						~~(layer.dirtyManager.getDirtyRectangle().y - this.viewport_.y),
+						(layer.dirtyManager.getDirtyRectangle().x - this.viewport_.x),
+						(layer.dirtyManager.getDirtyRectangle().y - this.viewport_.y),
 						layer.dirtyManager.getDirtyRectangle().w,
 						layer.dirtyManager.getDirtyRectangle().h						
 				);										

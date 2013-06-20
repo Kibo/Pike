@@ -44,6 +44,7 @@ pike.components.Collision = function(){
 	/**
 	 * Check if entity is in collision with others entities
 	 * @param {pike.events.ChangePosition} e
+	 * @fires {pike.events.Collision}
 	 */
 	this.checkCollision = function(e){
 		var boundsInCluster = this.layer.getCluster().getIdToClusterBounds( this.id );
@@ -54,10 +55,8 @@ pike.components.Collision = function(){
 				continue;
 			}
 			
-			if(this.getCollisionBounds_(this).intersects( this.getCollisionBounds_( entities[idx] ))){				
-				this.x = e.oldX;
-				this.y = e.oldY;
-				if(goog.DEBUG) console.log("[pike.components.Collision] entity " +  this.id +" is in collision with entity " + entities[idx].id);
+			if(this.getCollisionBounds_(this).intersects( this.getCollisionBounds_( entities[idx] ))){								
+				this.dispatchEvent( new pike.events.Collision(e.x, e.y, e.oldX, e.oldY, entities[idx], this));
 			}					
 		}				
 	};
@@ -114,7 +113,8 @@ pike.components.Sprite = function(){
 		this.spriteSource.x = sx;
 		this.spriteSource.y = sy;
 		this.spriteSource.w = sw;
-		this.spriteSource.h = sh;					
+		this.spriteSource.h = sh;	
+		this.spriteSource.row = 0;
 		this.spriteSource.numberOfFrames = numberOfFrames || 1;
 		this.spriteSource.currentFrame = 0;				
 		this.spriteSource.animator = new pike.animation.Animator( duration || 1000 );
@@ -138,14 +138,32 @@ pike.components.Sprite = function(){
 	};
 	
 	/**
+	 * Set row in spriteSource image
+	 * @param {number} vx
+	 * @param {number} vy
+	 */
+	this.setSpriteRow = function( vx, vy ){			
+		 if(Math.abs(vx) > Math.abs(vy)){
+			   (vx >= 0) ? 
+					   this.spriteSource.row = pike.components.Sprite.RIGHT : 
+					   this.spriteSource.row = pike.components.Sprite.LEFT; 
+		    	   	
+		     }else{
+		    	 (vy >= 0)?
+		    			 this.spriteSource.row = pike.components.Sprite.DOWN :
+		    			 this.spriteSource.row = pike.components.Sprite.UP;	 			    	     	
+		     }
+	};
+	
+	/**
 	 * On render handler
 	 * @param {pike.events.Render} e
 	 */
 	this.onSpriteRender = function(e){		
 		this.layer.getOffScreen().context.drawImage(
 				this.spriteSource.image,			
-				this.spriteSource.x + (this.spriteSource.currentFrame * this.spriteSource.w ), this.spriteSource.y, this.spriteSource.w, this.spriteSource.h,
-				~~this.x, ~~this.y, this.w, this.h				
+				this.spriteSource.x + (this.spriteSource.currentFrame * this.spriteSource.w ), this.spriteSource.y + (this.spriteSource.row * this.spriteSource.h), this.spriteSource.w, this.spriteSource.h,
+				this.x, this.y, this.w, this.h				
 		);			
 	};
 	
@@ -161,6 +179,11 @@ pike.components.Sprite = function(){
 		}
 	};
 };
+
+pike.components.Sprite.DOWN = 0;
+pike.components.Sprite.LEFT = 1;
+pike.components.Sprite.RIGHT = 2;
+pike.components.Sprite.UP = 3;
 
 //## Image #################################
 /**

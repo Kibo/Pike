@@ -83,7 +83,7 @@ pike.animation.Animator.prototype.pause = function() {
  * Updates the state of the animator.
  * @param {number} deltaTime - time passed since the last update. 0 is valid value.
  */
-pike.animation.Animator.prototype.update = function(deltaTime) {
+pike.animation.Animator.prototype.update = function(deltaTime) {	
 			
 	if (!this.started_) {
 		return;
@@ -94,9 +94,9 @@ pike.animation.Animator.prototype.update = function(deltaTime) {
 	}
 
 	this.timeSinceLoopStart_ += deltaTime;
-	
-	if (this.timeSinceLoopStart_ >= this.duration_) {
-
+		
+	if (this.timeSinceLoopStart_ >= this.duration_) {			
+		
 		// Just in case, we skipped more than one loop, determine how many loops did we miss
 		var loopsSkipped = Math.floor(this.timeSinceLoopStart_/this.duration_);
 		this.timeSinceLoopStart_ %= this.duration_;
@@ -109,7 +109,8 @@ pike.animation.Animator.prototype.update = function(deltaTime) {
 		this.loopsDone_ += loopsSkipped;				
 		this.reverseLoop_ = this.repeatBehavior_ == pike.animation.Animator.RepeatBehavior.REVERSE && this.loopsDone_ % 2 == 1;				
 		
-
+		
+		
 		// Check if we reached the end of the animation
 		if (this.repeatCount_ != pike.animation.Animator.INFINITE && this.loopsDone_ == this.repeatCount_) {			
 			this.stop();

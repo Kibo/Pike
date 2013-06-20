@@ -42,9 +42,12 @@
 		goog.require('pike.components.Sprite');	
 		goog.require('pike.components.Collision');
 		goog.require('pike.events.ChangePosition');	
+		goog.require('pike.animation.Animator');	
 	</script>
 	<script>
 		window.onload = function(){
+			
+			goog.DEBUG = false;
 			
 			var imageManager = new pike.assets.ImageManager();
 			imageManager.load({
@@ -80,40 +83,85 @@
 				stage.getLayer('background').addEntity( bgEntity );
 																													
 				var hero = new pike.core.Entity( pike.components.Sprite, pike.components.Watch, pike.components.Collision );
-				hero.setSprite( imageManager.get("entities"), 0, 0, 32, 32, 3, 300);
-				hero.setCollisionBounds(0,30,0,30);
-				hero.onMouseDown = function(e){
+				hero.setSprite( imageManager.get("entities"), 0, 0, 32, 32, 3, 124);
+				hero.setCollisionBounds(0,29,0,29);
+				hero.onMouseDown = function(e){					
+					this.targetX = e.posX;
+					this.targetY = e.posY;	
 					
-					this.setDirty(this.getBounds());
-					var oldX = this.x;
-					var oldY = this.y;
-					this.x = e.posX;
-					this.y = e.posY;
-					this.setDirty(this.getBounds());
+					this.vx = this.targetX - this.x;
+					this.vy = this.targetY - this.y;
+					var magnitude = Math.sqrt((this.vx*this.vx)+(this.vy*this.vy));
+																							
+					this.positionAnimator = new pike.animation.Animator( (magnitude/ hero.SPEED) * 1000 );
+					this.positionAnimator.setRepeatBehavior(pike.animation.Animator.LOOP)
+					this.positionAnimator.setRepeatCount(1);
+					this.positionAnimator.start();
+					this.lastUpdate = new Date().getTime();	
 					
-					this.dispatchEvent( new pike.events.ChangePosition(this.x, this.y, oldX, oldY, null, this) );
-					
-					this.watchMe(viewport, gameWorld);
-				};												
-				hero.handler.listen(timer, pike.events.Update.EVENT_TYPE, goog.bind(hero.onSpriteUpdate, hero));
+					this.startX = this.x;
+					this.startY = this.y;													
+				};
+				
+				hero.SPEED = 120; // 2px * 60fps = 120px/sec 
+				hero.onEnterFrame = function(e){
+				
+					if(this.targetX && this.targetX != this.x 
+					|| this.targetY && this.targetY != this.y  ){
+																	
+						var now = e.now;
+						var fraction = this.positionAnimator.update( (now - this.lastUpdate) )	
+						this.lastUpdate = now;
+																			
+						if(!fraction){
+							this.targetX = this.x;
+							this.targetY = this.y;
+							return
+						};
+																																					    					    					    					  
+				    	this.setDirty(this.getBounds());
+				    	var oldX = this.x;
+						var oldY = this.y;
+				    	this.x = this.startX + (this.vx * fraction);
+				    	this.y = this.startY + (this.vy * fraction);
+				    					    				   				    					    
+				    	this.x = (0.5 + this.x) << 0; //round
+				    	this.y = (0.5 + this.y) << 0; //round
+				    					    					    					    					    					    					
+				    	this.setDirty(this.getBounds());				    					    	
+				    	this.dispatchEvent( new pike.events.ChangePosition(this.x, this.y, oldX, oldY, this) );				    	
+				    	
+				    	this.setSpriteRow(this.vx, this.vy);	
+				    	this.onSpriteUpdate(e);
+				    	
+				    	this.watchMe(viewport, gameWorld);						
+					}														
+				};
+				hero.onCollision = function(e){
+					this.x = e.oldX;
+					this.y = e.oldY;
+					this.targetX = e.oldX;
+					this.targetY = e.oldY;
+				}
+								
+				hero.handler.listen(timer, pike.events.Update.EVENT_TYPE, goog.bind(hero.onEnterFrame, hero));
 				hero.handler.listen(hero, pike.events.Render.EVENT_TYPE, goog.bind(hero.onSpriteRender, hero));
-				hero.handler.listen( mouse, pike.events.Down.EVENT_TYPE, goog.bind( hero.onMouseDown, hero) );				
+				hero.handler.listen( mouse, pike.events.Down.EVENT_TYPE, goog.bind( hero.onMouseDown, hero) );
+				hero.handler.listen( hero, pike.events.Collision.EVENT_TYPE, goog.bind( hero.onCollision, hero) );
 				
 				var enemy =  new pike.core.Entity( pike.components.Sprite, pike.components.Collision);
 				enemy.x = 150;
 				enemy.y = 200;
 				enemy.setSprite( imageManager.get("entities"), 96, 0, 32, 32, 3, 300);
-				enemy.setCollisionBounds(0,30,0,30);
+				enemy.setCollisionBounds(0,29,0,29);
 				enemy.handler.listen(enemy, pike.events.Render.EVENT_TYPE, goog.bind(enemy.onSpriteRender, enemy));										
-								
-				
-				var clustaLayer = new pike.layers.ClusterLayer("Clusta", 640);
+												
+				var clustaLayer = new pike.layers.ClusterLayer("Clusta", 250);
 				clustaLayer.setDirtyManager( new pike.layers.DirtyManager() );				
 				clustaLayer.addEntity( hero );	
 				clustaLayer.addEntity( enemy );				
 				stage.addLayer( clustaLayer );
-				
-				
+								
 				//Foreground					
 				stage.addLayer( new pike.layers.Layer("foreground"));
 				mouse.setEventTarget( stage.getLayer('foreground').getScreen().canvas );

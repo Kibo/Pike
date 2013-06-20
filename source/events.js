@@ -12,6 +12,8 @@ goog.provide('pike.events.Render');
 goog.provide('pike.events.NewEntity');
 goog.provide('pike.events.RemoveEntity');
 
+goog.provide('pike.events.Collision');
+
 //mouse and touch events
 goog.provide('pike.events.Down');
 goog.provide('pike.events.Up');
@@ -239,4 +241,34 @@ goog.inherits( pike.events.ChangeSize, goog.events.Event );
  * @type {string}
  */
 pike.events.ChangeSize.EVENT_TYPE = "changesize";
+
+//## Collision #################################################################################
+/**
+* @param {number} x
+* @param {number} y
+* @param {number} oldX
+* @param {number} oldY
+* @param {Object} obj - object that collides
+* @param {goog.events.EventTarget} target
+* @constructor
+* @extends {goog.events.Event}
+*/
+pike.events.Collision = function( x, y, oldX, oldY, obj, target){
+	goog.events.Event.call(this, pike.events.Collision.EVENT_TYPE, target);	
+	this.x = x;
+	this.y = y;
+	this.oldX = oldX;
+	this.oldY = oldY;
+	this.obj = obj;
+};
+
+goog.inherits( pike.events.Collision, goog.events.Event );
+
+/**
+ * Event type
+ * @const
+ * @type {string}
+ */
+pike.events.Collision.EVENT_TYPE = "collision";
+
 
