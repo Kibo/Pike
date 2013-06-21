@@ -542,8 +542,14 @@ pike.layers.ObstacleLayer.prototype.renderOffScreen_ = function(){
  * @param {pike.events.ChangePosition} e
  */
 pike.layers.ObstacleLayer.prototype.onEntityChangePosition = function(e){
-	;
-	console.log( this.offScreen_.context.getImageData(e.x, e.y, 1, 1) );	
+	var entity = e.target;
+		
+	if(this.offScreen_.context.getImageData(entity.x, entity.y, 1, 1).data[3] != 0 
+	|| this.offScreen_.context.getImageData(entity.x + entity.w, entity.y, 1, 1).data[3] != 0
+	|| this.offScreen_.context.getImageData(entity.x + entity.w, entity.y + entity.h, 1, 1).data[3] != 0
+	|| this.offScreen_.context.getImageData(entity.x, entity.y + entity.h, 1, 1).data[3] != 0 ){
+		e.target.dispatchEvent( new pike.events.Collision(e.x, e.y, e.oldX, e.oldY, "obstacle", e.target));
+	}		
 };
 
 

@@ -12,45 +12,6 @@ goog.require('goog.events.EventHandler');
 goog.require('pike.graphics.Rectangle');
 goog.require('pike.animation.Animator');
 
-goog.provide('pike.components.Obstacles');
-
-//## Collision #################################
-/**
- * Obstacles
- * @constructor
- */
-pike.components.Obstacles = function(){
-		
-	this.obstacles = {};
-	
-	/**
-	 * PNG Image with alpha.
-	 * Color - collision
-	 * Transparency - no collision 
-	 * @param {Object} image - DOM image
-	 */
-	this.setObstacles = function(image){
-		
-		this.obstacles.image = image;
-		this.obstacles.x = 0;
-		this.obstacles.y = 0;
-		this.obstacles.w = image.width;
-		this.obstacles.h = image.height;		
-	};
-		
-	/**
-	 * Render image on offscreen
-	 */
-	this.renderObstacles = function(){
-		this.layer.getOffScreen().context.drawImage(
-				this.obstacles,
-				0, 0, this.w, this.h,
-				0, 0, this.w, this.h				
-		);
-	};			
-};
-
-
 //## Collision #################################
 /**
  * Collision
