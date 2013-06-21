@@ -81,7 +81,7 @@ pike.core.Stage.prototype.getRootElement = function(){
  */
 pike.core.Stage.prototype.onRender = function( e ){
 	for(var idx = 0; idx < this.layers_.length; idx++){
-		this.render_( this.layers_[idx] );			
+		this.layers_[idx].onRender();			
 	}
 };
 
@@ -107,75 +107,6 @@ pike.core.Stage.prototype.onViewportChangePosition = function(e){
  */
 pike.core.Stage.prototype.onGameWorldChangeSize = function(e){
 	this.setGameWorldSize_(e.w, e.h);
-};
-
-/**
- * Render layer to canvas
- * @param {pike.layers.Layer} layer
- * @private
- */
-pike.core.Stage.prototype.render_ = function( layer ){		
-	var screen = layer.getScreen();
-	var offScreen = layer.getOffScreen();
-		
-	if(layer.hasDirtyManager()){
-		
-		if(!layer.dirtyManager.isClean()){	
-								
-			offScreen.context.clearRect(
-					layer.dirtyManager.getDirtyRectangle().x,
-					layer.dirtyManager.getDirtyRectangle().y,
-					layer.dirtyManager.getDirtyRectangle().w,
-					layer.dirtyManager.getDirtyRectangle().h
-			);
-			
-			layer.dispatchEvent( new pike.events.Render( new Date().getTime(), this));
-											
-			if(!screen.isDirty){
-				screen.context.clearRect(
-					(layer.dirtyManager.getDirtyRectangle().x - this.viewport_.x),
-					(layer.dirtyManager.getDirtyRectangle().y - this.viewport_.y),
-					layer.dirtyManager.getDirtyRectangle().w,
-					layer.dirtyManager.getDirtyRectangle().h						
-				);
-				
-				screen.context.drawImage(
-						offScreen.canvas,
-						layer.dirtyManager.getDirtyRectangle().x,
-						layer.dirtyManager.getDirtyRectangle().y,
-						layer.dirtyManager.getDirtyRectangle().w,
-						layer.dirtyManager.getDirtyRectangle().h,
-						
-						(layer.dirtyManager.getDirtyRectangle().x - this.viewport_.x),
-						(layer.dirtyManager.getDirtyRectangle().y - this.viewport_.y),
-						layer.dirtyManager.getDirtyRectangle().w,
-						layer.dirtyManager.getDirtyRectangle().h						
-				);										
-			}
-								
-			layer.dirtyManager.clear();			
-		}
-		
-	}else if( offScreen.isDirty ){
-		
-		offScreen.context.clearRect( 0, 0, this.gameWorld_.w, this.gameWorld_.h );
-		layer.dispatchEvent( new pike.events.Render( new Date().getTime(), this) );
-				
-		offScreen.isDirty = false;
-		screen.isDirty = true;
-		if(goog.DEBUG) console.log("[pike.core.Stage] " + layer.name + " redraw offScreen");		
-	}
-	
-	if(layer.getScreen().isDirty){		 	
-		screen.context.clearRect( 0, 0, this.viewport_.w, this.viewport_.h );
-		screen.context.drawImage(
-				layer.getOffScreen().canvas,
-				this.viewport_.x, this.viewport_.y, this.viewport_.w, this.viewport_.h,
-				0, 0, this.viewport_.w, this.viewport_.h
-		);					
-		screen.isDirty = false;
-		if(goog.DEBUG) console.log("[pike.core.Stage] " + layer.name + " redraw screen");
-	}	
 };
 
 /**
@@ -259,16 +190,8 @@ pike.core.Stage.prototype.setViewportPosition_ = function(x,y){
 	this.viewport_.x = x;
 	this.viewport_.y = y;
 	
-	for(var idx = 0; idx < this.layers_.length; idx++){
-		
-		this.layers_[idx].setViewportPosition(this.viewport_.x, this.viewport_.y);
-		
-		var screen = this.layers_[idx].getScreen();		
-		screen.isDirty = true;	
-		
-		if(this.layers_[idx].hasDirtyManager()){
-			this.layers_[idx].dirtyManager.setPosition( this.viewport_.x, this.viewport_.y);			
-		}		
+	for(var idx = 0; idx < this.layers_.length; idx++){		
+		this.layers_[idx].setViewportPosition(this.viewport_.x, this.viewport_.y);							
 	}
 };
 

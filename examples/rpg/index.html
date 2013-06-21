@@ -81,7 +81,17 @@
 				bgEntity.handler.listen(bgEntity, pike.events.Render.EVENT_TYPE, goog.bind(bgEntity.onImageRender, bgEntity));				
 				
 				stage.getLayer('background').addEntity( bgEntity );
-																													
+									
+				//Obstacles
+				stage.addLayer( new pike.layers.ObstacleLayer("obstacles") );
+				var obsLayer = stage.getLayer('obstacles');
+				var obs = new pike.core.Entity( pike.components.Image );
+				obs.setImage( imageManager.get("fg") );
+				obs.handler.listen(obs, pike.events.Render.EVENT_TYPE, goog.bind(obs.onImageRender, obs));				
+				
+				obsLayer.addEntity( obs );
+				
+				//Entities
 				var hero = new pike.core.Entity( pike.components.Sprite, pike.components.Watch, pike.components.Collision );
 				hero.setSprite( imageManager.get("entities"), 0, 0, 32, 32, 3, 124);
 				hero.setCollisionBounds(0,29,0,29);
@@ -149,6 +159,8 @@
 				hero.handler.listen( mouse, pike.events.Down.EVENT_TYPE, goog.bind( hero.onMouseDown, hero) );
 				hero.handler.listen( hero, pike.events.Collision.EVENT_TYPE, goog.bind( hero.onCollision, hero) );
 				
+				obsLayer.handler.listen(hero, pike.events.ChangePosition.EVENT_TYPE, goog.bind(obsLayer.onEntityChangePosition, obsLayer));
+				
 				var enemy =  new pike.core.Entity( pike.components.Sprite, pike.components.Collision);
 				enemy.x = 150;
 				enemy.y = 200;
@@ -164,14 +176,14 @@
 								
 				//Foreground					
 				stage.addLayer( new pike.layers.Layer("foreground"));
-				mouse.setEventTarget( stage.getLayer('foreground').getScreen().canvas );
+				mouse.setEventTarget( stage.getLayer('foreground').getScreen().canvas );				
 								
 				var fgEntity = new pike.core.Entity( pike.components.Image );
 				fgEntity.setImage( imageManager.get("fg") );				
 				fgEntity.handler.listen(fgEntity, pike.events.Render.EVENT_TYPE, goog.bind(fgEntity.onImageRender, fgEntity));											
 				
 				stage.getLayer('foreground').addEntity( fgEntity );
-																																
+																				 	
 				timer.start();						
 			}				
 		}

@@ -5,6 +5,7 @@
 */
 goog.provide('pike.layers.Layer');
 goog.provide('pike.layers.ClusterLayer');
+goog.provide('pike.layers.ObstacleLayer');
 
 goog.require('goog.events');
 goog.require('goog.events.EventTarget');
@@ -52,6 +53,96 @@ pike.layers.Layer = function( name ){
 
 goog.inherits(pike.layers.Layer, goog.events.EventTarget);
 
+
+/**
+ * On render handler
+ */
+pike.layers.Layer.prototype.onRender = function(){
+	
+	if(this.hasDirtyManager()){
+		this.renderDirty_();
+		
+	}else if( this.offScreen_.isDirty ){
+		this.renderOffScreen_();
+	}
+	
+	if(this.screen_.isDirty){
+		this.renderScreen_();
+	}	
+};
+
+/**
+ * Renders dirty area
+ * @private
+ */
+pike.layers.Layer.prototype.renderDirty_ = function(){
+	if( this.dirtyManager.isClean() ){
+		return;
+	}
+	
+	this.offScreen_.context.clearRect(
+			this.dirtyManager.getDirtyRectangle().x,
+			this.dirtyManager.getDirtyRectangle().y,
+			this.dirtyManager.getDirtyRectangle().w,
+			this.dirtyManager.getDirtyRectangle().h
+	);
+	
+	this.dispatchEvent( new pike.events.Render( new Date().getTime(), this));
+									
+	if(!this.screen_.isDirty){
+		this.screen_.context.clearRect(
+			(this.dirtyManager.getDirtyRectangle().x - this.viewport_.x),
+			(this.dirtyManager.getDirtyRectangle().y - this.viewport_.y),
+			this.dirtyManager.getDirtyRectangle().w,
+			this.dirtyManager.getDirtyRectangle().h						
+		);
+		
+		this.screen_.context.drawImage(
+				this.offScreen_.canvas,
+				this.dirtyManager.getDirtyRectangle().x,
+				this.dirtyManager.getDirtyRectangle().y,
+				this.dirtyManager.getDirtyRectangle().w,
+				this.dirtyManager.getDirtyRectangle().h,
+				
+				(this.dirtyManager.getDirtyRectangle().x - this.viewport_.x),
+				(this.dirtyManager.getDirtyRectangle().y - this.viewport_.y),
+				this.dirtyManager.getDirtyRectangle().w,
+				this.dirtyManager.getDirtyRectangle().h						
+		);										
+	}
+						
+	this.dirtyManager.clear();		
+};
+
+/**
+ * Renders offscreen
+ * @private
+ */
+pike.layers.Layer.prototype.renderOffScreen_ = function(){
+	this.offScreen_.context.clearRect( 0, 0, this.gameWorld_.w, this.gameWorld_.h );
+	
+	this.dispatchEvent( new pike.events.Render( new Date().getTime(), this) );
+			
+	this.offScreen_.isDirty = false;
+	this.screen_.isDirty = true;
+	if(goog.DEBUG) console.log("[pike.core.Layer] " + this.name + " redraw offScreen");
+};
+
+/**
+ * Renders screen
+ * @private
+ */
+pike.layers.Layer.prototype.renderScreen_ = function(){
+	this.screen_.context.clearRect( 0, 0, this.viewport_.w, this.viewport_.h );
+	this.screen_.context.drawImage(
+			this.offScreen_.canvas,
+			this.viewport_.x, this.viewport_.y, this.viewport_.w, this.viewport_.h,
+			0, 0, this.viewport_.w, this.viewport_.h
+	);					
+	this.screen_.isDirty = false;
+	if(goog.DEBUG) console.log("[pike.core.Layer] " + this.name + " redraw screen");	
+};
+
 /**
  * Set internal viewport size
  * @param {numner} width
@@ -92,6 +183,8 @@ pike.layers.Layer.prototype.setGameWorldSize = function(width, height){
 pike.layers.Layer.prototype.setViewportPosition = function(x,y){
 	this.viewport_.x = x;
 	this.viewport_.y = y;
+	
+	this.getScreen().isDirty = true;
 		
 	if(this.hasDirtyManager()){
 		this.dirtyManager.setPosition( this.viewport_.x, this.viewport_.y);	
@@ -400,4 +493,60 @@ pike.layers.ClusterLayer.prototype.moveObjectBetweenClusters_ = function( entity
 		goog.array.remove(this.cache_, entity);
 	}
 };
+
+//## ObstacleLayer #################################################
+/**
+ * Create a new Obstacle layer
+ * @param {string} name
+ * @constructor
+ * @extends {pike.layers.Layer}
+ */
+pike.layers.ObstacleLayer = function( name ){
+	pike.layers.Layer.call(this, name);	
+};
+
+goog.inherits(pike.layers.ObstacleLayer, pike.layers.Layer);
+
+/**  
+ * @param {number} width
+ * @param {number} height
+ * @override
+ */
+pike.layers.ObstacleLayer.prototype.setViewportSize = function(width, height){
+	pike.layers.Layer.prototype.setViewportSize.call(this, width, height);
+	this.screen_.isDirty = false; //does not render screen	
+};
+
+/** 
+ * @param {number} x
+ * @param {number} y
+ * @override
+ */
+pike.layers.ObstacleLayer.prototype.setViewportPosition = function(x, y){
+	pike.layers.Layer.prototype.setViewportPosition.call(this, x, y);
+	this.screen_.isDirty = false; //does not render screen	
+};
+
+/**
+ * Renders offscreen
+ * @override
+ */
+pike.layers.ObstacleLayer.prototype.renderOffScreen_ = function(){
+	pike.layers.Layer.prototype.renderOffScreen_.call(this);
+	this.screen_.isDirty = false; //does not render screen	
+	if(goog.DEBUG) console.log("[pike.core.ObstacleLayer] " + this.name + " redraw offScreen");
+};
+
+/**
+ * On Entity change position handler
+ * @param {pike.events.ChangePosition} e
+ */
+pike.layers.ObstacleLayer.prototype.onEntityChangePosition = function(e){
+	;
+	console.log( this.offScreen_.context.getImageData(e.x, e.y, 1, 1) );	
+};
+
+
+
+
 	
