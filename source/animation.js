@@ -130,6 +130,7 @@ pike.animation.Animator.prototype.update = function(deltaTime) {
 
 /**
  * Ensures that the animator is not running
+ * @private
  */
 pike.animation.Animator.prototype.throwIfStarted_ = function() {
 	if (this.started_){
