@@ -190,7 +190,11 @@ pike.graphics.Cluster.prototype.getIdToClusterBounds = function(id){
 	return this.idToClusterBounds_[id];
 };
 
-
+/**
+ * Register entity in cluster 
+ * @param {number} id
+ * @param {pike.graphics.Rectangle} bounds
+ */
 pike.graphics.Cluster.prototype.setIdToClusterBounds = function(id, bounds){
 	this.idToClusterBounds_[id] = bounds;
 };
@@ -211,7 +215,7 @@ pike.graphics.Cluster.prototype.build = function(){
 /**
  * Adds an entity to the clusters
  * @param {pike.core.Entity} entity
- 	* @param {?pike.graphics.Rectangle} clusterBounds
+ * @param {?pike.graphics.Rectangle} clusterBounds
  * @returns {pike.graphics.Rectangle}
  */
 pike.graphics.Cluster.prototype.addToClusters = function( entity, clusterBounds ){

@@ -18,9 +18,9 @@ pike.assets.ImageManager = function(){
  * Load multiple images
  * @param {Object} images
  * @param {function()} onDone - callback when all images are loaded
- * @param {function(itemLoaded, itemTotal, key, path, success)} onProgress - callback when an image is loaded
+ * @param { function(itemLoaded, itemTotal, key, path, success) } onProgress - callback when an image is loaded
  * @example
- *  * ~~~
+ * ~~~
  *	im.load({
  *		"sheet"		: "img/sheet.png",
  *		"entities"	: "img/entities.png",

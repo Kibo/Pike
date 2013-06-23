@@ -3502,7 +3502,7 @@ pike.input.InputHandlerBase = function() {
 };
 goog.inherits(pike.input.InputHandlerBase, goog.events.EventTarget);
 pike.input.InputHandlerBase.prototype.onDownDomEvent = function(e) {
-  var coords = this.lastMoveCoordinates_ = this.getInputCoordinates_(e);
+  var coords = this.lastMoveCoordinates_ = this.getInputCoordinates(e);
   if(goog.DEBUG) {
     window.console.log("[pike.core.InputHanderBase] down " + coords.posX + ", " + coords.posY)
   }
@@ -3510,7 +3510,7 @@ pike.input.InputHandlerBase.prototype.onDownDomEvent = function(e) {
   this.stopEventIfRequired_(e)
 };
 pike.input.InputHandlerBase.prototype.onUpDomEvent = function(e) {
-  var coords = this.getInputCoordinates_(e);
+  var coords = this.getInputCoordinates(e);
   if(goog.DEBUG) {
     window.console.log("[pike.core.InputHanderBase] up " + coords.posX + ", " + coords.posY + ", moving: " + this.moving_)
   }
@@ -3519,7 +3519,7 @@ pike.input.InputHandlerBase.prototype.onUpDomEvent = function(e) {
   this.moving_ = false
 };
 pike.input.InputHandlerBase.prototype.onMoveDomEvent = function(e) {
-  var coords = this.getInputCoordinates_(e);
+  var coords = this.getInputCoordinates(e);
   var deltaX = coords.posX - this.lastMoveCoordinates_.posX;
   var deltaY = coords.posY - this.lastMoveCoordinates_.posY;
   if(!this.moving_ && Math.sqrt(deltaX * deltaX + deltaY * deltaY) > this.moveThreshold_) {
@@ -3540,7 +3540,7 @@ pike.input.InputHandlerBase.prototype.stopEventIfRequired_ = function(e) {
     e.preventDefault()
   }
 };
-pike.input.InputHandlerBase.prototype.getInputCoordinates_ = function(e) {
+pike.input.InputHandlerBase.prototype.getInputCoordinates = function(e) {
   return{posX:e.offsetX + this.viewport_.x, posY:e.offsetY + this.viewport_.y}
 };
 pike.input.InputHandlerBase.prototype.onViewportChangePosition = function(e) {
@@ -3595,7 +3595,7 @@ pike.input.TouchInputHandler.prototype.attachDomListeners_ = function() {
   this.handler.listen(el, goog.events.EventType.TOUCHMOVE, goog.bind(this.onMoveDomEvent, this))
 };
 pike.input.TouchInputHandler.prototype.onDownDomEvent = function(e) {
-  this.lastInteractionCoordinates_ = this.getInputCoordinates_(e);
+  this.lastInteractionCoordinates_ = this.getInputCoordinates(e);
   pike.input.InputHandlerBase.prototype.onDownDomEvent.call(this, e)
 };
 pike.input.TouchInputHandler.prototype.onUpDomEvent = function(e) {
@@ -3608,7 +3608,7 @@ pike.input.TouchInputHandler.prototype.onUpDomEvent = function(e) {
   this.moving_ = false
 };
 pike.input.TouchInputHandler.prototype.onMoveDomEvent = function(e) {
-  this.lastInteractionCoordinates_ = this.getInputCoordinates_(e);
+  this.lastInteractionCoordinates_ = this.getInputCoordinates(e);
   pike.input.InputHandlerBase.prototype.onMoveDomEvent.call(this, e)
 };
 // Input 24

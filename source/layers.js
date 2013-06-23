@@ -15,8 +15,6 @@ goog.require('pike.graphics.Rectangle');
 goog.require('pike.events.NewEntity');
 goog.require('pike.events.RemoveEntity');
 
-
-
 //## Layer #################################
 /**
  * Create a new layer
@@ -273,7 +271,10 @@ pike.layers.Layer.prototype.dispatchEvent = function( e ){
  */
 pike.layers.ClusterLayer = function( name, clusterSize ){
 	pike.layers.Layer.call(this, name);
-		   
+	
+	/**
+	* @type {pike.graphics.Cluster}	
+	*/
     this.clusters_ = new pike.graphics.Cluster(clusterSize, 0, 0);
 
     /* currently visible clusters */
@@ -355,6 +356,9 @@ pike.layers.ClusterLayer.prototype.removeEntity = function( entity ){
 	pike.layers.Layer.prototype.removeEntity.call(this, entity);
 };
 
+/**
+ * @private
+ */
 pike.layers.ClusterLayer.prototype.resetCache_ = function(){
 	var cache = this.cache_ = [];
     for (var i = this.visibleClusterBounds_.y; i < this.visibleClusterBounds_.y + this.visibleClusterBounds_.h; i++) {
@@ -405,6 +409,9 @@ pike.layers.ClusterLayer.prototype.resetClusters_ = function(){
     }		
 };
 
+/**
+ * @private
+ */
 pike.layers.ClusterLayer.prototype.updateVisibleClusters_ = function(){
 	var newRect = this.viewport_.getOverlappingGridCells(
 			this.clusters_.getClusterSize(),
@@ -480,6 +487,9 @@ pike.layers.ClusterLayer.prototype.onEntityMove = function(e){
 	}	
 };
 
+/**
+ * @private
+ */
 pike.layers.ClusterLayer.prototype.moveObjectBetweenClusters_ = function( entity, oldClusters, newClusters) {
 	this.clusters_.removeFromClusters(entity, oldClusters);
 	this.clusters_.addToClusters(entity, newClusters);
@@ -664,7 +674,3 @@ pike.layers.DirtyManager.prototype.setPosition = function( x, y ){
 	this.viewport_.y = y;
 };
 
-
-
-
-	

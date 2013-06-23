@@ -174,9 +174,32 @@ pike.components.Sprite = function(){
 	};
 };
 
+/**
+ * Down
+ * @const
+ * @type {number}
+ */
 pike.components.Sprite.DOWN = 0;
+
+/**
+ * Left
+ * @const
+ * @type {number}
+ */
 pike.components.Sprite.LEFT = 1;
+
+/**
+ * Right
+ * @const
+ * @type {number}
+ */
 pike.components.Sprite.RIGHT = 2;
+
+/**
+ * Up
+ * @const
+ * @type {number}
+ */
 pike.components.Sprite.UP = 3;
 
 //## Image #################################
@@ -191,12 +214,20 @@ pike.components.Image = function(){
 	this.w = 0;
 	this.h = 0;
 	
+	/**
+	 * Set image
+	 * @param {Object} image - DOM image
+	 */
 	this.setImage = function( image ){
 		this.image = image;
 		this.w = image.width;
 		this.h = image.height;
 	};	
 	
+	/**
+	 * On image render handler
+	 * @param {pike.events.Render} e
+	 */
 	this.onImageRender = function(e){
 		this.layer.getOffScreen().context.drawImage(
 				this.image,
@@ -212,7 +243,12 @@ pike.components.Image = function(){
  * @constructor
  */
 pike.components.Watch = function(){
-		
+	
+	/**
+	 * Watch entity on Viewport
+	 * @param {pike.core.Viewport} viewport
+	 * @param {pike.core.Gameworld} gameWorld
+	 */
 	this.watchMe = function( viewport, gameWorld ){
 		
 		var viewportBounds = viewport.getBounds();
@@ -256,18 +292,30 @@ pike.components.Watch = function(){
 		}
 	};	
 		
+	/**
+	 * @private
+	 */
 	this.rightInnerBoundary = function( viewport ){
   		return viewport.x + ( viewport.w * 0.75);
 	};
 
+	/**
+	 * @private
+	 */
 	this.leftInnerBoundary = function( viewport ){
   		return viewport.x + ( viewport.w * 0.25);
 	};
 	
+	/**
+	 * @private
+	 */
 	this.topInnerBoundary = function( viewport ){
   		return viewport.y + (viewport.h * 0.25);
 	};
 	
+	/**
+	 * @private
+	 */
 	this.bottomInnerBoundary = function( viewport ){
   		return viewport.y + (viewport.h * 0.75);
 	};		

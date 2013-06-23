@@ -7,7 +7,7 @@ goog.provide('pike.animation.Animator');
 
 //## Animator ###############################################
 /**
- * Animator
+ * Create a new Animator
  * @param {?number} duration - the duration of the one loop of the animation in milliseconds.
  * @constructor
  */
@@ -41,6 +41,11 @@ pike.animation.Animator = function( duration ){
  */
 pike.animation.Animator.INFINITE = -1;
 
+
+/**
+ * Possible Repeat behavior
+ * @enum {number}
+ */
 pike.animation.Animator.RepeatBehavior = {
 	LOOP: 1,
 	REVERSE: 2

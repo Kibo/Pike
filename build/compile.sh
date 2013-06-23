@@ -71,6 +71,7 @@ java -jar $PATH_TO_COMPILER \
 --js ../source/layers.js \
 --js ../source/components.js \
 --js ../source/assets.js \
+--warning_level VERBOSE \
 --compilation_level SIMPLE_OPTIMIZATIONS \
 --js_output_file $OUTPUT_FILE-$VERSION.min.js
 

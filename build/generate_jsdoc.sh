@@ -7,6 +7,8 @@ PATH_TO_DOC="../doc"
 java -jar $JAVADOC_HOME/jsrun.jar $JAVADOC_HOME/app/run.js \
 -t=$JAVADOC_HOME/templates/jsdoc \
 -d=$PATH_TO_DOC \
+--private \
+--verbose \
 $PATH_TO_SOURCES
 
 
