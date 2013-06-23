@@ -8,13 +8,11 @@ The basic idea is to create a library of reusable classes for game developers.
 There are no restrictions, here are the basic classes.
 
 ###Downloads
--[pike-latest.js](#)
--[pike-0.2.min.js](#)
--[pike-0.2.js](#)
+- [pike-latest.js](https://raw.github.com/Kibo/Pike/master/pike-latest.js)
 
 ###JSDoc
--[Class index](#)
--[File index](#)
+- [Class index](https://raw.github.com/Kibo/Pike/master/doc/index.html)
+- [File index](https://raw.github.com/Kibo/Pike/master/doc/files.html)
 
 ###Covers
 - Resource loader
