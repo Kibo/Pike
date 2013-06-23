@@ -11,8 +11,8 @@ There are no restrictions, here are the basic classes.
 - [pike-latest.js](https://raw.github.com/Kibo/Pike/master/pike-latest.js)
 
 ###JSDoc
-- [Class index](https://raw.github.com/Kibo/Pike/master/doc/index.html)
-- [File index](https://raw.github.com/Kibo/Pike/master/doc/files.html)
+- [Class index](https://rawgithub.com/Kibo/Pike/master/doc/index.html)
+- [File index](https://rawgithub.com/Kibo/Pike/master/doc/files.html)
 
 ###Covers
 - Resource loader
