@@ -1,10 +1,11 @@
 /**
-* @fileoverview Animator
+* @fileoverview Animation control
 * @author tomasjurman@gmail.com (Tomas Jurman)
 * @license Dual licensed under the MIT or GPL licenses.
 */
 goog.provide('pike.animation.Animator');
 
+//## Animator ###############################################
 /**
  * Animator
  * @param {?number} duration - the duration of the one loop of the animation in milliseconds.
@@ -158,7 +159,7 @@ pike.animation.Animator.prototype.setDuration = function(duration) {
 
 /**
  * Set the number of loops in the animation, default is 1. Valid values are integers, -1 or Animator.INFINITE for infinite looping
- * @param {number}
+ * @param {number} repeatCount
  */
 pike.animation.Animator.prototype.setRepeatCount = function(repeatCount) {
 	this.throwIfStarted_();
@@ -182,7 +183,7 @@ pike.animation.Animator.prototype.getRepeatCount = function(){
  * RepeatBehavior determines what animator does after reaching the end of the loop.
  * If it is set to pike.animation.Animator.RepeatBehavior.LOOP, then the next loop will start from 0 again, proceeding to 1. 
  * If the behavior is pike.animation.Animator.RepeatBehavior.REVERSE the odd loops will run backwards - from 1 to 0. Obviously setting this parameter only makes sense when the number of loops is more than 1.
- * @param {pike.animation.Animator.RepeatBehavior.LOOP | pike.animation.Animator.RepeatBehavior.REVERSE}
+ * @param {pike.animation.Animator.RepeatBehavior.LOOP | pike.animation.Animator.RepeatBehavior.REVERSE} repeatBehavior
  */
 pike.animation.Animator.prototype.setRepeatBehavior = function( repeatBehavior ) {
 	return this.repeatBehavior_ = repeatBehavior;

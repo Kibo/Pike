@@ -1,20 +1,23 @@
 /**
-* @fileoverview Layer
+* @fileoverview Layers and components of layers
 * @author tomasjurman@gmail.com (Tomas Jurman)
 * @license Dual licensed under the MIT or GPL licenses.
 */
 goog.provide('pike.layers.Layer');
 goog.provide('pike.layers.ClusterLayer');
 goog.provide('pike.layers.ObstacleLayer');
+goog.provide('pike.layers.DirtyManager');
 
-goog.require('goog.events');
-goog.require('goog.events.EventTarget');
 goog.require('goog.events.EventHandler');
+goog.require('goog.events.EventTarget');
+goog.require('pike.graphics.Rectangle');
+
 goog.require('pike.events.NewEntity');
 goog.require('pike.events.RemoveEntity');
-goog.require('pike.core.Entity');
-goog.require('pike.graphics.Cluster');
 
+
+
+//## Layer #################################
 /**
  * Create a new layer
  * @param {string} name
@@ -125,7 +128,7 @@ pike.layers.Layer.prototype.renderOffScreen_ = function(){
 			
 	this.offScreen_.isDirty = false;
 	this.screen_.isDirty = true;
-	if(goog.DEBUG) console.log("[pike.core.Layer] " + this.name + " redraw offScreen");
+	if(goog.DEBUG) window.console.log("[pike.core.Layer] " + this.name + " redraw offScreen");
 };
 
 /**
@@ -140,7 +143,7 @@ pike.layers.Layer.prototype.renderScreen_ = function(){
 			0, 0, this.viewport_.w, this.viewport_.h
 	);					
 	this.screen_.isDirty = false;
-	if(goog.DEBUG) console.log("[pike.core.Layer] " + this.name + " redraw screen");	
+	if(goog.DEBUG) window.console.log("[pike.core.Layer] " + this.name + " redraw screen");	
 };
 
 /**
@@ -232,7 +235,7 @@ pike.layers.Layer.prototype.addEntity = function( entity ){
 	this.entities_.push( entity );
 	entity.layer = this;
 	this.dispatchEvent( new pike.events.NewEntity( entity, this) );
-	if(goog.DEBUG) console.log("[pike.core.Layer] Layer: " + this.name + " has newentity #" + entity.id);	
+	if(goog.DEBUG) window.console.log("[pike.core.Layer] Layer: " + this.name + " has newentity #" + entity.id);	
 };
 
 /**
@@ -245,7 +248,7 @@ pike.layers.Layer.prototype.removeEntity = function( entity ){
 	goog.array.remove(this.entities_, entity);
 	delete entity.layer;
 	this.dispatchEvent( new pike.events.RemoveEntity( entity, this));
-	if(goog.DEBUG) console.log("[pike.core.Layer] removeentity");
+	if(goog.DEBUG) window.console.log("[pike.core.Layer] removeentity");
 };
 
 /**
@@ -365,7 +368,7 @@ pike.layers.ClusterLayer.prototype.resetCache_ = function(){
         }
     }
     
-    if(goog.DEBUG) console.log("[pike.layers.ClusterLayer] resetcache");
+    if(goog.DEBUG) window.console.log("[pike.layers.ClusterLayer] resetcache");
     
     this.sortCache_();
     this.cacheDirty_ = false;
@@ -384,7 +387,7 @@ pike.layers.ClusterLayer.prototype.sortCache_ = function() {
     });
         
     this.cacheUnsorted_ = false;
-    if(goog.DEBUG) console.log("[pike.layers.ClusterLayer] sortcache");
+    if(goog.DEBUG) window.console.log("[pike.layers.ClusterLayer] sortcache");
 };
 
 /**
@@ -394,7 +397,7 @@ pike.layers.ClusterLayer.prototype.sortCache_ = function() {
 pike.layers.ClusterLayer.prototype.resetClusters_ = function(){		
 	this.clusters_.build();
 		
-	if(goog.DEBUG) console.log("[pike.layers.ClusterLayer] resetcluster");
+	if(goog.DEBUG) window.console.log("[pike.layers.ClusterLayer] resetcluster");
 	
 	for (var i=0; i < this.entities_.length; i++) {
         var entity = this.entities_[i];  
@@ -534,7 +537,7 @@ pike.layers.ObstacleLayer.prototype.setViewportPosition = function(x, y){
 pike.layers.ObstacleLayer.prototype.renderOffScreen_ = function(){
 	pike.layers.Layer.prototype.renderOffScreen_.call(this);
 	this.screen_.isDirty = false; //does not render screen	
-	if(goog.DEBUG) console.log("[pike.core.ObstacleLayer] " + this.name + " redraw offScreen");
+	if(goog.DEBUG) window.console.log("[pike.core.ObstacleLayer] " + this.name + " redraw offScreen");
 };
 
 /**
@@ -550,6 +553,114 @@ pike.layers.ObstacleLayer.prototype.onEntityChangePosition = function(e){
 	|| this.offScreen_.context.getImageData(entity.x, entity.y + entity.h, 1, 1).data[3] != 0 ){
 		e.target.dispatchEvent( new pike.events.Collision(e.x, e.y, e.oldX, e.oldY, "obstacle", e.target));
 	}		
+};
+
+//## DirtyManager #################################
+/**
+ * Create a new DirtyManager
+ * @param {number} allDirtyThreshold - the value is the number between 0 and 1.
+ * @constructor
+ */
+pike.layers.DirtyManager = function( allDirtyThreshold ){
+		
+	this.viewport_ = new pike.graphics.Rectangle(0, 0, 0, 0);
+	
+	/**
+	* @type {!goog.events.EventHandler}
+	* @protected
+	*/
+	this.handler = new goog.events.EventHandler(this);
+	
+	// Current dirty rectangle that covers all smaller dirty areas
+	this.dirtyRect_ = null;
+	
+	this.allDirtyThreshold_ = allDirtyThreshold == undefined ? .5 : allDirtyThreshold;
+	
+	// true when we have reached the threshold
+	this.allDirty_ = true;
+	
+	this.markAllDirty();
+};
+
+/**
+ * Returns the current dirty rectangle that covers all registered dirty areas
+ * @return {pike.graphics.Rectangle}
+ */
+pike.layers.DirtyManager.prototype.getDirtyRectangle = function(){
+	return this.dirtyRect_;
+};
+
+/**
+ * Mark all viewport as dirty
+ */
+pike.layers.DirtyManager.prototype.markAllDirty = function(){
+	this.allDirty_ = true;
+	this.dirtyRect_ = this.viewport_.copy();
+};
+
+/**
+ * Mark the given area as dirty.
+ * @param {?pike.graphics.Rectangle} rect
+ */
+pike.layers.DirtyManager.prototype.markDirty = function( rect ){	
+	if ( !(rect.w || rect.h) || this.allDirty_) {
+		return;
+	}
+		
+	// We are only interested in the rectangles that intersect the viewport
+	rect = this.viewport_.intersection( rect );	
+	
+	if (!rect) {
+		return;
+	}
+															
+	if (this.dirtyRect_) {
+		this.dirtyRect_ = this.dirtyRect_.convexHull(rect);		
+	} else {					
+		this.dirtyRect_ = rect;		
+	}
+		
+	// Check for threshold. If it is reached, mark the whole screen dirty
+	if (this.dirtyRect_.w * this.dirtyRect_.h > this.allDirtyThreshold_ * this.viewport_.w * this.viewport_.h){	
+			this.markAllDirty();
+	}	
+};
+
+/**
+ * Returns true if there are not dirty area
+ * @return {boolean}
+ */
+pike.layers.DirtyManager.prototype.isClean = function(){
+	return !(this.dirtyRect_);
+};
+
+/**
+ * Clear the dirty regions.
+ */
+pike.layers.DirtyManager.prototype.clear = function(){
+	this.dirtyRect_ = null;
+	this.allDirty_ = false;
+};
+
+/**
+ * Set size
+ * @param {number} width
+ * @param {number} height
+ */
+pike.layers.DirtyManager.prototype.setSize = function( width, height ){
+	this.viewport_.w = width;
+	this.viewport_.h = height;
+	this.markAllDirty();	
+};
+
+/**
+ * Set Position
+ * @param {number} x
+ * @param {number} y
+ */
+pike.layers.DirtyManager.prototype.setPosition = function( x, y ){
+	this.viewport_.x = x;
+	this.viewport_.y = y;
 };
 
 

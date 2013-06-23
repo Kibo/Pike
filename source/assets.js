@@ -1,10 +1,11 @@
 /**
-* @fileoverview Layer
+* @fileoverview Game assets management
 * @author tomasjurman@gmail.com (Tomas Jurman)
 * @license Dual licensed under the MIT or GPL licenses.
 */
 goog.provide('pike.assets.ImageManager');
 
+//## ImageManager #####################################
 /**
  * Create a new ImageManager
  * @constructor 
@@ -16,8 +17,8 @@ pike.assets.ImageManager = function(){
 /**
  * Load multiple images
  * @param {Object} images
- * @param {function} onDone - callback when all images are loaded
- * @param {function} onProgress( itemLoaded, itemTotal, key, path, success ) - callback when an image is loaded
+ * @param {function()} onDone - callback when all images are loaded
+ * @param {function(itemLoaded, itemTotal, key, path, success)} onProgress - callback when an image is loaded
  * @example
  *  * ~~~
  *	im.load({

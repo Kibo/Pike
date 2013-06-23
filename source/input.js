@@ -1,5 +1,5 @@
 /**
-* @fileoverview Viewport
+* @fileoverview Keyboard, mouse, touchboard control
 * @author tomasjurman@gmail.com (Tomas Jurman)
 * @license Dual licensed under the MIT or GPL licenses.
 */
@@ -12,7 +12,6 @@ goog.require('pike.events.Down');
 goog.require('pike.events.Up');
 goog.require('pike.events.Move');
 goog.require('goog.events.EventTarget');
-
 
 //## InputHandlerBase ###############################################
 /**
@@ -51,7 +50,7 @@ pike.input.InputHandlerBase.prototype.onDownDomEvent = function( e ){
 	// We must save this coordinates to support the moveThreshold
 	var coords = this.lastMoveCoordinates_ = this.getInputCoordinates_(e);	
 		
-	if(goog.DEBUG) console.log("[pike.core.InputHanderBase] down " + coords.posX + ", " + coords.posY );
+	if(goog.DEBUG) window.console.log("[pike.core.InputHanderBase] down " + coords.posX + ", " + coords.posY );
 	this.dispatchEvent( new pike.events.Down(coords.posX, coords.posY, e, this) );	
 	this.stopEventIfRequired_(e);
 };
@@ -63,7 +62,7 @@ pike.input.InputHandlerBase.prototype.onDownDomEvent = function( e ){
 pike.input.InputHandlerBase.prototype.onUpDomEvent = function(e){
 	var coords = this.getInputCoordinates_(e);
 	
-	if(goog.DEBUG) console.log("[pike.core.InputHanderBase] up " + coords.posX + ", " + coords.posY + ", moving: " + this.moving_ );
+	if(goog.DEBUG) window.console.log("[pike.core.InputHanderBase] up " + coords.posX + ", " + coords.posY + ", moving: " + this.moving_ );
 	this.dispatchEvent( new pike.events.Up( coords.posX, coords.posY, this.moving_, e, this) );
 	this.stopEventIfRequired_(e);
 	this.moving_ = false;	
@@ -84,7 +83,7 @@ pike.input.InputHandlerBase.prototype.onMoveDomEvent = function(e){
     }
     
     if (this.moving_) {
-    	if(goog.DEBUG) console.log("[pike.core.InputHanderBase] move " + coords.posX + ", " + coords.posY + ", deltaX: " + deltaX + ", deltaY: " + deltaY );
+    	if(goog.DEBUG) window.console.log("[pike.core.InputHanderBase] move " + coords.posX + ", " + coords.posY + ", deltaX: " + deltaX + ", deltaY: " + deltaY );
     	this.dispatchEvent( new pike.events.Move( coords.posX, coords.posY, deltaX, deltaY, e, this) );    	             
     	this.lastMoveCoordinates_ = coords;
     }
@@ -214,7 +213,7 @@ pike.input.TouchInputHandler.prototype.onDownDomEvent = function(e) {
 
 pike.input.TouchInputHandler.prototype.onUpDomEvent = function(e) {
 	
-	if(goog.DEBUG) console.log("[pike.core.TouchHanderBase] up " + this.lastInteractionCoordinates_.posX + ", " + this.lastInteractionCoordinates_.posY + ", moving: " + this.moving_);
+	if(goog.DEBUG) window.console.log("[pike.core.TouchHanderBase] up " + this.lastInteractionCoordinates_.posX + ", " + this.lastInteractionCoordinates_.posY + ", moving: " + this.moving_);
 	this.dispatchEvent( new pike.events.Up(
 			this.lastInteractionCoordinates_.posX, 
 			this.lastInteractionCoordinates_.posY, 

@@ -1,5 +1,5 @@
 /**
-* @fileoverview Events
+* @fileoverview Events required to control the game components
 * @author tomasjurman@gmail.com (Tomas Jurman)
 * @license Dual licensed under the MIT or GPL licenses.
 */
@@ -24,7 +24,7 @@ goog.require('goog.events.EventTarget');
 
 //## Update #################################################################################
 /**
-* @param {Date} now
+* @param {number} now
 * @param {goog.events.EventTarget} target
 * @constructor
 * @extends {goog.events.Event}

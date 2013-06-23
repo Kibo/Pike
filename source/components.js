@@ -1,14 +1,15 @@
 /**
-* @fileoverview Components
+* @fileoverview Game components
 * @author tomasjurman@gmail.com (Tomas Jurman)
 * @license Dual licensed under the MIT or GPL licenses.
 */
+
 goog.provide('pike.components.Collision');
 goog.provide('pike.components.Sprite');
-goog.provide('pike.components.Watch');
 goog.provide('pike.components.Image');
+goog.provide('pike.components.Watch');
 
-goog.require('goog.events.EventHandler');
+goog.require('goog.events');
 goog.require('pike.graphics.Rectangle');
 goog.require('pike.animation.Animator');
 
@@ -168,7 +169,7 @@ pike.components.Sprite = function(){
 	
 	/**
 	 * Set dirty ares
-	 * @param {{pike.graphics.Rectangle} rect
+	 * @param {pike.graphics.Rectangle} rect
 	 */
 	this.setDirty = function(rect){
 		if(this.layer.hasDirtyManager()){
