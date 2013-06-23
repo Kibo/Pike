@@ -3975,7 +3975,8 @@ pike.layers.ObstacleLayer.prototype.renderOffScreen_ = function() {
 };
 pike.layers.ObstacleLayer.prototype.onEntityChangePosition = function(e) {
   var entity = e.target;
-  if(this.offScreen_.context.getImageData(entity.x, entity.y, 1, 1).data[3] != 0 || this.offScreen_.context.getImageData(entity.x + entity.w, entity.y, 1, 1).data[3] != 0 || this.offScreen_.context.getImageData(entity.x + entity.w, entity.y + entity.h, 1, 1).data[3] != 0 || this.offScreen_.context.getImageData(entity.x, entity.y + entity.h, 1, 1).data[3] != 0) {
+  var collisionBounds = entity.getCollisionBounds() || entity.getBounds();
+  if(this.offScreen_.context.getImageData(collisionBounds.x, collisionBounds.y, 1, 1).data[3] != 0 || this.offScreen_.context.getImageData(collisionBounds.x + collisionBounds.w, collisionBounds.y, 1, 1).data[3] != 0 || this.offScreen_.context.getImageData(collisionBounds.x + collisionBounds.w, collisionBounds.y + collisionBounds.h, 1, 1).data[3] != 0 || this.offScreen_.context.getImageData(collisionBounds.x, collisionBounds.y + collisionBounds.h, 1, 1).data[3] != 0) {
     e.target.dispatchEvent(new pike.events.Collision(e.x, e.y, e.oldX, e.oldY, "obstacle", e.target))
   }
 };
@@ -4050,16 +4051,13 @@ pike.components.Collision = function() {
       if(this.id == entities[idx].id) {
         continue
       }
-      if(this.getCollisionBounds_(this).intersects(this.getCollisionBounds_(entities[idx]))) {
+      if(this.getCollisionBounds(this).intersects(entities[idx].getCollisionBounds() || entities[idx].getBounds())) {
         this.dispatchEvent(new pike.events.Collision(e.x, e.y, e.oldX, e.oldY, entities[idx], this))
       }
     }
   };
-  this.getCollisionBounds_ = function(entity) {
-    if(entity.collisionBounds_) {
-      return new pike.graphics.Rectangle(entity.getBounds().x + entity.collisionBounds_.x, entity.getBounds().y + entity.collisionBounds_.y, entity.getBounds().w - entity.collisionBounds_.w, entity.getBounds().h - entity.collisionBounds_.h)
-    }
-    return entity.getBounds()
+  this.getCollisionBounds = function() {
+    return new pike.graphics.Rectangle(this.x + this.collisionBounds_.x, this.y + this.collisionBounds_.y, this.w - this.collisionBounds_.w, this.h - this.collisionBounds_.h)
   };
   this.handler.listen(this, pike.events.ChangePosition.EVENT_TYPE, goog.bind(this.checkCollision, this))
 };

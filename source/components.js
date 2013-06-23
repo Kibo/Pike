@@ -55,28 +55,22 @@ pike.components.Collision = function(){
 				continue;
 			}
 			
-			if(this.getCollisionBounds_(this).intersects( this.getCollisionBounds_( entities[idx] ))){								
+			if(this.getCollisionBounds(this).intersects(   entities[idx].getCollisionBounds() || entities[idx].getBounds() )){								
 				this.dispatchEvent( new pike.events.Collision(e.x, e.y, e.oldX, e.oldY, entities[idx], this));
 			}					
 		}				
 	};
 	
 	/**
-	 * Calculate inner collision boundary for entity
-	 * @param {pike.core.Entity} entity
-	 * @return {pike.graphics.Rectangle} bounds
-	 * @private
+	 * Get boundaries of Entity for collision
 	 */
-	this.getCollisionBounds_ = function(entity){
-		if(entity.collisionBounds_){
-			return new pike.graphics.Rectangle(
-					entity.getBounds().x + entity.collisionBounds_.x,
-					entity.getBounds().y + entity.collisionBounds_.y,
-					entity.getBounds().w - entity.collisionBounds_.w,
-					entity.getBounds().h - entity.collisionBounds_.h);			
-		}
-				
-		return entity.getBounds();
+	this.getCollisionBounds = function(){		
+		return new pike.graphics.Rectangle(
+				this.x + this.collisionBounds_.x,
+				this.y + this.collisionBounds_.y,
+				this.w - this.collisionBounds_.w,
+				this.h - this.collisionBounds_.h);			
+						
 	};
 	
 	this.handler.listen( this, pike.events.ChangePosition.EVENT_TYPE, goog.bind( this.checkCollision, this));	

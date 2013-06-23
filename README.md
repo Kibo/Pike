@@ -27,6 +27,9 @@ There are no restrictions, here are the basic classes.
 - Documented code
 - Tested code
 
+###Examples
+- [rpg](https://rawgithub.com/Kibo/Pike/master/examples/rpg/index.html)
+
 ###Contact me
 - tomasjurman@gmail.com
 

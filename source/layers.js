@@ -546,11 +546,12 @@ pike.layers.ObstacleLayer.prototype.renderOffScreen_ = function(){
  */
 pike.layers.ObstacleLayer.prototype.onEntityChangePosition = function(e){
 	var entity = e.target;
-		
-	if(this.offScreen_.context.getImageData(entity.x, entity.y, 1, 1).data[3] != 0 
-	|| this.offScreen_.context.getImageData(entity.x + entity.w, entity.y, 1, 1).data[3] != 0
-	|| this.offScreen_.context.getImageData(entity.x + entity.w, entity.y + entity.h, 1, 1).data[3] != 0
-	|| this.offScreen_.context.getImageData(entity.x, entity.y + entity.h, 1, 1).data[3] != 0 ){
+	var collisionBounds = entity.getCollisionBounds() || entity.getBounds();
+							 		
+	if(this.offScreen_.context.getImageData(collisionBounds.x, collisionBounds.y, 1, 1).data[3] != 0 
+	|| this.offScreen_.context.getImageData(collisionBounds.x + collisionBounds.w, collisionBounds.y, 1, 1).data[3] != 0
+	|| this.offScreen_.context.getImageData(collisionBounds.x + collisionBounds.w, collisionBounds.y + collisionBounds.h, 1, 1).data[3] != 0
+	|| this.offScreen_.context.getImageData(collisionBounds.x, collisionBounds.y + collisionBounds.h, 1, 1).data[3] != 0 ){
 		e.target.dispatchEvent( new pike.events.Collision(e.x, e.y, e.oldX, e.oldY, "obstacle", e.target));
 	}		
 };
