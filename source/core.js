@@ -28,6 +28,8 @@ goog.require('goog.events.EventTarget');
 pike.core.Entity = function( components ){
 	goog.events.EventTarget.call(this);
 	this.id = goog.getUid(this);
+	
+	this.components_ = {};
 		
 	/**
 	* @type {!goog.events.EventHandler}
@@ -39,13 +41,26 @@ pike.core.Entity = function( components ){
 	for(var idx = 0; idx < arguments.length; idx++){
 		if (typeof arguments[idx] !== "function"){
 	        	throw "Argument is not a function " + arguments[idx];
-	    }
-		
+	    }				
 		arguments[idx].call(this);
-	}		
+		
+		//add component name to list
+		if( arguments[idx].NAME ){
+			this.components_[ arguments[idx].NAME ] = true;
+		}
+	}			
 };
 
 goog.inherits(pike.core.Entity, goog.events.EventTarget);
+
+/**
+ * Determine that entity has a component
+ * @param {string} name
+ * @return {boolean}
+ */
+pike.core.Entity.prototype.hasComponent = function(name){
+	return this.components_[name] ? true : false;
+};
 
 /**
 * Get boundaries of Entity
@@ -53,6 +68,14 @@ goog.inherits(pike.core.Entity, goog.events.EventTarget);
 */
 pike.core.Entity.prototype.getBounds = function(){
 	return new pike.graphics.Rectangle(this.x, this.y, this.w, this.h);
+};
+
+/**
+* Get collision boundaries of Entity
+* @return {pike.graphics.Rectangle}
+*/
+pike.core.Entity.prototype.getCBounds = function(){
+	return this.getBounds();
 };
 
 /** @inheritDoc */

@@ -245,8 +245,21 @@ pike.layers.Layer.prototype.removeEntity = function( entity ){
 	entity.dispose();
 	goog.array.remove(this.entities_, entity);
 	delete entity.layer;
-	this.dispatchEvent( new pike.events.RemoveEntity( entity, this));
+	this.dispatchEvent( new pike.events.RemoveEntity( entity, this));	
 	if(goog.DEBUG) window.console.log("[pike.core.Layer] removeentity");
+};
+
+/**
+ * Get entity
+ * @param {number} id
+ * @return {?pike.core.Entity}
+ */
+pike.layers.Layer.prototype.getEntity = function(id){
+	for(var idx = 0; idx < this.entities_.length; idx++){
+		if(this.entities_[idx].id == id){
+			return this.entities_[idx];
+		}
+	}	
 };
 
 /**
@@ -556,13 +569,13 @@ pike.layers.ObstacleLayer.prototype.renderOffScreen_ = function(){
  */
 pike.layers.ObstacleLayer.prototype.onEntityChangePosition = function(e){
 	var entity = e.target;
-	var collisionBounds = entity.getCollisionBounds() || entity.getBounds();
-							 		
+	var collisionBounds = entity.getCBounds();
+		
 	if(this.offScreen_.context.getImageData(collisionBounds.x, collisionBounds.y, 1, 1).data[3] != 0 
 	|| this.offScreen_.context.getImageData(collisionBounds.x + collisionBounds.w, collisionBounds.y, 1, 1).data[3] != 0
 	|| this.offScreen_.context.getImageData(collisionBounds.x + collisionBounds.w, collisionBounds.y + collisionBounds.h, 1, 1).data[3] != 0
-	|| this.offScreen_.context.getImageData(collisionBounds.x, collisionBounds.y + collisionBounds.h, 1, 1).data[3] != 0 ){
-		e.target.dispatchEvent( new pike.events.Collision(e.x, e.y, e.oldX, e.oldY, "obstacle", e.target));
+	|| this.offScreen_.context.getImageData(collisionBounds.x, collisionBounds.y + collisionBounds.h, 1, 1).data[3] != 0 ){		
+		entity.dispatchEvent( new pike.events.Collision(e.x, e.y, e.oldX, e.oldY, new pike.core.Entity(), entity ));
 	}		
 };
 

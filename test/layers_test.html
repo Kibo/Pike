@@ -5,7 +5,7 @@
 </head>
 <body>
 <script src="../../closure-library/closure/goog/base.js"></script>
-<script src="../source/deps.js"></script>
+<script src="js/deps.js"></script>
 <script>
 	goog.require('goog.testing.ContinuationTestCase');	
 	goog.require('goog.testing.jsunit');	
@@ -47,6 +47,17 @@ var testRemoveEntity = function() {
 	assertTrue(layer.entities_.length == 0);
 	
 };
+
+var testGetEntity = function() {
+	var layer = new pike.layers.Layer("entities");
+	var entity1 = new pike.core.Entity();
+	var entity2 = new pike.core.Entity();	
+	layer.addEntity( entity1 );
+	layer.addEntity( entity2 );
+	
+	assertEquals(entity1, layer.getEntity( entity1.id ));
+	assertEquals(entity2, layer.getEntity( entity2.id ));	
+}
 
 function tearDown(){}
 </script>

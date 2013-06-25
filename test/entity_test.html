@@ -1,0 +1,61 @@
+<!doctype html>
+<html>
+<head>
+<title>Test Case</title>
+</head>
+<body>
+<script src="../../closure-library/closure/goog/base.js"></script>
+<script src="js/deps.js"></script>
+<script>
+	goog.require('goog.testing.ContinuationTestCase');	
+	goog.require('goog.testing.jsunit');	
+</script>
+<script>
+	goog.require('pike.core.Entity');
+	goog.require('pike.components.Sprite');
+	goog.require('pike.components.Collision');
+	goog.require('pike.events.ChangePosition');
+</script>
+<script>
+function setUpPage(){}
+function setUp(){}
+
+var testCreateEntity = function() {
+	var entity = new pike.core.Entity();	
+	assertTrue( typeof entity.id == 'number' );	
+};
+
+var testAddComponent = function() {
+	var entity = new pike.core.Entity( function(){
+		this.abc = 10;
+		this.toAbc = function(){
+			this.abc;
+		}
+	}, function(){		
+		this.cde = 20;
+		this.toAbc = function(){
+			return this.abc + this.cde;			
+		}			
+	} );	
+	
+	assertEquals( 10, entity.abc );
+	assertEquals( 20, entity.cde );
+	assertEquals( 30, entity.toAbc() );
+		
+};
+
+var testHasComponent = function() {
+	var entity1 = new pike.core.Entity(pike.components.Sprite, pike.components.Collision );
+	var entity2 = new pike.core.Entity(pike.components.Sprite);
+	
+	assertTrue( entity1.hasComponent( pike.components.Sprite.NAME ));
+	assertTrue( entity1.hasComponent( pike.components.Collision.NAME ));
+	
+	assertTrue( entity2.hasComponent( pike.components.Sprite.NAME ));
+	assertFalse( entity2.hasComponent( pike.components.Collision.NAME ));	
+}
+
+function tearDown(){}
+</script>
+</body>
+</html>

@@ -607,6 +607,12 @@ pike.animation.Animator.prototype.getRepeatBehavior = function() {
   return this.repeatBehavior_
 };
 // Input 2
+goog.provide("goog.disposable.IDisposable");
+goog.disposable.IDisposable = function() {
+};
+goog.disposable.IDisposable.prototype.dispose;
+goog.disposable.IDisposable.prototype.isDisposed;
+// Input 3
 goog.provide("goog.Disposable");
 goog.provide("goog.dispose");
 goog.require("goog.disposable.IDisposable");
@@ -688,12 +694,6 @@ goog.disposeAll = function(var_args) {
     }
   }
 };
-// Input 3
-goog.provide("goog.disposable.IDisposable");
-goog.disposable.IDisposable = function() {
-};
-goog.disposable.IDisposable.prototype.dispose;
-goog.disposable.IDisposable.prototype.isDisposed;
 // Input 4
 goog.provide("goog.events.Event");
 goog.provide("goog.events.EventLike");
@@ -3309,17 +3309,27 @@ goog.require("goog.events.EventTarget");
 pike.core.Entity = function(components) {
   goog.events.EventTarget.call(this);
   this.id = goog.getUid(this);
+  this.components_ = {};
   this.handler = new goog.events.EventHandler(this);
   for(var idx = 0;idx < arguments.length;idx++) {
     if(typeof arguments[idx] !== "function") {
       throw"Argument is not a function " + arguments[idx];
     }
-    arguments[idx].call(this)
+    arguments[idx].call(this);
+    if(arguments[idx].NAME) {
+      this.components_[arguments[idx].NAME] = true
+    }
   }
 };
 goog.inherits(pike.core.Entity, goog.events.EventTarget);
+pike.core.Entity.prototype.hasComponent = function(name) {
+  return this.components_[name] ? true : false
+};
 pike.core.Entity.prototype.getBounds = function() {
   return new pike.graphics.Rectangle(this.x, this.y, this.w, this.h)
+};
+pike.core.Entity.prototype.getCBounds = function() {
+  return this.getBounds()
 };
 pike.core.Entity.prototype.disposeInternal = function() {
   pike.core.Entity.superClass_.disposeInternal.call(this);
@@ -3820,6 +3830,13 @@ pike.layers.Layer.prototype.removeEntity = function(entity) {
     window.console.log("[pike.core.Layer] removeentity")
   }
 };
+pike.layers.Layer.prototype.getEntity = function(id) {
+  for(var idx = 0;idx < this.entities_.length;idx++) {
+    if(this.entities_[idx].id == id) {
+      return this.entities_[idx]
+    }
+  }
+};
 pike.layers.Layer.prototype.dispatchEvent = function(e) {
   for(var idx = 0;idx < this.entities_.length;idx++) {
     this.entities_[idx].dispatchEvent(e)
@@ -3975,9 +3992,9 @@ pike.layers.ObstacleLayer.prototype.renderOffScreen_ = function() {
 };
 pike.layers.ObstacleLayer.prototype.onEntityChangePosition = function(e) {
   var entity = e.target;
-  var collisionBounds = entity.getCollisionBounds() || entity.getBounds();
+  var collisionBounds = entity.getCBounds();
   if(this.offScreen_.context.getImageData(collisionBounds.x, collisionBounds.y, 1, 1).data[3] != 0 || this.offScreen_.context.getImageData(collisionBounds.x + collisionBounds.w, collisionBounds.y, 1, 1).data[3] != 0 || this.offScreen_.context.getImageData(collisionBounds.x + collisionBounds.w, collisionBounds.y + collisionBounds.h, 1, 1).data[3] != 0 || this.offScreen_.context.getImageData(collisionBounds.x, collisionBounds.y + collisionBounds.h, 1, 1).data[3] != 0) {
-    e.target.dispatchEvent(new pike.events.Collision(e.x, e.y, e.oldX, e.oldY, "obstacle", e.target))
+    entity.dispatchEvent(new pike.events.Collision(e.x, e.y, e.oldX, e.oldY, new pike.core.Entity, entity))
   }
 };
 pike.layers.DirtyManager = function(allDirtyThreshold) {
@@ -4040,6 +4057,7 @@ goog.require("goog.events");
 goog.require("pike.graphics.Rectangle");
 goog.require("pike.animation.Animator");
 pike.components.Collision = function() {
+  this.collisionBounds_ = new pike.graphics.Rectangle(0, 0, 0, 0);
   this.setCollisionBounds = function(x, y, w, h) {
     this.collisionBounds_ = new pike.graphics.Rectangle(x, y, w, h);
     return this
@@ -4051,16 +4069,17 @@ pike.components.Collision = function() {
       if(this.id == entities[idx].id) {
         continue
       }
-      if(this.getCollisionBounds(this).intersects(entities[idx].getCollisionBounds() || entities[idx].getBounds())) {
+      if(this.getCBounds(this).intersects(entities[idx].getCBounds())) {
         this.dispatchEvent(new pike.events.Collision(e.x, e.y, e.oldX, e.oldY, entities[idx], this))
       }
     }
   };
-  this.getCollisionBounds = function() {
+  this.getCBounds = function() {
     return new pike.graphics.Rectangle(this.x + this.collisionBounds_.x, this.y + this.collisionBounds_.y, this.w - this.collisionBounds_.w, this.h - this.collisionBounds_.h)
   };
   this.handler.listen(this, pike.events.ChangePosition.EVENT_TYPE, goog.bind(this.checkCollision, this))
 };
+pike.components.Collision.NAME = "pike.components.Collision";
 pike.components.Sprite = function() {
   this.x = 100;
   this.y = 100;
@@ -4107,6 +4126,7 @@ pike.components.Sprite = function() {
     }
   }
 };
+pike.components.Sprite.NAME = "pike.components.Sprite";
 pike.components.Sprite.DOWN = 0;
 pike.components.Sprite.LEFT = 1;
 pike.components.Sprite.RIGHT = 2;
@@ -4125,6 +4145,7 @@ pike.components.Image = function() {
     this.layer.getOffScreen().context.drawImage(this.image, 0, 0, this.w, this.h, 0, 0, this.w, this.h)
   }
 };
+pike.components.Image.NAME = "pike.components.Image";
 pike.components.Watch = function() {
   this.watchMe = function(viewport, gameWorld) {
     var viewportBounds = viewport.getBounds();
@@ -4160,6 +4181,128 @@ pike.components.Watch = function() {
     return viewport.y + viewport.h * 0.75
   }
 };
+pike.components.Watch.NAME = "pike.components.Watch";
+pike.components.Backpack = function() {
+  this.setIconUrl = function(url) {
+    this.iconUrl_ = url
+  };
+  this.isOnBackpack = function() {
+    return this.inOnBackpack_
+  };
+  this.isDropAcceptable = function() {
+    return this.isDropAcceptable_
+  };
+  this.setDropAcceptable = function(isAcceptable) {
+    this.isDropAcceptable_ = isAcceptable
+  };
+  this.getBackpackElement = function() {
+    var backpack = document.getElementById(pike.components.Backpack.ELEMENT_ID);
+    if(!backpack) {
+      backpack = document.createElement("div");
+      backpack.setAttribute("id", pike.components.Backpack.ELEMENT_ID);
+      document.getElementsByTagName("body")[0].appendChild(backpack)
+    }
+    return backpack
+  };
+  this.putInBackpack = function() {
+    this.backpackItem_ = document.createElement("img");
+    this.backpackItem_.src = this.iconUrl_;
+    this.backpackItem_.style.cursor = "pointer";
+    this.backpackItem_.style.padding = "2px 2px";
+    this.backpackItem_.setAttribute("data-widget", this.id);
+    this.backpackItem_.setAttribute("draggable", "true");
+    this.getBackpackElement().appendChild(this.backpackItem_);
+    if(this.hasComponent(pike.components.Sprite.NAME)) {
+      this.setDirty(this.getBounds())
+    }
+    var oldX = this.x;
+    var oldY = this.y;
+    this.y = -this.h;
+    this.dispatchEvent(new pike.events.ChangePosition(this.x, this.y, oldX, oldY, this));
+    this.inOnBackpack_ = true;
+    if(goog.DEBUG) {
+      window.console.log("[pike.components.Backpack] putInBag #" + this.id)
+    }
+    goog.events.listen(this.backpackItem_, goog.events.EventType.DRAGSTART, goog.bind(this.dragStart_, this));
+    goog.events.listen(this.backpackItem_, goog.events.EventType.DRAGEND, goog.bind(this.dragEnd_, this));
+    var stageElement = document.getElementById(pike.core.Stage.ELEMENT_ID);
+    if(!goog.events.hasListener(stageElement, goog.events.EventType.DRAGOVER)) {
+      goog.events.listen(stageElement, goog.events.EventType.DRAGOVER, goog.bind(this.dragOver_, this));
+      if(goog.DEBUG) {
+        window.console.log("[pike.components.Backpack] set Stage listener: dragover")
+      }
+    }
+    if(!goog.events.hasListener(stageElement, goog.events.EventType.DROP)) {
+      goog.events.listen(stageElement, goog.events.EventType.DROP, goog.bind(this.drop_, this));
+      if(goog.DEBUG) {
+        window.console.log("[pike.components.Backpack] set Stage listener: drop")
+      }
+    }
+  };
+  this.removeFromBackpack = function() {
+    goog.dom.removeNode(this.backpackItem_);
+    this.backpackItem_ = null;
+    this.inOnBackpack_ = false;
+    if(goog.DEBUG) {
+      window.console.log("[pike.components.Backpack] removeFromBag #" + this.id)
+    }
+  };
+  this.dragStart_ = function(e) {
+    var event = e.getBrowserEvent();
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData("text/plain", event.target.getAttribute("data-widget"));
+    event.dataTransfer.setDragImage(e.target, 15, 15);
+    this.isDropAcceptable_ = true;
+    if(goog.DEBUG) {
+      window.console.log("[pike.components.Backpack] dragstart")
+    }
+    return true
+  };
+  this.dragEnd_ = function(e) {
+    var event = e.getBrowserEvent();
+    event.dataTransfer.clearData("text/plain");
+    if(goog.DEBUG) {
+      window.console.log("[pike.components.Backpack] dragend")
+    }
+    return true
+  };
+  this.dragOver_ = function(e) {
+    var event = e.getBrowserEvent();
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move";
+    if(goog.DEBUG) {
+      window.console.log("[pike.components.Backpack] dragover")
+    }
+    return false
+  };
+  this.drop_ = function(e) {
+    var event = e.getBrowserEvent();
+    event.stopPropagation();
+    var entityId = event.dataTransfer.getData("text/plain");
+    var entity = this.layer.getEntity(entityId);
+    var oldX = entity.x;
+    var oldY = entity.y;
+    entity.x = e.offsetX + entity.layer.viewport_.x;
+    entity.y = e.offsetY + entity.layer.viewport_.y;
+    if(this.hasComponent(pike.components.Sprite.NAME)) {
+      entity.setDirty(entity.getBounds())
+    }
+    entity.dispatchEvent(new pike.events.ChangePosition(entity.x, entity.y, oldX, oldY, entity));
+    if(goog.DEBUG) {
+      window.console.log("[pike.components.Backpack] drop #" + entity.id)
+    }
+    if(!entity.isDropAcceptable_) {
+      if(goog.DEBUG) {
+        window.console.log("[pike.components.Backpack] drop is not accepted")
+      }
+      return true
+    }
+    entity.removeFromBackpack();
+    return false
+  }
+};
+pike.components.Backpack.NAME = "pike.components.Backpack";
+pike.components.Backpack.ELEMENT_ID = "pike-backpack";
 // Input 27
 /*
  Dual licensed under the MIT or GPL licenses.

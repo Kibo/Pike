@@ -5,7 +5,7 @@
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 		<meta name="generator" content="JsDoc Toolkit" />
 		
-		<title>JsDoc Reference - pike.layers.ClusterLayer</title>
+		<title>JsDoc Reference - pike.components.Backpack</title>
 
 		<style type="text/css">
 			/* default.css */
@@ -262,26 +262,24 @@ ul.inheritsList
 <!-- ============================== class title ============================ -->
 			<h1 class="classTitle">
 				
-				Class pike.layers.ClusterLayer
+				Class pike.components.Backpack
 			</h1>
 
 <!-- ============================== class summary ========================== -->			
 			<p class="description">
 				
-				<br />Extends
-					.<br />
 				
 			
 				
 				
 				
-					<br /><i>Defined in: </i> <a href="../symbols/src/source_layers.js.html">layers.js</a>.
+					<br /><i>Defined in: </i> <a href="../symbols/src/source_components.js.html">components.js</a>.
 				
 			</p>
 
 <!-- ============================== constructor summary ==================== -->			
 			
-			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class pike.layers.ClusterLayer.">
+			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class pike.components.Backpack.">
 				<caption>Class Summary</caption>
 				<thead>
 					<tr>
@@ -294,9 +292,11 @@ ul.inheritsList
 						<td class="attributes">&nbsp;</td>
 						<td class="nameDescription" >
 							<div class="fixedFont">
-								<b><a href="../symbols/pike.layers.ClusterLayer.html#constructor">pike.layers.ClusterLayer</a></b>(name, clusterSize)
+								<b><a href="../symbols/pike.components.Backpack.html#constructor">pike.components.Backpack</a></b>()
 							</div>
-							<div class="description">Create a new Cluster layer</div>
+							<div class="description">Backpack
+Lets put an entity to a DOM container(Backpack) as a DOM element 
+and with drag-and-drop get back on canvas</div>
 						</td>
 					</tr>
 				</tbody>
@@ -307,7 +307,7 @@ ul.inheritsList
 			
 				
 				
-				<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class pike.layers.ClusterLayer.">
+				<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class pike.components.Backpack.">
 					<caption>Field Summary</caption>
 					<thead>
 						<tr>
@@ -318,12 +318,22 @@ ul.inheritsList
 					<tbody>
 					
 						<tr>
-							<td class="attributes">&nbsp;</td>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
 								<div class="fixedFont">
-								<b><a href="../symbols/pike.layers.ClusterLayer.html#clusters_">clusters_</a></b>
+								pike.components.Backpack.<b><a href="../symbols/pike.components.Backpack.html#.ELEMENT_ID">ELEMENT_ID</a></b>
 								</div>
-								<div class="description"></div>
+								<div class="description">DOM Element id for Backpack</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								pike.components.Backpack.<b><a href="../symbols/pike.components.Backpack.html#.NAME">NAME</a></b>
+								</div>
+								<div class="description">Component name</div>
 							</td>
 						</tr>
 					
@@ -338,7 +348,7 @@ ul.inheritsList
 			
 				
 				
-				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class pike.layers.ClusterLayer.">
+				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class pike.components.Backpack.">
 					<caption>Method Summary</caption>
 					<thead>
 						<tr>
@@ -349,119 +359,103 @@ ul.inheritsList
 					<tbody>
 					
 						<tr>
-							<td class="attributes">&nbsp;</td>
+							<td class="attributes">&lt;private&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/pike.layers.ClusterLayer.html#addEntity">addEntity</a></b>(entity)
+								<div class="fixedFont"><b><a href="../symbols/pike.components.Backpack.html#dragEnd_">dragEnd_</a></b>(e)
 								</div>
-								<div class="description">Add a entity to the layer</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/pike.layers.ClusterLayer.html#dispatchEvent">dispatchEvent</a></b>(e)
-								</div>
-								<div class="description"></div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/pike.layers.ClusterLayer.html#getCluster">getCluster</a></b>()
-								</div>
-								<div class="description">Cluster instance attached to this layer</div>
+								<div class="description">Drag end handler</div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&lt;private&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/pike.layers.ClusterLayer.html#moveObjectBetweenClusters_">moveObjectBetweenClusters_</a></b>(entity, oldClusters, newClusters)
+								<div class="fixedFont"><b><a href="../symbols/pike.components.Backpack.html#dragOver_">dragOver_</a></b>(e)
 								</div>
-								<div class="description"></div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/pike.layers.ClusterLayer.html#onEntityMove">onEntityMove</a></b>(e)
-								</div>
-								<div class="description">on entity move handler</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/pike.layers.ClusterLayer.html#removeEntity">removeEntity</a></b>(entity)
-								</div>
-								<div class="description">Remove entity</div>
+								<div class="description">Drag over handler
+Common for all items - dont use "this"</div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&lt;private&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/pike.layers.ClusterLayer.html#resetCache_">resetCache_</a></b>()
+								<div class="fixedFont"><b><a href="../symbols/pike.components.Backpack.html#dragStart_">dragStart_</a></b>(e)
 								</div>
-								<div class="description"></div>
+								<div class="description">Drag start handler</div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&lt;private&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/pike.layers.ClusterLayer.html#resetClusters_">resetClusters_</a></b>()
+								<div class="fixedFont"><b><a href="../symbols/pike.components.Backpack.html#drop_">drop_</a></b>(e)
 								</div>
-								<div class="description">Recreate the clusters</div>
+								<div class="description">Drop over handler
+Common for all items - dont use "this"</div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/pike.layers.ClusterLayer.html#setGameWorldSize">setGameWorldSize</a></b>(x, y)
+								<div class="fixedFont"><b><a href="../symbols/pike.components.Backpack.html#getBackpackElement">getBackpackElement</a></b>()
 								</div>
-								<div class="description">Set internal gameworld size</div>
+								<div class="description">Get backpack DOM container</div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/pike.layers.ClusterLayer.html#setViewportPosition">setViewportPosition</a></b>(x, y)
+								<div class="fixedFont"><b><a href="../symbols/pike.components.Backpack.html#isDropAcceptable">isDropAcceptable</a></b>()
 								</div>
-								<div class="description">Set internal viewport position</div>
+								<div class="description">Determines that entity is drop acceptable</div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/pike.layers.ClusterLayer.html#setViewportSize">setViewportSize</a></b>(x, y)
+								<div class="fixedFont"><b><a href="../symbols/pike.components.Backpack.html#isOnBackpack">isOnBackpack</a></b>()
 								</div>
-								<div class="description">Set internal viewport size</div>
+								<div class="description">Determines that entity is on the backpack</div>
 							</td>
 						</tr>
 					
 						<tr>
-							<td class="attributes">&lt;private&gt; &nbsp;</td>
+							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/pike.layers.ClusterLayer.html#sortCache_">sortCache_</a></b>()
+								<div class="fixedFont"><b><a href="../symbols/pike.components.Backpack.html#putInBackpack">putInBackpack</a></b>()
 								</div>
-								<div class="description"></div>
+								<div class="description">Create DOM representation of entity and attach it on backpack DOM container</div>
 							</td>
 						</tr>
 					
 						<tr>
-							<td class="attributes">&lt;private&gt; &nbsp;</td>
+							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/pike.layers.ClusterLayer.html#updateVisibleClusters_">updateVisibleClusters_</a></b>()
+								<div class="fixedFont"><b><a href="../symbols/pike.components.Backpack.html#removeFromBackpack">removeFromBackpack</a></b>()
 								</div>
-								<div class="description"></div>
+								<div class="description">Remove DOM item from DOM backpack container</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/pike.components.Backpack.html#setDropAcceptable">setDropAcceptable</a></b>(isAcceptable)
+								</div>
+								<div class="description">Set drop acceptable</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/pike.components.Backpack.html#setIconUrl">setIconUrl</a></b>(url)
+								</div>
+								<div class="description">Set a icon for item in backpack</div>
 							</td>
 						</tr>
 					
@@ -482,34 +476,19 @@ ul.inheritsList
 				</div>
 				
 				<div class="fixedFont">
-						<b>pike.layers.ClusterLayer</b>(name, clusterSize)
+						<b>pike.components.Backpack</b>()
 				</div>
 				
 				<div class="description">
-					Create a new Cluster layer
+					Backpack
+Lets put an entity to a DOM container(Backpack) as a DOM element 
+and with drag-and-drop get back on canvas
 					
 				</div>
 				
 				
 				
 				
-					
-						<dl class="detailList">
-						<dt class="heading">Parameters:</dt>
-						
-							<dt>
-								<span class="light fixedFont">{string}</span>  <b>name</b>
-								
-							</dt>
-								<dd></dd>
-						
-							<dt>
-								<span class="light fixedFont">{numner}</span>  <b>clusterSize</b>
-								
-							</dt>
-								<dd>- px</dd>
-						
-						</dl>
 					
 					
 					
@@ -527,15 +506,37 @@ ul.inheritsList
 					Field Detail
 				</div>
 				
-					<a name="clusters_"> </a>
-					<div class="fixedFont">
+					<a name=".ELEMENT_ID"> </a>
+					<div class="fixedFont">&lt;static&gt; 
 					
 					
-					<b>clusters_</b>
+					<span class="light">pike.components.Backpack.</span><b>ELEMENT_ID</b>
 					
 					</div>
 					<div class="description">
+						DOM Element id for Backpack
 						
+						
+					</div>
+					
+					
+
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name=".NAME"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					
+					<span class="light">pike.components.Backpack.</span><b>NAME</b>
+					
+					</div>
+					<div class="description">
+						Component name
 						
 						
 					</div>
@@ -557,15 +558,15 @@ ul.inheritsList
 					Method Detail
 				</div>
 				
-					<a name="addEntity"> </a>
-					<div class="fixedFont">
+					<a name="dragEnd_"> </a>
+					<div class="fixedFont">&lt;private&gt; 
 					
 					
-					<b>addEntity</b>(entity)
+					<b>dragEnd_</b>(e)
 					
 					</div>
 					<div class="description">
-						Add a entity to the layer
+						Drag end handler
 						
 						
 					</div>
@@ -577,10 +578,10 @@ ul.inheritsList
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{<a href="../symbols/pike.core.Entity.html">pike.core.Entity</a>}</span> <b>entity</b>
+									<span class="light fixedFont">{Object}</span> <b>e</b>
 									
 								</dt>
-								<dd></dd>
+								<dd>-Closure DOM event</dd>
 							
 							</dl>
 						
@@ -593,15 +594,16 @@ ul.inheritsList
 
 					<hr />
 				
-					<a name="dispatchEvent"> </a>
-					<div class="fixedFont">
+					<a name="dragOver_"> </a>
+					<div class="fixedFont">&lt;private&gt; 
 					
 					
-					<b>dispatchEvent</b>(e)
+					<b>dragOver_</b>(e)
 					
 					</div>
 					<div class="description">
-						
+						Drag over handler
+Common for all items - dont use "this"
 						
 						
 					</div>
@@ -613,10 +615,10 @@ ul.inheritsList
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<b>e</b>
+									<span class="light fixedFont">{Object}</span> <b>e</b>
 									
 								</dt>
-								<dd></dd>
+								<dd>-Closure DOM event</dd>
 							
 							</dl>
 						
@@ -629,15 +631,88 @@ ul.inheritsList
 
 					<hr />
 				
-					<a name="getCluster"> </a>
-					<div class="fixedFont">
+					<a name="dragStart_"> </a>
+					<div class="fixedFont">&lt;private&gt; 
 					
-					<span class="light">{<a href="../symbols/pike.graphics.Cluster.html">pike.graphics.Cluster</a>}</span>
-					<b>getCluster</b>()
+					
+					<b>dragStart_</b>(e)
 					
 					</div>
 					<div class="description">
-						Cluster instance attached to this layer
+						Drag start handler
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Object}</span> <b>e</b>
+									
+								</dt>
+								<dd>-Closure DOM event</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="drop_"> </a>
+					<div class="fixedFont">&lt;private&gt; 
+					
+					
+					<b>drop_</b>(e)
+					
+					</div>
+					<div class="description">
+						Drop over handler
+Common for all items - dont use "this"
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Object}</span> <b>e</b>
+									
+								</dt>
+								<dd>-Closure DOM event</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="getBackpackElement"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{Object}</span>
+					<b>getBackpackElement</b>()
+					
+					</div>
+					<div class="description">
+						Get backpack DOM container
 						
 						
 					</div>
@@ -652,7 +727,7 @@ ul.inheritsList
 							<dl class="detailList">
 							<dt class="heading">Returns:</dt>
 							
-								<dd><span class="light fixedFont">{<a href="../symbols/pike.graphics.Cluster.html">pike.graphics.Cluster</a>}</span> </dd>
+								<dd><span class="light fixedFont">{Object}</span> DOM element</dd>
 							
 							</dl>
 						
@@ -661,15 +736,15 @@ ul.inheritsList
 
 					<hr />
 				
-					<a name="moveObjectBetweenClusters_"> </a>
-					<div class="fixedFont">&lt;private&gt; 
+					<a name="isDropAcceptable"> </a>
+					<div class="fixedFont">
 					
-					
-					<b>moveObjectBetweenClusters_</b>(entity, oldClusters, newClusters)
+					<span class="light">{boolean}</span>
+					<b>isDropAcceptable</b>()
 					
 					</div>
 					<div class="description">
-						
+						Determines that entity is drop acceptable
 						
 						
 					</div>
@@ -677,64 +752,69 @@ ul.inheritsList
 					
 					
 						
+						
+						
+						
+						
 							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
+							<dt class="heading">Returns:</dt>
 							
-								<dt>
-									<b>entity</b>
-									
-								</dt>
-								<dd></dd>
-							
-								<dt>
-									<b>oldClusters</b>
-									
-								</dt>
-								<dd></dd>
-							
-								<dt>
-									<b>newClusters</b>
-									
-								</dt>
-								<dd></dd>
+								<dd><span class="light fixedFont">{boolean}</span> </dd>
 							
 							</dl>
-						
-						
-						
-						
 						
 						
 						
 
 					<hr />
 				
-					<a name="onEntityMove"> </a>
+					<a name="isOnBackpack"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{boolean}</span>
+					<b>isOnBackpack</b>()
+					
+					</div>
+					<div class="description">
+						Determines that entity is on the backpack
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{boolean}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="putInBackpack"> </a>
 					<div class="fixedFont">
 					
 					
-					<b>onEntityMove</b>(e)
+					<b>putInBackpack</b>()
 					
 					</div>
 					<div class="description">
-						on entity move handler
+						Create DOM representation of entity and attach it on backpack DOM container
 						
 						
 					</div>
 					
 					
 					
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{<a href="../symbols/pike.events.Move.html">pike.events.Move</a>}</span> <b>e</b>
-									
-								</dt>
-								<dd></dd>
-							
-							</dl>
 						
 						
 						
@@ -745,51 +825,15 @@ ul.inheritsList
 
 					<hr />
 				
-					<a name="removeEntity"> </a>
+					<a name="removeFromBackpack"> </a>
 					<div class="fixedFont">
 					
 					
-					<b>removeEntity</b>(entity)
+					<b>removeFromBackpack</b>()
 					
 					</div>
 					<div class="description">
-						Remove entity
-						
-						
-					</div>
-					
-					
-					
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{<a href="../symbols/pike.core.Entity.html">pike.core.Entity</a>}</span> <b>entity</b>
-									
-								</dt>
-								<dd></dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="resetCache_"> </a>
-					<div class="fixedFont">&lt;private&gt; 
-					
-					
-					<b>resetCache_</b>()
-					
-					</div>
-					<div class="description">
-						
+						Remove DOM item from DOM backpack container
 						
 						
 					</div>
@@ -806,40 +850,15 @@ ul.inheritsList
 
 					<hr />
 				
-					<a name="resetClusters_"> </a>
-					<div class="fixedFont">&lt;private&gt; 
-					
-					
-					<b>resetClusters_</b>()
-					
-					</div>
-					<div class="description">
-						Recreate the clusters
-						
-						
-					</div>
-					
-					
-					
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="setGameWorldSize"> </a>
+					<a name="setDropAcceptable"> </a>
 					<div class="fixedFont">
 					
 					
-					<b>setGameWorldSize</b>(x, y)
+					<b>setDropAcceptable</b>(isAcceptable)
 					
 					</div>
 					<div class="description">
-						Set internal gameworld size
+						Set drop acceptable
 						
 						
 					</div>
@@ -851,13 +870,7 @@ ul.inheritsList
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{number}</span> <b>x</b>
-									
-								</dt>
-								<dd></dd>
-							
-								<dt>
-									<span class="light fixedFont">{number}</span> <b>y</b>
+									<span class="light fixedFont">{boolean}</span> <b>isAcceptable</b>
 									
 								</dt>
 								<dd></dd>
@@ -873,15 +886,15 @@ ul.inheritsList
 
 					<hr />
 				
-					<a name="setViewportPosition"> </a>
+					<a name="setIconUrl"> </a>
 					<div class="fixedFont">
 					
 					
-					<b>setViewportPosition</b>(x, y)
+					<b>setIconUrl</b>(url)
 					
 					</div>
 					<div class="description">
-						Set internal viewport position
+						Set a icon for item in backpack
 						
 						
 					</div>
@@ -893,110 +906,12 @@ ul.inheritsList
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{number}</span> <b>x</b>
+									<span class="light fixedFont">{string}</span> <b>url</b>
 									
 								</dt>
-								<dd></dd>
-							
-								<dt>
-									<span class="light fixedFont">{number}</span> <b>y</b>
-									
-								</dt>
-								<dd></dd>
+								<dd>- icon</dd>
 							
 							</dl>
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="setViewportSize"> </a>
-					<div class="fixedFont">
-					
-					
-					<b>setViewportSize</b>(x, y)
-					
-					</div>
-					<div class="description">
-						Set internal viewport size
-						
-						
-					</div>
-					
-					
-					
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{number}</span> <b>x</b>
-									
-								</dt>
-								<dd></dd>
-							
-								<dt>
-									<span class="light fixedFont">{number}</span> <b>y</b>
-									
-								</dt>
-								<dd></dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="sortCache_"> </a>
-					<div class="fixedFont">&lt;private&gt; 
-					
-					
-					<b>sortCache_</b>()
-					
-					</div>
-					<div class="description">
-						
-						
-						
-					</div>
-					
-					
-					
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="updateVisibleClusters_"> </a>
-					<div class="fixedFont">&lt;private&gt; 
-					
-					
-					<b>updateVisibleClusters_</b>()
-					
-					</div>
-					<div class="description">
-						
-						
-						
-					</div>
-					
-					
-					
 						
 						
 						
@@ -1019,7 +934,7 @@ ul.inheritsList
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Tue Jun 25 2013 10:23:06 GMT+0200 (CEST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Tue Jun 25 2013 10:23:05 GMT+0200 (CEST)
 		</div>
 	</body>
 </html>

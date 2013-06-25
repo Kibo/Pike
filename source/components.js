@@ -16,9 +16,12 @@ goog.require('pike.animation.Animator');
 //## Collision #################################
 /**
  * Collision
+ * Adds the ability to detect collisions with another entity.
  * @constructor
  */
 pike.components.Collision = function(){
+	
+	this.collisionBounds_ = new pike.graphics.Rectangle(0, 0, 0, 0);
 		
 	/**
 	 * Set collision boundary
@@ -54,8 +57,8 @@ pike.components.Collision = function(){
 			if(this.id == entities[idx].id){
 				continue;
 			}
-			
-			if(this.getCollisionBounds(this).intersects(   entities[idx].getCollisionBounds() || entities[idx].getBounds() )){								
+						
+			if(this.getCBounds(this).intersects( entities[idx].getCBounds() )){								
 				this.dispatchEvent( new pike.events.Collision(e.x, e.y, e.oldX, e.oldY, entities[idx], this));
 			}					
 		}				
@@ -64,7 +67,7 @@ pike.components.Collision = function(){
 	/**
 	 * Get boundaries of Entity for collision
 	 */
-	this.getCollisionBounds = function(){		
+	this.getCBounds = function(){		
 		return new pike.graphics.Rectangle(
 				this.x + this.collisionBounds_.x,
 				this.y + this.collisionBounds_.y,
@@ -75,10 +78,17 @@ pike.components.Collision = function(){
 	
 	this.handler.listen( this, pike.events.ChangePosition.EVENT_TYPE, goog.bind( this.checkCollision, this));	
 };
+/**
+ * Component name
+ * @const
+ * @type {string}
+ */
+pike.components.Collision.NAME="pike.components.Collision";
 
 //## Sprite #################################
 /**
  * Sprite
+ * Adds sprite support
  * @constructor
  */
 pike.components.Sprite = function(){
@@ -175,6 +185,13 @@ pike.components.Sprite = function(){
 };
 
 /**
+ * Component name
+ * @const
+ * @type {string}
+ */
+pike.components.Sprite.NAME="pike.components.Sprite";
+
+/**
  * Down
  * @const
  * @type {number}
@@ -204,6 +221,7 @@ pike.components.Sprite.UP = 3;
 
 //## Image #################################
 /**
+ * Image
  * Draws image
  * @constructor
  */
@@ -237,8 +255,16 @@ pike.components.Image = function(){
 	};		
 };
 
+/**
+ * Component name
+ * @const
+ * @type {string}
+ */
+pike.components.Image.NAME="pike.components.Image";
+
 //## Watch #################################
 /**
+ * Watch
  * Watches a entity on the viewport
  * @constructor
  */
@@ -321,3 +347,212 @@ pike.components.Watch = function(){
 	};		
 };
 
+/**
+ * Component name
+ * @const
+ * @type {string}
+ */
+pike.components.Watch.NAME="pike.components.Watch";
+
+
+//## Backpack #################################
+/**
+ * Backpack
+ * Lets put an entity to a DOM container(Backpack) as a DOM element 
+ * and with drag-and-drop get back on canvas
+ * @depending pike.core.Stage
+ * @constructor
+ */
+pike.components.Backpack = function(){
+	
+	/**
+	 * Set a icon for item in backpack
+	 * @param {string} url - icon
+	 */
+	this.setIconUrl = function(url){
+		this.iconUrl_ = url;
+	};
+	
+	/**
+	 * Determines that entity is on the backpack
+	 * @return {boolean}
+	 */
+	this.isOnBackpack = function(){
+		return this.inOnBackpack_;
+	};
+	
+	/**
+	 * Determines that entity is drop acceptable
+	 * @return {boolean}
+	 */
+	this.isDropAcceptable = function(){
+		return this.isDropAcceptable_;
+	};
+	
+	/**
+	 * Set drop acceptable
+	 * @param {boolean} isAcceptable
+	 */
+	this.setDropAcceptable = function( isAcceptable ){
+		this.isDropAcceptable_ = isAcceptable;
+	};
+	
+		
+	/**
+	 * Get backpack DOM container
+	 * @return {Object} DOM element
+	 */
+	this.getBackpackElement = function(){
+		var backpack = document.getElementById( pike.components.Backpack.ELEMENT_ID );
+		
+		if(! backpack ){
+			backpack = document.createElement("div");
+			backpack.setAttribute("id", pike.components.Backpack.ELEMENT_ID );
+			document.getElementsByTagName("body")[0].appendChild( backpack );	
+		}
+		
+		return backpack;
+	};
+		
+	/**
+	* Create DOM representation of entity and attach it on backpack DOM container
+	*/
+	this.putInBackpack = function(){
+		
+		this.backpackItem_ = document.createElement('img');
+		this.backpackItem_.src = this.iconUrl_;
+		this.backpackItem_.style.cursor = "pointer";
+		this.backpackItem_.style.padding = "2px 2px";
+		this.backpackItem_.setAttribute("data-widget", this.id);
+		this.backpackItem_.setAttribute("draggable", "true");	
+						
+		this.getBackpackElement().appendChild( this.backpackItem_ );
+		
+		if(this.hasComponent( pike.components.Sprite.NAME )){
+			//clear area 
+			this.setDirty( this.getBounds() );
+		}
+								
+		var oldX = this.x;
+		var oldY = this.y;						
+		this.y = -this.h; //hide entity						
+		this.dispatchEvent( new pike.events.ChangePosition(this.x, this.y, oldX, oldY, this) );
+		this.inOnBackpack_ = true;		
+		if(goog.DEBUG) window.console.log("[pike.components.Backpack] putInBag #" + this.id);
+		
+		//set listener
+		goog.events.listen(this.backpackItem_, goog.events.EventType.DRAGSTART, goog.bind(this.dragStart_, this));
+		goog.events.listen(this.backpackItem_, goog.events.EventType.DRAGEND, goog.bind(this.dragEnd_, this));
+																		
+		var stageElement = document.getElementById( pike.core.Stage.ELEMENT_ID )
+		if(!goog.events.hasListener( stageElement, goog.events.EventType.DRAGOVER)){						
+			goog.events.listen(stageElement, goog.events.EventType.DRAGOVER, goog.bind(this.dragOver_, this));
+			if(goog.DEBUG) window.console.log("[pike.components.Backpack] set Stage listener: dragover");
+		};
+		
+		if(!goog.events.hasListener( stageElement, goog.events.EventType.DROP)){
+			goog.events.listen(stageElement, goog.events.EventType.DROP, goog.bind(this.drop_, this));							
+			if(goog.DEBUG) window.console.log("[pike.components.Backpack] set Stage listener: drop");
+		};				
+	};	
+	
+	/**
+	 * Remove DOM item from DOM backpack container
+	 */
+	this.removeFromBackpack = function(){		
+		goog.dom.removeNode( this.backpackItem_ );
+		this.backpackItem_ = null;
+		this.inOnBackpack_ = false;
+		if(goog.DEBUG) window.console.log("[pike.components.Backpack] removeFromBag #" + this.id);
+	};
+	
+	/**
+	 * Drag start handler
+	 * @param {Object} e -Closure DOM event
+	 * @private
+	 */
+	this.dragStart_ = function(e){
+		var event = e.getBrowserEvent();
+		event.dataTransfer.effectAllowed = 'move';
+		event.dataTransfer.setData("text/plain", event.target.getAttribute("data-widget"));   			 								
+		event.dataTransfer.setDragImage(e.target, 15, 15); //TODO
+		this.isDropAcceptable_ = true;
+		if(goog.DEBUG) window.console.log("[pike.components.Backpack] dragstart");
+		return true;						
+	};
+	
+	/**
+	 * Drag end handler
+	 * @param {Object} e -Closure DOM event
+	 * @private
+	 */
+	this.dragEnd_ = function(e){
+		var event = e.getBrowserEvent();		
+		event.dataTransfer.clearData("text/plain");
+		if(goog.DEBUG) window.console.log("[pike.components.Backpack] dragend");
+		return true;
+	};
+	
+	
+	/**
+	 * Drag over handler
+	 * Common for all items - dont use "this"
+	 * @param {Object} e -Closure DOM event
+	 * @private
+	 */
+	this.dragOver_ = function(e){
+		var event = e.getBrowserEvent();
+		event.preventDefault();
+		event.dataTransfer.dropEffect = 'move';
+		if(goog.DEBUG) window.console.log("[pike.components.Backpack] dragover");
+		return false;
+	};
+	
+	/**
+	 * Drop over handler
+	 * Common for all items - dont use "this"
+	 * @param {Object} e -Closure DOM event
+	 * @private
+	 */
+	this.drop_ = function(e){
+		var event = e.getBrowserEvent();
+		event.stopPropagation();
+		var entityId = event.dataTransfer.getData("text/plain");						
+								
+		var entity = this.layer.getEntity( entityId ); //TODO potential bug - if entities is not in the same layer
+		var oldX = entity.x;
+		var oldY = entity.y;
+		entity.x = e.offsetX + entity.layer.viewport_.x;
+		entity.y = e.offsetY + entity.layer.viewport_.y;
+				
+		if(this.hasComponent( pike.components.Sprite.NAME )){
+			//clear area 
+			entity.setDirty( entity.getBounds() );
+		}
+					
+		entity.dispatchEvent( new pike.events.ChangePosition(entity.x, entity.y, oldX, oldY, entity));									    									
+		if(goog.DEBUG) window.console.log("[pike.components.Backpack] drop #" + entity.id);
+		
+		if( !entity.isDropAcceptable_ ){
+			if(goog.DEBUG) window.console.log("[pike.components.Backpack] drop is not accepted");
+			return true; //comes back to backpack
+		}
+					
+		entity.removeFromBackpack();
+		return false; //success
+	};																												
+};
+
+/**
+ * Component name
+ * @const
+ * @type {string}
+ */
+pike.components.Backpack.NAME="pike.components.Backpack";
+
+/**
+ * DOM Element id for Backpack
+ * @const
+ * @type {string}
+ */
+pike.components.Backpack.ELEMENT_ID = "pike-backpack";
