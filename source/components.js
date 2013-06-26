@@ -8,16 +8,31 @@ goog.provide('pike.components.Collision');
 goog.provide('pike.components.Sprite');
 goog.provide('pike.components.Image');
 goog.provide('pike.components.Watch');
+goog.provide('pike.components.Backpack');
+goog.provide('pike.components.Dialogues');
 
 goog.require('goog.events');
 goog.require('pike.graphics.Rectangle');
 goog.require('pike.animation.Animator');
+goog.require('pike.events.StartDialogue');
+goog.require('pike.events.ShowDialogue');
+goog.require('pike.events.EndDialogue');
 
 //## Collision #################################
 /**
  * Collision
- * Adds the ability to detect collisions with another entity.
+ * Adds the ability to detect collisions with another entity. * 
  * @constructor
+ * 
+ * @example
+ * ~~~
+ * var hero = new pike.core.Entity( pike.components.Collision )
+ * hero.onCollision = function(e){
+ * 	//do something  
+ * }
+ * hero.handler.listen( hero, pike.events.Collision.EVENT_TYPE, goog.bind( hero.onCollision, hero) );
+ * ~~~
+ * @author Tomas Jurman (tomasjurman@gmail.com)
  */
 pike.components.Collision = function(){
 	
@@ -90,6 +105,16 @@ pike.components.Collision.NAME="pike.components.Collision";
  * Sprite
  * Adds sprite support
  * @constructor
+ * @example
+ * ~~~
+ * var hero = new pike.core.Entity( pike.components.Sprite )
+ * hero.setSprite( imageManager.get("herosprite"), 0, 0, 32, 32, 3, 124);
+ * hero.onEnterFrame = function(e){
+ *      this.onSpriteUpdate(e);
+ * }
+ * hero.handler.listen(hero, pike.events.Render.EVENT_TYPE, goog.bind(hero.onSpriteRender, hero)); 
+ * ~~~
+ * @author Tomas Jurman (tomasjurman@gmail.com)
  */
 pike.components.Sprite = function(){
 	
@@ -224,6 +249,13 @@ pike.components.Sprite.UP = 3;
  * Image
  * Draws image
  * @constructor
+ * @example
+ * ~~~
+ * var background = new pike.core.Entity( pike.components.Image );
+ * background.setImage( imageManager.get("background") );
+ * background.handler.listen(background, pike.events.Render.EVENT_TYPE, goog.bind(background.onImageRender, background));
+ * ~~~
+ * @author Tomas Jurman (tomasjurman@gmail.com)
  */
 pike.components.Image = function(){
 	
@@ -267,6 +299,14 @@ pike.components.Image.NAME="pike.components.Image";
  * Watch
  * Watches a entity on the viewport
  * @constructor
+ * @example
+ * ~~~
+ * var hero = new pike.core.Entity( pike.components.Watch ) 
+ * hero.onEnterFrame = function(e){
+ *      this.watchMe(viewport, gameWorld);
+ * }
+ * ~~~
+ * @author Tomas Jurman (tomasjurman@gmail.com)
  */
 pike.components.Watch = function(){
 	
@@ -360,8 +400,18 @@ pike.components.Watch.NAME="pike.components.Watch";
  * Backpack
  * Lets put an entity to a DOM container(Backpack) as a DOM element 
  * and with drag-and-drop get back on canvas
- * @depending pike.core.Stage
  * @constructor
+ * @example
+ * ~~~
+ * var sword = new pike.core.Entity( pike.components.Backpack )
+ * var hero  = new pike.core.Entity( pike.components.Collision )
+ * hero.onCollision = function(e){
+ *   if(e.obj.hasComponent( pike.components.Backpack.NAME ) ){
+ *   	e.obj.putInBackpack();	
+ *   }	 
+ * }
+ * ~~~
+ * @author Tomas Jurman (tomasjurman@gmail.com)
  */
 pike.components.Backpack = function(){
 	
@@ -556,3 +606,360 @@ pike.components.Backpack.NAME="pike.components.Backpack";
  * @type {string}
  */
 pike.components.Backpack.ELEMENT_ID = "pike-backpack";
+
+
+//## Dialogues #################################
+/**
+ * Dialogues
+ * The component that adds an entity a ability to carry conversation. 
+ * As data source it uses JSON file. 
+ * For building source data structure you can use prepared Dialogues builder tool.
+ * 
+ * @see Dialogues builder tool ( http://kibo.github.com/dialoguesBuilder/ )
+ * @constructor
+ * @example
+ * ~~~
+ * var oldWoman = new pike.core.Entity( pike.components.Dialogues )
+ * oldWoman.setDialogues( sourceData )
+ * var dialog = oldWoman.getDialogue();
+ * oldWoman.showDialogue( dialog );
+ * ~~~
+ * @author Tomas Jurman (tomasjurman@gmail.com)
+ */
+pike.components.Dialogues = function(){
+		
+	/**
+	 * Set source data
+	 * @param {Object} data - source
+	 * @fires {Error} data is not valid
+	 * @return {Object} this
+	 * @see Dialogues Builder tool ( http://kibo.github.com/dialoguesBuilder/ )
+	 */
+	this.setDialogues = function( data ){
+		if( !this.isDialoguesSourceValid_( data )){
+    		throw new Error("Data is not valid.");
+    	}
+		
+		this.dialoguesData_ = data;				    	
+    	return this;		
+	};
+	      
+    /**
+     * Get current dialogue or root of dialogues
+     * @trigger {pike.events.StartDialogue} e
+     * @return {Object} current dialogue
+     */
+    this.getDialogue = function(){
+    	if(!this.dialogue_){
+    		this.setDialogue_( this.getRootOfDialogues().id );
+    		if(goog.DEBUG) window.console.log("[pike.components.Dialogues] startdialogue");
+    		this.dispatchEvent( new pike.events.StartDialogue( this.dialogue_, this ) );
+    	}
+
+    	return this.dialogue_;    	
+    };
+    
+    /**
+     * Show dialogue as HTML in your predefined container. 
+     * @trigger {pike.events.ShowDialogue} e  
+     */
+    this.showDialogue = function( dialogue ){
+    	if( !dialogue ){
+    		throw new Error("[pike.components.Dialogues] Error: There is not a dialogue.");
+    	};
+    	
+    	this.cleanDialoguesContainer_(); 
+    	
+    	var dialogueAsHTML = dialogue.isChoice 
+    		? this.getChoiceDialogueAsHTML_( dialogue ) 
+    		: this.getSentenceDialogueAsHTML_( dialogue );
+    		    		    	   
+    	this.getDialoguesDOMContainer_().appendChild(  dialogueAsHTML  );
+    	if(goog.DEBUG) window.console.log("[pike.components.Dialogues] showdialogue");
+    	this.dispatchEvent( new pike.events.ShowDialogue( dialogue, this));
+    };
+           
+    /**
+     * Set current dialog
+     * @param {number} id
+     * @trigger {pike.events.EndDialogue} e - when the conversation is at the end
+     * @private
+     */
+    this.setDialogue_ = function( id ){
+    	
+    	//before it sets a new sentence, it executes a afterCode on last sentence
+    	if(this.dialogue_){
+    		this.executeCode_(this.dialogue_.codeAfter);
+    	}
+    	
+    	if(!id){    		
+    		if(goog.DEBUG) window.console.log("[pike.components.Dialogues] enddialogue");
+    		this.dispatchEvent( new pike.events.EndDialogue( this ) );	
+    		return;
+    	}
+    	
+    	for(var idx = 0; idx < this.dialoguesData_.dialogues.length; idx++){
+    		if( this.dialoguesData_.dialogues[idx].id == id){	    				    				    	
+    			
+    			//sets a new sentence
+    			this.dialogue_ = this.dialoguesData_.dialogues[idx];	    				    				    	
+    			this.executeCode_(this.dialogue_.codeBefore);
+
+    			if( !this.isActive_( this.dialogue_ )){ 
+    				
+    				var nextDialogueId = this.dialogue_.outgoingLinks.length == 1 
+    					? this.dialogue_.outgoingLinks[0] 
+    					: null; //final node or choice
+    				
+    				this.setDialogue_( nextDialogueId );
+    			}
+
+    			return;
+    			break;
+    		}
+    	}
+
+    	this.dialogue_ = null;    	
+    };
+    
+    /**
+     * Get root of dialogues
+     * Root is the node, that has not parent.
+     * @return {Object} root
+     */
+    this.getRootOfDialogues = function(){
+    	for(var idx = 0; idx < this.dialoguesData_.dialogues.length; idx++){
+    		if(!this.dialoguesData_.dialogues[idx].parent){
+    			return this.dialoguesData_.dialogues[idx];
+    			break;
+    		}
+    	}    	
+    };
+		
+	/**
+	 * Get actor
+	 * @param {number} id
+	 * @return {?Object} actor or null
+	 */
+	this.getActor = function( id ){
+		if(!id){
+    		return null;
+    	}
+
+    	for(var idx = 0; idx < this.dialoguesData_.actors.length; idx++){
+    		if( this.dialoguesData_.actors[idx].id == id ){
+    			return this.dialoguesData_.actors[idx];
+    		}
+    	}		    
+   	  	return null;
+	};
+		
+	/**
+	 * Find dialogue by id
+	 * @param {number} id
+	 * @return {?Object} dialogue or null if dialogue is not exists
+	 */
+	this.findDialogueById = function(id){
+		if(!id){
+			return null;
+		}
+
+		for(var idx = 0; idx < this.dialoguesData_.dialogues.length; idx++){
+			if( this.dialoguesData_.dialogues[idx].id == id){
+				return this.dialoguesData_.dialogues[idx];
+				break;
+			}
+		}
+
+		return null;
+		
+	};
+		
+	/**
+	 * Get sentence as HTML
+	 * @param {Object} dialogue
+	 * @private
+	 */
+	this.getSentenceDialogueAsHTML_ = function( dialogue ){
+		var container = document.createElement("div");
+		container.setAttribute("class", this.getActor( dialogue.actor ).name );
+		container.appendChild( this.createDialogueElement_(dialogue) );	
+		return container
+	};
+	
+	/**
+	 * Get choice as HTML
+	 * @param {Object} choice
+	 * @private
+	 */
+	this.getChoiceDialogueAsHTML_ = function( choice ){
+		var container = document.createElement("div");
+		container.setAttribute("class", "choice");
+		
+		for(var idx = 0; idx < choice.outgoingLinks.length; idx++ ){
+			var dialogue = this.findDialogueById( choice.outgoingLinks[idx] );
+			if( !this.isActive_( dialogue )) continue;
+			
+			container.appendChild( this.createDialogueElement_(dialogue) );			
+		}
+		
+		return container;
+	};
+	
+	/**
+	 * Create dialogue DOM element
+	 * @private
+	 */
+	this.createDialogueElement_ = function( dialogue ){
+		var container = document.createElement( pike.components.Dialogues.DIALOGUE_ELEMENT );
+		container.setAttribute("data-dialogue", dialogue.id);
+		goog.events.listen(container, goog.events.EventType.CLICK, goog.bind(function(e){
+			var currentDialogue = this.findDialogueById( e.target.getAttribute("data-dialogue") );		
+			var nextDialogueId = currentDialogue.outgoingLinks.length == 1 
+				? currentDialogue.outgoingLinks[0] 
+				: null; //final node
+			this.setDialogue_( nextDialogueId );
+			if( this.dialogue_ ){
+				this.showDialogue( this.getDialogue() );
+			}			
+		}, this));
+				
+		container.appendChild( document.createTextNode( dialogue.dialogueText));
+		return container;
+	};
+		
+	/**
+	 * Remove all children from defined DOM dialogues container.
+	 * @private
+	 */
+	this.cleanDialoguesContainer_ = function(){
+		this.getDialoguesDOMContainer_().innerHTML = '';
+	};
+		
+	/**
+	 * Check the source data
+	 * @param {Object} data
+	 * @return {boolean}
+	 * @private
+	 */
+	this.isDialoguesSourceValid_ = function( data ){
+		var isValid = true;
+
+    	if( !data ||
+ 			!data.dialogues ||
+ 			data.dialogues.length == 0 ||
+ 			!data.actors ||
+ 			data.actors.length <= 1 ||	 			
+ 			!this.hasDialoguesRoot_( data )	 			
+    		){
+ 				isValid = false;
+ 			}
+
+		return isValid;
+	};
+	
+	/**
+	 * Check if data has only the one root dialog
+	 * @param {Object} data
+	 * @return {boolean}
+	 * @private
+	 */
+	this.hasDialoguesRoot_ = function(data){
+		var roots = [];
+    	for(var idx = 0; idx < data.dialogues.length; idx++){
+    		if( !data.dialogues[idx].parent){
+    			roots.push( data.dialogues[idx] );
+    		}
+    	}
+
+    	return roots.length == 1 ? true : false;
+	};
+	
+	/**
+	 * Evaluates conditionString property in dialogue
+	 * @param {Object} dialogue
+	 * @return {boolean}
+	 * @private
+	 */
+	this.isActive_ = function( dialogue ){
+		var result = true;
+    	if(dialogue.conditionsString){
+    		result = this.executeCode_( dialogue.conditionsString );
+    	}
+
+    	return result;
+	};	
+	
+	/**
+	 * Parse String and execute it as JavaScript code.
+	 * Use JavaScript eval(string) function
+	 * 
+	 * @param {String} code
+	 * @see eval(string) (https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/eval)
+	 * @private
+	 */
+	this.executeCode_ = function( code ){
+		if(code){
+
+			if(goog.DEBUG) window.console.log(" [pike.components.Dialogues] execute code: " + code);
+    			    		
+    		try {
+				return eval( code ); 
+			} catch (e) {
+			    if (e) {
+			        throw new Error("Syntax error on your code: " + code);
+			    }
+			}	 	    			    		   
+    	}
+	};
+	
+	/**
+	 * Get dialogues DOM container
+	 * @return {Object} DOM element
+	 * @private
+	 */
+	this.getDialoguesDOMContainer_ = function(){
+		var dialogues = document.getElementById( pike.components.Dialogues.ELEMENT_ID );
+		
+		if(!dialogues ){
+			dialogues = document.createElement("div");
+			dialogues.setAttribute("id", pike.components.Dialogues.ELEMENT_ID );
+			document.getElementsByTagName("body")[0].appendChild( dialogues );	
+		}
+		
+		return dialogues;
+	};
+	
+	/**
+     * On End dialogue handler
+     * @param {pike.events.EndDialogue} e
+     */
+    this.onEndDialogue = function(e){
+    	this.dialogue_ = null;
+		this.cleanDialoguesContainer_();
+    };
+    
+    this.handler.listen(this, pike.events.EndDialogue.EVENT_TYPE, goog.bind(this.onEndDialogue, this));	
+};
+
+/**
+ * Component name
+ * @const
+ * @type {string}
+ */
+pike.components.Dialogues.NAME="pike.components.Dialogues";
+
+/**
+ * DOM Element id for Dialogues
+ * @const
+ * @type {string}
+ */
+pike.components.Dialogues.ELEMENT_ID = "pike-dialogues";
+
+/**
+ * DOM Element for one sentence
+ * @const
+ * @type {string}
+ */
+pike.components.Dialogues.DIALOGUE_ELEMENT = "p";
+

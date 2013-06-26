@@ -1,0 +1,193 @@
+<!doctype html>
+<html>
+<head>
+<title>Test Case</title>
+</head>
+<body>
+<script src="../../closure-library/closure/goog/base.js"></script>
+<script src="js/deps.js"></script>
+<script>
+	goog.require('goog.testing.ContinuationTestCase');	
+	goog.require('goog.testing.jsunit');	
+</script>
+<script>
+	goog.require('pike.components.Dialogues');
+	goog.require('pike.core.Entity');
+	goog.require('pike.events.StartDialogue');
+	goog.require('pike.events.ShowDialogue');
+	goog.require('pike.events.EndDialogue');
+</script>
+<script>
+var conversations = {
+		guard:{
+			"id":"guard",
+			"actors": [
+				{
+					"id": 10,
+					"name": "hero"
+				},
+				{
+					"id": 20,
+					"name": "guard"
+				}
+			],
+			"dialogues": [
+				{
+					"id": 10,
+					"parent": null,
+					"isChoice": false,
+					"actor": 10,
+					"conversant": 20,
+					"menuText": "",
+					"dialogueText": "Where is the cave?",
+					"conditionsString": "",
+					"codeBefore": "",
+					"codeAfter": "",
+					"outgoingLinks": [
+						20
+					]
+				},
+				{
+					"id": 20,
+					"parent": 10,
+					"isChoice": false,
+					"actor": 20,
+					"conversant": 10,
+					"menuText": "",
+					"dialogueText": "Outside the village.",
+					"conditionsString": "",
+					"codeBefore": "",
+					"codeAfter": "",
+					"outgoingLinks": [
+						30
+					]
+				},
+				{
+					"id": 30,
+					"parent": 20,
+					"isChoice": true,
+					"conditionsString": "",
+					"codeBefore": "",
+					"codeAfter": "",
+					"outgoingLinks": [
+						40,
+						50
+					]
+				},
+				{
+					"id": 40,
+					"parent": 30,
+					"isChoice": false,
+					"actor": 10,
+					"conversant": 20,
+					"menuText": "Ask about cave.",
+					"dialogueText": "What do you know about the cave?",
+					"conditionsString": "",
+					"codeBefore": "",
+					"codeAfter": "",
+					"outgoingLinks": [
+						41
+					]
+				},
+				{
+					"id": 41,
+					"parent": 40,
+					"isChoice": false,
+					"actor": 20,
+					"conversant": 10,
+					"menuText": "",
+					"dialogueText": "People is losing there.",
+					"conditionsString": "",
+					"codeBefore": "",
+					"codeAfter": "",
+					"outgoingLinks": [
+						30
+					]
+				},
+				{
+					"id": 50,
+					"parent": 30,
+					"isChoice": false,
+					"actor": 10,
+					"conversant": 20,
+					"menuText": "Leave",
+					"dialogueText": "Good by.",
+					"conditionsString": "",
+					"codeBefore": "",
+					"codeAfter": "",
+					"outgoingLinks": []
+				}
+			]
+		}
+	};
+</script>
+<script>
+var testCase = new goog.testing.ContinuationTestCase('Dialogues Test Case');
+testCase.autoDiscoverTests();
+
+// Standalone Closure Test Runner.
+if (typeof G_testRunner != 'undefined') {
+  G_testRunner.initialize(testCase);
+}
+
+function setUpPage(){}
+function setUp(){}
+
+function testStartDialogues() {
+	var dialogues = new pike.core.Entity( pike.components.Dialogues );
+	dialogues.setDialogues( conversations.guard );
+	
+	var event = null;
+    goog.events.listen(dialogues, pike.events.StartDialogue.EVENT_TYPE, function(e) {
+    	event = e;
+    });
+		  
+    waitForEvent(dialogues, pike.events.StartDialogue.EVENT_TYPE, function() {
+    	assertTrue( event instanceof pike.events.StartDialogue);
+    	assertTrue( event.dialogue === dialogues.getRootOfDialogues());
+    	assertTrue( event.target === dialogues); 
+    });
+	
+	dialogues.getDialogue();
+};
+
+
+function testEndDialogues() {
+	var dialogues = new pike.core.Entity( pike.components.Dialogues );
+	dialogues.setDialogues( conversations.guard );
+	
+	var event = null;
+    goog.events.listen(dialogues, pike.events.EndDialogue.EVENT_TYPE, function(e) {
+    	event = e;
+    });
+		  
+    waitForEvent(dialogues, pike.events.EndDialogue.EVENT_TYPE, function() {
+    	assertTrue( event instanceof pike.events.EndDialogue);
+    	assertTrue( event.target === dialogues);       	  
+    });
+	
+	dialogues.setDialogue_();
+};
+
+function testShowDialogue() {
+	var dialogues = new pike.core.Entity( pike.components.Dialogues );
+	dialogues.setDialogues( conversations.guard );
+	
+	var event = null;
+    goog.events.listen(dialogues, pike.events.ShowDialogue.EVENT_TYPE, function(e) {
+    	event = e;
+    });
+		  
+    waitForEvent(dialogues, pike.events.ShowDialogue.EVENT_TYPE, function() {
+    	assertTrue( event instanceof pike.events.ShowDialogue);
+    	assertTrue( event.dialogue === dialogues.getRootOfDialogues());
+    	assertTrue( event.target === dialogues);       	  
+    });
+	
+    dialogues.showDialogue( dialogues.getDialogue() );
+};
+
+function tearDown(){}
+</script>
+</body>
+</html>

@@ -19,6 +19,11 @@ goog.provide('pike.events.Down');
 goog.provide('pike.events.Up');
 goog.provide('pike.events.Move');
 
+//components
+goog.provide('pike.events.StartDialogue');
+goog.provide('pike.events.ShowDialogue');
+goog.provide('pike.events.EndDialogue');
+
 goog.require('goog.events.Event');
 goog.require('goog.events.EventTarget');
 
@@ -270,5 +275,67 @@ goog.inherits( pike.events.Collision, goog.events.Event );
  * @type {string}
  */
 pike.events.Collision.EVENT_TYPE = "collision";
+
+//## EndDialogue #################################################################################
+/**
+* @param {goog.events.EventTarget} target
+* @constructor
+* @extends {goog.events.Event}
+*/
+pike.events.EndDialogue = function( target){
+	goog.events.Event.call(this, pike.events.EndDialogue.EVENT_TYPE, target);
+};
+
+goog.inherits( pike.events.EndDialogue, goog.events.Event );
+
+/**
+ * Event type
+ * @const
+ * @type {string}
+ */
+pike.events.EndDialogue.EVENT_TYPE = "enddialogue";
+
+//## StartDialogue #################################################################################
+/**
+* @param {Object} dialogue
+* @param {goog.events.EventTarget} target
+* @constructor
+* @extends {goog.events.Event}
+*/
+pike.events.StartDialogue = function( dialogue, target){
+	goog.events.Event.call(this, pike.events.StartDialogue.EVENT_TYPE, target);
+	this.dialogue = dialogue;
+};
+
+goog.inherits( pike.events.StartDialogue, goog.events.Event );
+
+/**
+ * Event type
+ * @const
+ * @type {string}
+ */
+pike.events.StartDialogue.EVENT_TYPE = "startdialogue";
+
+//## ShowDialogue #################################################################################
+/**
+* @param {Object} dialogue
+* @param {goog.events.EventTarget} target
+* @constructor
+* @extends {goog.events.Event}
+*/
+pike.events.ShowDialogue = function( dialogue, target){
+	goog.events.Event.call(this, pike.events.ShowDialogue.EVENT_TYPE, target);
+	this.dialogue = dialogue;
+};
+
+goog.inherits( pike.events.ShowDialogue, goog.events.Event );
+
+/**
+ * Event type
+ * @const
+ * @type {string}
+ */
+pike.events.ShowDialogue.EVENT_TYPE = "showdialogue";
+
 
 

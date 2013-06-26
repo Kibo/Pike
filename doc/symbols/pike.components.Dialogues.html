@@ -5,7 +5,7 @@
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 		<meta name="generator" content="JsDoc Toolkit" />
 		
-		<title>JsDoc Reference - pike.core.Stage</title>
+		<title>JsDoc Reference - pike.components.Dialogues</title>
 
 		<style type="text/css">
 			/* default.css */
@@ -270,26 +270,24 @@ ul.inheritsList
 <!-- ============================== class title ============================ -->
 			<h1 class="classTitle">
 				
-				Class pike.core.Stage
+				Class pike.components.Dialogues
 			</h1>
 
 <!-- ============================== class summary ========================== -->			
 			<p class="description">
 				
-				<br />Extends
-					.<br />
 				
 			
 				
 				
 				
-					<br /><i>Defined in: </i> <a href="../symbols/src/source_core.js.html">core.js</a>.
+					<br /><i>Defined in: </i> <a href="../symbols/src/source_components.js.html">components.js</a>.
 				
 			</p>
 
 <!-- ============================== constructor summary ==================== -->			
 			
-			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class pike.core.Stage.">
+			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class pike.components.Dialogues.">
 				<caption>Class Summary</caption>
 				<thead>
 					<tr>
@@ -302,9 +300,10 @@ ul.inheritsList
 						<td class="attributes">&nbsp;</td>
 						<td class="nameDescription" >
 							<div class="fixedFont">
-								<b><a href="../symbols/pike.core.Stage.html#constructor">pike.core.Stage</a></b>()
+								<b><a href="../symbols/pike.components.Dialogues.html#constructor">pike.components.Dialogues</a></b>()
 							</div>
-							<div class="description">Create a new Stage</div>
+							<div class="description">Dialogues
+The component that adds an entity a ability to carry conversation.</div>
 						</td>
 					</tr>
 				</tbody>
@@ -315,7 +314,7 @@ ul.inheritsList
 			
 				
 				
-				<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class pike.core.Stage.">
+				<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class pike.components.Dialogues.">
 					<caption>Field Summary</caption>
 					<thead>
 						<tr>
@@ -329,19 +328,29 @@ ul.inheritsList
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
 								<div class="fixedFont">
-								pike.core.Stage.<b><a href="../symbols/pike.core.Stage.html#.ELEMENT_ID">ELEMENT_ID</a></b>
+								pike.components.Dialogues.<b><a href="../symbols/pike.components.Dialogues.html#.DIALOGUE_ELEMENT">DIALOGUE_ELEMENT</a></b>
 								</div>
-								<div class="description">DOM Element id for Viewport</div>
+								<div class="description">DOM Element for one sentence</div>
 							</td>
 						</tr>
 					
 						<tr>
-							<td class="attributes">&nbsp;</td>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
 								<div class="fixedFont">
-								<b><a href="../symbols/pike.core.Stage.html#handler">handler</a></b>
+								pike.components.Dialogues.<b><a href="../symbols/pike.components.Dialogues.html#.ELEMENT_ID">ELEMENT_ID</a></b>
 								</div>
-								<div class="description"></div>
+								<div class="description">DOM Element id for Dialogues</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								pike.components.Dialogues.<b><a href="../symbols/pike.components.Dialogues.html#.NAME">NAME</a></b>
+								</div>
+								<div class="description">Component name</div>
 							</td>
 						</tr>
 					
@@ -356,7 +365,7 @@ ul.inheritsList
 			
 				
 				
-				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class pike.core.Stage.">
+				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class pike.components.Dialogues.">
 					<caption>Method Summary</caption>
 					<thead>
 						<tr>
@@ -367,110 +376,156 @@ ul.inheritsList
 					<tbody>
 					
 						<tr>
-							<td class="attributes">&nbsp;</td>
+							<td class="attributes">&lt;private&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/pike.core.Stage.html#addLayer">addLayer</a></b>(layer)
+								<div class="fixedFont"><b><a href="../symbols/pike.components.Dialogues.html#cleanDialoguesContainer_">cleanDialoguesContainer_</a></b>()
 								</div>
-								<div class="description">Register a layer</div>
+								<div class="description">Remove all children from defined DOM dialogues container.</div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&lt;private&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/pike.core.Stage.html#createRootElement_">createRootElement_</a></b>()
+								<div class="fixedFont"><b><a href="../symbols/pike.components.Dialogues.html#createDialogueElement_">createDialogueElement_</a></b>(dialogue)
 								</div>
-								<div class="description">Create root element</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/pike.core.Stage.html#getLayer">getLayer</a></b>(name)
-								</div>
-								<div class="description">Get a layer</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/pike.core.Stage.html#getRootElement">getRootElement</a></b>()
-								</div>
-								<div class="description">The root DOM element of the stage</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/pike.core.Stage.html#onGameWorldChangeSize">onGameWorldChangeSize</a></b>(e)
-								</div>
-								<div class="description">on GameWorld change size handler</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/pike.core.Stage.html#onRender">onRender</a></b>(e)
-								</div>
-								<div class="description">onRender event handler</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/pike.core.Stage.html#onViewportChangePosition">onViewportChangePosition</a></b>(e)
-								</div>
-								<div class="description">on Viewport change position handler</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/pike.core.Stage.html#onViewportChangeSize">onViewportChangeSize</a></b>(e)
-								</div>
-								<div class="description">on Viewport change size handler</div>
+								<div class="description">Create dialogue DOM element</div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&lt;private&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/pike.core.Stage.html#setGameWorldSize_">setGameWorldSize_</a></b>(width, height)
+								<div class="fixedFont"><b><a href="../symbols/pike.components.Dialogues.html#executeCode_">executeCode_</a></b>(code)
 								</div>
-								<div class="description">Set internal gameWorld size</div>
+								<div class="description">Parse String and execute it as JavaScript code.</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/pike.components.Dialogues.html#findDialogueById">findDialogueById</a></b>(id)
+								</div>
+								<div class="description">Find dialogue by id</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/pike.components.Dialogues.html#getActor">getActor</a></b>(id)
+								</div>
+								<div class="description">Get actor</div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&lt;private&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/pike.core.Stage.html#setLayerSize_">setLayerSize_</a></b>(layer)
+								<div class="fixedFont"><b><a href="../symbols/pike.components.Dialogues.html#getChoiceDialogueAsHTML_">getChoiceDialogueAsHTML_</a></b>(choice)
 								</div>
-								<div class="description">Sets the layer size</div>
+								<div class="description">Get choice as HTML</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/pike.components.Dialogues.html#getDialogue">getDialogue</a></b>()
+								</div>
+								<div class="description">Get current dialogue or root of dialogues</div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&lt;private&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/pike.core.Stage.html#setViewportPosition_">setViewportPosition_</a></b>(x, y)
+								<div class="fixedFont"><b><a href="../symbols/pike.components.Dialogues.html#getDialoguesDOMContainer_">getDialoguesDOMContainer_</a></b>()
 								</div>
-								<div class="description">Set internal viewport position</div>
+								<div class="description">Get dialogues DOM container</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/pike.components.Dialogues.html#getRootOfDialogues">getRootOfDialogues</a></b>()
+								</div>
+								<div class="description">Get root of dialogues
+Root is the node, that has not parent.</div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&lt;private&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/pike.core.Stage.html#setViewportSize_">setViewportSize_</a></b>(width, height)
+								<div class="fixedFont"><b><a href="../symbols/pike.components.Dialogues.html#getSentenceDialogueAsHTML_">getSentenceDialogueAsHTML_</a></b>(dialogue)
 								</div>
-								<div class="description">Set internal viewport size</div>
+								<div class="description">Get sentence as HTML</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;private&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/pike.components.Dialogues.html#hasDialoguesRoot_">hasDialoguesRoot_</a></b>(data)
+								</div>
+								<div class="description">Check if data has only the one root dialog</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;private&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/pike.components.Dialogues.html#isActive_">isActive_</a></b>(dialogue)
+								</div>
+								<div class="description">Evaluates conditionString property in dialogue</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;private&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/pike.components.Dialogues.html#isDialoguesSourceValid_">isDialoguesSourceValid_</a></b>(data)
+								</div>
+								<div class="description">Check the source data</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/pike.components.Dialogues.html#onEndDialogue">onEndDialogue</a></b>(e)
+								</div>
+								<div class="description">On End dialogue handler</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;private&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/pike.components.Dialogues.html#setDialogue_">setDialogue_</a></b>(id)
+								</div>
+								<div class="description">Set current dialog</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/pike.components.Dialogues.html#setDialogues">setDialogues</a></b>(data)
+								</div>
+								<div class="description">Set source data</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/pike.components.Dialogues.html#showDialogue">showDialogue</a></b>(dialogue)
+								</div>
+								<div class="description">Show dialogue as HTML in your predefined container.</div>
 							</td>
 						</tr>
 					
@@ -491,16 +546,28 @@ ul.inheritsList
 				</div>
 				
 				<div class="fixedFont">
-						<b>pike.core.Stage</b>()
+						<b>pike.components.Dialogues</b>()
 				</div>
 				
 				<div class="description">
-					Create a new Stage
-					
+					Dialogues
+The component that adds an entity a ability to carry conversation. 
+As data source it uses JSON file. 
+For building source data structure you can use prepared Dialogues builder tool.
+					<br /><i>Author: </i>Tomas Jurman (tomasjurman@gmail.com).
 				</div>
 				
 				
 				
+				<pre class="code">~~~
+var oldWoman = new pike.core.Entity( pike.components.Dialogues )
+oldWoman.setDialogues( sourceData )
+var dialog = oldWoman.getDialogue();
+oldWoman.showDialogue( dialog );
+~~~</pre>
+				
+				
+				
 				
 					
 					
@@ -508,6 +575,13 @@ ul.inheritsList
 					
 					
 					
+					
+						<dl class="detailList">
+						<dt class="heading">See:</dt>
+						
+							<dd>Dialogues builder tool ( http://kibo.github.com/dialoguesBuilder/ )</dd>
+						
+						</dl>
 					
 
 			</div>
@@ -519,15 +593,15 @@ ul.inheritsList
 					Field Detail
 				</div>
 				
-					<a name=".ELEMENT_ID"> </a>
+					<a name=".DIALOGUE_ELEMENT"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 					
 					
-					<span class="light">pike.core.Stage.</span><b>ELEMENT_ID</b>
+					<span class="light">pike.components.Dialogues.</span><b>DIALOGUE_ELEMENT</b>
 					
 					</div>
 					<div class="description">
-						DOM Element id for Viewport
+						DOM Element for one sentence
 						
 						
 					</div>
@@ -541,15 +615,37 @@ ul.inheritsList
 
 					<hr />
 				
-					<a name="handler"> </a>
-					<div class="fixedFont">
+					<a name=".ELEMENT_ID"> </a>
+					<div class="fixedFont">&lt;static&gt; 
 					
 					
-					<b>handler</b>
+					<span class="light">pike.components.Dialogues.</span><b>ELEMENT_ID</b>
 					
 					</div>
 					<div class="description">
+						DOM Element id for Dialogues
 						
+						
+					</div>
+					
+					
+
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name=".NAME"> </a>
+					<div class="fixedFont">&lt;static&gt; 
+					
+					
+					<span class="light">pike.components.Dialogues.</span><b>NAME</b>
+					
+					</div>
+					<div class="description">
+						Component name
 						
 						
 					</div>
@@ -571,15 +667,40 @@ ul.inheritsList
 					Method Detail
 				</div>
 				
-					<a name="addLayer"> </a>
-					<div class="fixedFont">
+					<a name="cleanDialoguesContainer_"> </a>
+					<div class="fixedFont">&lt;private&gt; 
 					
 					
-					<b>addLayer</b>(layer)
+					<b>cleanDialoguesContainer_</b>()
 					
 					</div>
 					<div class="description">
-						Register a layer
+						Remove all children from defined DOM dialogues container.
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="createDialogueElement_"> </a>
+					<div class="fixedFont">&lt;private&gt; 
+					
+					
+					<b>createDialogueElement_</b>(dialogue)
+					
+					</div>
+					<div class="description">
+						Create dialogue DOM element
 						
 						
 					</div>
@@ -591,7 +712,7 @@ ul.inheritsList
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{<a href="../symbols/pike.layers.Layer.html">pike.layers.Layer</a>}</span> <b>layer</b>
+									<b>dialogue</b>
 									
 								</dt>
 								<dd></dd>
@@ -607,40 +728,16 @@ ul.inheritsList
 
 					<hr />
 				
-					<a name="createRootElement_"> </a>
+					<a name="executeCode_"> </a>
 					<div class="fixedFont">&lt;private&gt; 
 					
 					
-					<b>createRootElement_</b>()
+					<b>executeCode_</b>(code)
 					
 					</div>
 					<div class="description">
-						Create root element
-						
-						
-					</div>
-					
-					
-					
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="getLayer"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{?<a href="../symbols/pike.layers.Layer.html">pike.layers.Layer</a>}</span>
-					<b>getLayer</b>(name)
-					
-					</div>
-					<div class="description">
-						Get a layer
+						Parse String and execute it as JavaScript code.
+Use JavaScript eval(string) function
 						
 						
 					</div>
@@ -652,10 +749,53 @@ ul.inheritsList
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{string}</span> <b>name</b>
+									<span class="light fixedFont">{String}</span> <b>code</b>
 									
 								</dt>
-								<dd>- layer name</dd>
+								<dd></dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">See:</dt>
+							
+								<dd>eval(string) (https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/eval)</dd>
+							
+							</dl>
+						
+
+					<hr />
+				
+					<a name="findDialogueById"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{?Object}</span>
+					<b>findDialogueById</b>(id)
+					
+					</div>
+					<div class="description">
+						Find dialogue by id
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{number}</span> <b>id</b>
+									
+								</dt>
+								<dd></dd>
 							
 							</dl>
 						
@@ -666,7 +806,7 @@ ul.inheritsList
 							<dl class="detailList">
 							<dt class="heading">Returns:</dt>
 							
-								<dd><span class="light fixedFont">{?<a href="../symbols/pike.layers.Layer.html">pike.layers.Layer</a>}</span> </dd>
+								<dd><span class="light fixedFont">{?Object}</span> dialogue or null if dialogue is not exists</dd>
 							
 							</dl>
 						
@@ -675,15 +815,94 @@ ul.inheritsList
 
 					<hr />
 				
-					<a name="getRootElement"> </a>
+					<a name="getActor"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{?Object}</span>
+					<b>getActor</b>(id)
+					
+					</div>
+					<div class="description">
+						Get actor
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{number}</span> <b>id</b>
+									
+								</dt>
+								<dd></dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{?Object}</span> actor or null</dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="getChoiceDialogueAsHTML_"> </a>
+					<div class="fixedFont">&lt;private&gt; 
+					
+					
+					<b>getChoiceDialogueAsHTML_</b>(choice)
+					
+					</div>
+					<div class="description">
+						Get choice as HTML
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Object}</span> <b>choice</b>
+									
+								</dt>
+								<dd></dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="getDialogue"> </a>
 					<div class="fixedFont">
 					
 					<span class="light">{Object}</span>
-					<b>getRootElement</b>()
+					<b>getDialogue</b>()
 					
 					</div>
 					<div class="description">
-						The root DOM element of the stage
+						Get current dialogue or root of dialogues
 						
 						
 					</div>
@@ -698,7 +917,7 @@ ul.inheritsList
 							<dl class="detailList">
 							<dt class="heading">Returns:</dt>
 							
-								<dd><span class="light fixedFont">{Object}</span> rootElement</dd>
+								<dd><span class="light fixedFont">{Object}</span> current dialogue</dd>
 							
 							</dl>
 						
@@ -707,15 +926,15 @@ ul.inheritsList
 
 					<hr />
 				
-					<a name="onGameWorldChangeSize"> </a>
-					<div class="fixedFont">
+					<a name="getDialoguesDOMContainer_"> </a>
+					<div class="fixedFont">&lt;private&gt; 
 					
-					
-					<b>onGameWorldChangeSize</b>(e)
+					<span class="light">{Object}</span>
+					<b>getDialoguesDOMContainer_</b>()
 					
 					</div>
 					<div class="description">
-						on GameWorld change size handler
+						Get dialogues DOM container
 						
 						
 					</div>
@@ -723,35 +942,32 @@ ul.inheritsList
 					
 					
 						
+						
+						
+						
+						
 							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
+							<dt class="heading">Returns:</dt>
 							
-								<dt>
-									<span class="light fixedFont">{<a href="../symbols/pike.events.ChangeSize.html">pike.events.ChangeSize</a>}</span> <b>e</b>
-									
-								</dt>
-								<dd></dd>
+								<dd><span class="light fixedFont">{Object}</span> DOM element</dd>
 							
 							</dl>
-						
-						
-						
-						
 						
 						
 						
 
 					<hr />
 				
-					<a name="onRender"> </a>
+					<a name="getRootOfDialogues"> </a>
 					<div class="fixedFont">
 					
-					
-					<b>onRender</b>(e)
+					<span class="light">{Object}</span>
+					<b>getRootOfDialogues</b>()
 					
 					</div>
 					<div class="description">
-						onRender event handler
+						Get root of dialogues
+Root is the node, that has not parent.
 						
 						
 					</div>
@@ -759,107 +975,31 @@ ul.inheritsList
 					
 					
 						
+						
+						
+						
+						
 							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
+							<dt class="heading">Returns:</dt>
 							
-								<dt>
-									<span class="light fixedFont">{<a href="../symbols/pike.events.Render.html">pike.events.Render</a>}</span> <b>e</b>
-									
-								</dt>
-								<dd></dd>
+								<dd><span class="light fixedFont">{Object}</span> root</dd>
 							
 							</dl>
-						
-						
-						
-						
 						
 						
 						
 
 					<hr />
 				
-					<a name="onViewportChangePosition"> </a>
-					<div class="fixedFont">
-					
-					
-					<b>onViewportChangePosition</b>(e)
-					
-					</div>
-					<div class="description">
-						on Viewport change position handler
-						
-						
-					</div>
-					
-					
-					
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{<a href="../symbols/pike.events.ChangePosition.html">pike.events.ChangePosition</a>}</span> <b>e</b>
-									
-								</dt>
-								<dd></dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="onViewportChangeSize"> </a>
-					<div class="fixedFont">
-					
-					
-					<b>onViewportChangeSize</b>(e)
-					
-					</div>
-					<div class="description">
-						on Viewport change size handler
-						
-						
-					</div>
-					
-					
-					
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{<a href="../symbols/pike.events.ChangeSize.html">pike.events.ChangeSize</a>}</span> <b>e</b>
-									
-								</dt>
-								<dd></dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="setGameWorldSize_"> </a>
+					<a name="getSentenceDialogueAsHTML_"> </a>
 					<div class="fixedFont">&lt;private&gt; 
 					
 					
-					<b>setGameWorldSize_</b>(width, height)
+					<b>getSentenceDialogueAsHTML_</b>(dialogue)
 					
 					</div>
 					<div class="description">
-						Set internal gameWorld size
+						Get sentence as HTML
 						
 						
 					</div>
@@ -871,13 +1011,7 @@ ul.inheritsList
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{number}</span> <b>width</b>
-									
-								</dt>
-								<dd></dd>
-							
-								<dt>
-									<span class="light fixedFont">{number}</span> <b>height</b>
+									<span class="light fixedFont">{Object}</span> <b>dialogue</b>
 									
 								</dt>
 								<dd></dd>
@@ -893,15 +1027,15 @@ ul.inheritsList
 
 					<hr />
 				
-					<a name="setLayerSize_"> </a>
+					<a name="hasDialoguesRoot_"> </a>
 					<div class="fixedFont">&lt;private&gt; 
 					
-					
-					<b>setLayerSize_</b>(layer)
+					<span class="light">{boolean}</span>
+					<b>hasDialoguesRoot_</b>(data)
 					
 					</div>
 					<div class="description">
-						Sets the layer size
+						Check if data has only the one root dialog
 						
 						
 					</div>
@@ -913,7 +1047,136 @@ ul.inheritsList
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{<a href="../symbols/pike.layers.Layer.html">pike.layers.Layer</a>}</span> <b>layer</b>
+									<span class="light fixedFont">{Object}</span> <b>data</b>
+									
+								</dt>
+								<dd></dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{boolean}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="isActive_"> </a>
+					<div class="fixedFont">&lt;private&gt; 
+					
+					<span class="light">{boolean}</span>
+					<b>isActive_</b>(dialogue)
+					
+					</div>
+					<div class="description">
+						Evaluates conditionString property in dialogue
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Object}</span> <b>dialogue</b>
+									
+								</dt>
+								<dd></dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{boolean}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="isDialoguesSourceValid_"> </a>
+					<div class="fixedFont">&lt;private&gt; 
+					
+					<span class="light">{boolean}</span>
+					<b>isDialoguesSourceValid_</b>(data)
+					
+					</div>
+					<div class="description">
+						Check the source data
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Object}</span> <b>data</b>
+									
+								</dt>
+								<dd></dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{boolean}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="onEndDialogue"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>onEndDialogue</b>(e)
+					
+					</div>
+					<div class="description">
+						On End dialogue handler
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{<a href="../symbols/pike.events.EndDialogue.html">pike.events.EndDialogue</a>}</span> <b>e</b>
 									
 								</dt>
 								<dd></dd>
@@ -929,15 +1192,15 @@ ul.inheritsList
 
 					<hr />
 				
-					<a name="setViewportPosition_"> </a>
+					<a name="setDialogue_"> </a>
 					<div class="fixedFont">&lt;private&gt; 
 					
 					
-					<b>setViewportPosition_</b>(x, y)
+					<b>setDialogue_</b>(id)
 					
 					</div>
 					<div class="description">
-						Set internal viewport position
+						Set current dialog
 						
 						
 					</div>
@@ -949,13 +1212,7 @@ ul.inheritsList
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{number}</span> <b>x</b>
-									
-								</dt>
-								<dd></dd>
-							
-								<dt>
-									<span class="light fixedFont">{number}</span> <b>y</b>
+									<span class="light fixedFont">{number}</span> <b>id</b>
 									
 								</dt>
 								<dd></dd>
@@ -971,15 +1228,15 @@ ul.inheritsList
 
 					<hr />
 				
-					<a name="setViewportSize_"> </a>
-					<div class="fixedFont">&lt;private&gt; 
+					<a name="setDialogues"> </a>
+					<div class="fixedFont">
 					
-					
-					<b>setViewportSize_</b>(width, height)
+					<span class="light">{Object}</span>
+					<b>setDialogues</b>(data)
 					
 					</div>
 					<div class="description">
-						Set internal viewport size
+						Set source data
 						
 						
 					</div>
@@ -991,13 +1248,57 @@ ul.inheritsList
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{number}</span> <b>width</b>
+									<span class="light fixedFont">{Object}</span> <b>data</b>
 									
 								</dt>
-								<dd></dd>
+								<dd>- source</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{Object}</span> this</dd>
+							
+							</dl>
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">See:</dt>
+							
+								<dd>Dialogues Builder tool ( http://kibo.github.com/dialoguesBuilder/ )</dd>
+							
+							</dl>
+						
+
+					<hr />
+				
+					<a name="showDialogue"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>showDialogue</b>(dialogue)
+					
+					</div>
+					<div class="description">
+						Show dialogue as HTML in your predefined container.
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{number}</span> <b>height</b>
+									<b>dialogue</b>
 									
 								</dt>
 								<dd></dd>

@@ -20,6 +20,32 @@
 				border:5px solid #333;			
 			}
 			
+			#pike-dialogues{
+				width:800px;
+				margin:0 auto;	
+			}
+			
+			#pike-dialogues div{						
+				min-height:96px;				
+				padding-left:100px;				
+			}
+			
+			#pike-dialogues div p:first-child{						
+				padding-top:1em;				
+			}
+			
+			#pike-dialogues div.hero{
+				background:transparent url(../img/hero.png) no-repeat 0 0;						
+			}
+			
+			#pike-dialogues div.guard{
+				background:transparent url(../img/guard.png) no-repeat 0 0;						
+			}
+			
+			#pike-dialogues div.choice{
+				background:transparent url(../img/heroQuestions.png) no-repeat 0 0;						
+			}
+			
 			#bag{
 				
 			}
@@ -33,6 +59,7 @@
 				   
     <script src="../../../closure-library/closure/goog/base.js"></script>
     <script src="../../test/js/deps.js"></script>
+    <script src="data/dialogues.js"></script>
     <script>
 		goog.require('pike.assets.ImageManager');
 		goog.require('pike.input.MouseInputHandler');
@@ -51,10 +78,7 @@
 		window.onload = function(){
 			
 			goog.DEBUG = true;
-			
-			//Components
-			
-									
+															
 			//Assets
 			var imageManager = new pike.assets.ImageManager();
 			imageManager.load({
@@ -118,7 +142,10 @@
 					this.lastUpdate = new Date().getTime();	
 					
 					this.startX = this.x;
-					this.startY = this.y;													
+					this.startY = this.y;	
+					
+					
+					this.dispatchEvent( new pike.events.EndDialogue( this ) );	
 				};
 				
 				hero.SPEED = 120; // 2px * 60fps = 120px/sec 
@@ -157,6 +184,10 @@
 				};
 				hero.onCollision = function(e){
 					
+					if(e.obj.hasComponent( pike.components.Dialogues.NAME ) ){						
+						e.obj.showDialogue( e.obj.getDialogue() );						
+					}
+					
 					if(e.obj.hasComponent( pike.components.Backpack.NAME ) ){
 						e.obj.putInBackpack();
 						return;
@@ -175,12 +206,17 @@
 				hero.handler.listen( hero, pike.events.Collision.EVENT_TYPE, goog.bind( hero.onCollision, hero) );				
 				//obsLayer.handler.listen(hero, pike.events.ChangePosition.EVENT_TYPE, goog.bind(obsLayer.onEntityChangePosition, obsLayer));
 				
-				var enemy =  new pike.core.Entity( pike.components.Sprite, pike.components.Collision);
+				var enemy =  new pike.core.Entity( pike.components.Sprite, pike.components.Collision, pike.components.Dialogues);
 				enemy.x = 150;
 				enemy.y = 200;
 				enemy.setSprite( imageManager.get("entities"), 96, 0, 32, 32, 3, 300);
 				enemy.setCollisionBounds(0,29,0,29);
-				enemy.handler.listen(enemy, pike.events.Render.EVENT_TYPE, goog.bind(enemy.onSpriteRender, enemy));	
+				enemy.setDialogues( dialogues.guard );														
+				enemy.handler.listen(enemy, pike.events.Render.EVENT_TYPE, goog.bind(enemy.onSpriteRender, enemy));
+				enemy.handler.listen(hero, pike.events.EndDialogue.EVENT_TYPE, goog.bind(function(e){
+					this.dispatchEvent( new pike.events.EndDialogue( this ) );	
+				}, enemy));	
+				
 								
 				var cheese =  new pike.core.Entity( pike.components.Sprite, pike.components.Collision, pike.components.Backpack);
 				cheese.x = 150;
@@ -237,7 +273,8 @@
         <h1 align="center">Pike - rpg example</h1>
                
         <div id="pike-stage"></div>
-        <div id="pike-backpack"></div>                       
+        <div id="pike-backpack"></div>
+        <div id="pike-dialogues"></div>                          
                               
         <script src="../../libs/xstats/xstats.js"></script>
         <script>

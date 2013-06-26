@@ -5,7 +5,7 @@
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 		<meta name="generator" content="JsDoc Toolkit" />
 		
-		<title>JsDoc Reference - pike.core.GameWorld</title>
+		<title>JsDoc Reference - pike.events.ShowDialogue</title>
 
 		<style type="text/css">
 			/* default.css */
@@ -270,7 +270,7 @@ ul.inheritsList
 <!-- ============================== class title ============================ -->
 			<h1 class="classTitle">
 				
-				Class pike.core.GameWorld
+				Class pike.events.ShowDialogue
 			</h1>
 
 <!-- ============================== class summary ========================== -->			
@@ -283,13 +283,13 @@ ul.inheritsList
 				
 				
 				
-					<br /><i>Defined in: </i> <a href="../symbols/src/source_core.js.html">core.js</a>.
+					<br /><i>Defined in: </i> <a href="../symbols/src/source_events.js.html">events.js</a>.
 				
 			</p>
 
 <!-- ============================== constructor summary ==================== -->			
 			
-			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class pike.core.GameWorld.">
+			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class pike.events.ShowDialogue.">
 				<caption>Class Summary</caption>
 				<thead>
 					<tr>
@@ -302,9 +302,9 @@ ul.inheritsList
 						<td class="attributes">&nbsp;</td>
 						<td class="nameDescription" >
 							<div class="fixedFont">
-								<b><a href="../symbols/pike.core.GameWorld.html#constructor">pike.core.GameWorld</a></b>()
+								<b><a href="../symbols/pike.events.ShowDialogue.html#constructor">pike.events.ShowDialogue</a></b>(dialogue, target)
 							</div>
-							<div class="description">Creates a new Gameworld.</div>
+							<div class="description"></div>
 						</td>
 					</tr>
 				</tbody>
@@ -315,7 +315,7 @@ ul.inheritsList
 			
 				
 				
-				<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class pike.core.GameWorld.">
+				<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class pike.events.ShowDialogue.">
 					<caption>Field Summary</caption>
 					<thead>
 						<tr>
@@ -326,12 +326,12 @@ ul.inheritsList
 					<tbody>
 					
 						<tr>
-							<td class="attributes">&nbsp;</td>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
 								<div class="fixedFont">
-								<b><a href="../symbols/pike.core.GameWorld.html#handler">handler</a></b>
+								pike.events.ShowDialogue.<b><a href="../symbols/pike.events.ShowDialogue.html#.EVENT_TYPE">EVENT_TYPE</a></b>
 								</div>
-								<div class="description"></div>
+								<div class="description">Event type</div>
 							</td>
 						</tr>
 					
@@ -344,42 +344,6 @@ ul.inheritsList
 
 <!-- ============================== methods summary ======================== -->
 			
-				
-				
-				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class pike.core.GameWorld.">
-					<caption>Method Summary</caption>
-					<thead>
-						<tr>
-							<th scope="col">Method Attributes</th>
-							<th scope="col">Method Name and Description</th>
-						</tr>
-					</thead>
-					<tbody>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/pike.core.GameWorld.html#getBounds">getBounds</a></b>()
-								</div>
-								<div class="description">Get boundaries of GameWorld</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/pike.core.GameWorld.html#setSize">setSize</a></b>(width, height)
-								</div>
-								<div class="description">Set size of GameWorld</div>
-							</td>
-						</tr>
-					
-					</tbody>
-				</table>
-				
-				
-				
-			
 <!-- ============================== events summary ======================== -->
 			
 
@@ -391,17 +355,34 @@ ul.inheritsList
 				</div>
 				
 				<div class="fixedFont">
-						<b>pike.core.GameWorld</b>()
+						<b>pike.events.ShowDialogue</b>(dialogue, target)
 				</div>
 				
 				<div class="description">
-					Creates a new Gameworld.
+					
 					
 				</div>
 				
 				
 				
 				
+					
+						<dl class="detailList">
+						<dt class="heading">Parameters:</dt>
+						
+							<dt>
+								<span class="light fixedFont">{Object}</span>  <b>dialogue</b>
+								
+							</dt>
+								<dd></dd>
+						
+							<dt>
+								<span class="light fixedFont">{goog.events.EventTarget}</span>  <b>target</b>
+								
+							</dt>
+								<dd></dd>
+						
+						</dl>
 					
 					
 					
@@ -419,15 +400,15 @@ ul.inheritsList
 					Field Detail
 				</div>
 				
-					<a name="handler"> </a>
-					<div class="fixedFont">
+					<a name=".EVENT_TYPE"> </a>
+					<div class="fixedFont">&lt;static&gt; 
 					
 					
-					<b>handler</b>
+					<span class="light">pike.events.ShowDialogue.</span><b>EVENT_TYPE</b>
 					
 					</div>
 					<div class="description">
-						
+						Event type
 						
 						
 					</div>
@@ -444,85 +425,6 @@ ul.inheritsList
 			
 
 <!-- ============================== method details ========================= -->		
-			
-				<div class="sectionTitle">
-					Method Detail
-				</div>
-				
-					<a name="getBounds"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{<a href="../symbols/pike.graphics.Rectangle.html">pike.graphics.Rectangle</a>}</span>
-					<b>getBounds</b>()
-					
-					</div>
-					<div class="description">
-						Get boundaries of GameWorld
-						
-						
-					</div>
-					
-					
-					
-						
-						
-						
-						
-						
-							<dl class="detailList">
-							<dt class="heading">Returns:</dt>
-							
-								<dd><span class="light fixedFont">{<a href="../symbols/pike.graphics.Rectangle.html">pike.graphics.Rectangle</a>}</span> </dd>
-							
-							</dl>
-						
-						
-						
-
-					<hr />
-				
-					<a name="setSize"> </a>
-					<div class="fixedFont">
-					
-					
-					<b>setSize</b>(width, height)
-					
-					</div>
-					<div class="description">
-						Set size of GameWorld
-						
-						
-					</div>
-					
-					
-					
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{number}</span> <b>width</b>
-									
-								</dt>
-								<dd></dd>
-							
-								<dt>
-									<span class="light fixedFont">{number}</span> <b>height</b>
-									
-								</dt>
-								<dd></dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-						
-						
-
-					
-				
 			
 			
 <!-- ============================== event details ========================= -->		

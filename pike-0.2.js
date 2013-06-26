@@ -3103,6 +3103,9 @@ goog.provide("pike.events.Collision");
 goog.provide("pike.events.Down");
 goog.provide("pike.events.Up");
 goog.provide("pike.events.Move");
+goog.provide("pike.events.StartDialogue");
+goog.provide("pike.events.ShowDialogue");
+goog.provide("pike.events.EndDialogue");
 goog.require("goog.events.Event");
 goog.require("goog.events.EventTarget");
 pike.events.Update = function(now, target) {
@@ -3184,6 +3187,23 @@ pike.events.Collision = function(x, y, oldX, oldY, obj, target) {
 };
 goog.inherits(pike.events.Collision, goog.events.Event);
 pike.events.Collision.EVENT_TYPE = "collision";
+pike.events.EndDialogue = function(target) {
+  goog.events.Event.call(this, pike.events.EndDialogue.EVENT_TYPE, target)
+};
+goog.inherits(pike.events.EndDialogue, goog.events.Event);
+pike.events.EndDialogue.EVENT_TYPE = "enddialogue";
+pike.events.StartDialogue = function(dialogue, target) {
+  goog.events.Event.call(this, pike.events.StartDialogue.EVENT_TYPE, target);
+  this.dialogue = dialogue
+};
+goog.inherits(pike.events.StartDialogue, goog.events.Event);
+pike.events.StartDialogue.EVENT_TYPE = "startdialogue";
+pike.events.ShowDialogue = function(dialogue, target) {
+  goog.events.Event.call(this, pike.events.ShowDialogue.EVENT_TYPE, target);
+  this.dialogue = dialogue
+};
+goog.inherits(pike.events.ShowDialogue, goog.events.Event);
+pike.events.ShowDialogue.EVENT_TYPE = "showdialogue";
 // Input 21
 /*
  Dual licensed under the MIT or GPL licenses.
@@ -4053,9 +4073,14 @@ goog.provide("pike.components.Collision");
 goog.provide("pike.components.Sprite");
 goog.provide("pike.components.Image");
 goog.provide("pike.components.Watch");
+goog.provide("pike.components.Backpack");
+goog.provide("pike.components.Dialogues");
 goog.require("goog.events");
 goog.require("pike.graphics.Rectangle");
 goog.require("pike.animation.Animator");
+goog.require("pike.events.StartDialogue");
+goog.require("pike.events.ShowDialogue");
+goog.require("pike.events.EndDialogue");
 pike.components.Collision = function() {
   this.collisionBounds_ = new pike.graphics.Rectangle(0, 0, 0, 0);
   this.setCollisionBounds = function(x, y, w, h) {
@@ -4303,6 +4328,182 @@ pike.components.Backpack = function() {
 };
 pike.components.Backpack.NAME = "pike.components.Backpack";
 pike.components.Backpack.ELEMENT_ID = "pike-backpack";
+pike.components.Dialogues = function() {
+  this.setDialogues = function(data) {
+    if(!this.isDialoguesSourceValid_(data)) {
+      throw new Error("Data is not valid.");
+    }
+    this.dialoguesData_ = data;
+    return this
+  };
+  this.getDialogue = function() {
+    if(!this.dialogue_) {
+      this.setDialogue_(this.getRootOfDialogues().id);
+      if(goog.DEBUG) {
+        window.console.log("[pike.components.Dialogues] startdialogue")
+      }
+      this.dispatchEvent(new pike.events.StartDialogue(this.dialogue_, this))
+    }
+    return this.dialogue_
+  };
+  this.showDialogue = function(dialogue) {
+    if(!dialogue) {
+      throw new Error("[pike.components.Dialogues] Error: There is not a dialogue.");
+    }
+    this.cleanDialoguesContainer_();
+    var dialogueAsHTML = dialogue.isChoice ? this.getChoiceDialogueAsHTML_(dialogue) : this.getSentenceDialogueAsHTML_(dialogue);
+    this.getDialoguesDOMContainer_().appendChild(dialogueAsHTML);
+    if(goog.DEBUG) {
+      window.console.log("[pike.components.Dialogues] showdialogue")
+    }
+    this.dispatchEvent(new pike.events.ShowDialogue(dialogue, this))
+  };
+  this.setDialogue_ = function(id) {
+    if(this.dialogue_) {
+      this.executeCode_(this.dialogue_.codeAfter)
+    }
+    if(!id) {
+      if(goog.DEBUG) {
+        window.console.log("[pike.components.Dialogues] enddialogue")
+      }
+      this.dispatchEvent(new pike.events.EndDialogue(this));
+      return
+    }
+    for(var idx = 0;idx < this.dialoguesData_.dialogues.length;idx++) {
+      if(this.dialoguesData_.dialogues[idx].id == id) {
+        this.dialogue_ = this.dialoguesData_.dialogues[idx];
+        this.executeCode_(this.dialogue_.codeBefore);
+        if(!this.isActive_(this.dialogue_)) {
+          var nextDialogueId = this.dialogue_.outgoingLinks.length == 1 ? this.dialogue_.outgoingLinks[0] : null;
+          this.setDialogue_(nextDialogueId)
+        }
+        return;
+        break
+      }
+    }
+    this.dialogue_ = null
+  };
+  this.getRootOfDialogues = function() {
+    for(var idx = 0;idx < this.dialoguesData_.dialogues.length;idx++) {
+      if(!this.dialoguesData_.dialogues[idx].parent) {
+        return this.dialoguesData_.dialogues[idx];
+        break
+      }
+    }
+  };
+  this.getActor = function(id) {
+    if(!id) {
+      return null
+    }
+    for(var idx = 0;idx < this.dialoguesData_.actors.length;idx++) {
+      if(this.dialoguesData_.actors[idx].id == id) {
+        return this.dialoguesData_.actors[idx]
+      }
+    }
+    return null
+  };
+  this.findDialogueById = function(id) {
+    if(!id) {
+      return null
+    }
+    for(var idx = 0;idx < this.dialoguesData_.dialogues.length;idx++) {
+      if(this.dialoguesData_.dialogues[idx].id == id) {
+        return this.dialoguesData_.dialogues[idx];
+        break
+      }
+    }
+    return null
+  };
+  this.getSentenceDialogueAsHTML_ = function(dialogue) {
+    var container = document.createElement("div");
+    container.setAttribute("class", this.getActor(dialogue.actor).name);
+    container.appendChild(this.createDialogueElement_(dialogue));
+    return container
+  };
+  this.getChoiceDialogueAsHTML_ = function(choice) {
+    var container = document.createElement("div");
+    container.setAttribute("class", "choice");
+    for(var idx = 0;idx < choice.outgoingLinks.length;idx++) {
+      var dialogue = this.findDialogueById(choice.outgoingLinks[idx]);
+      if(!this.isActive_(dialogue)) {
+        continue
+      }
+      container.appendChild(this.createDialogueElement_(dialogue))
+    }
+    return container
+  };
+  this.createDialogueElement_ = function(dialogue) {
+    var container = document.createElement(pike.components.Dialogues.DIALOGUE_ELEMENT);
+    container.setAttribute("data-dialogue", dialogue.id);
+    goog.events.listen(container, goog.events.EventType.CLICK, goog.bind(function(e) {
+      var currentDialogue = this.findDialogueById(e.target.getAttribute("data-dialogue"));
+      var nextDialogueId = currentDialogue.outgoingLinks.length == 1 ? currentDialogue.outgoingLinks[0] : null;
+      this.setDialogue_(nextDialogueId);
+      if(this.dialogue_) {
+        this.showDialogue(this.getDialogue())
+      }
+    }, this));
+    container.appendChild(document.createTextNode(dialogue.dialogueText));
+    return container
+  };
+  this.cleanDialoguesContainer_ = function() {
+    this.getDialoguesDOMContainer_().innerHTML = ""
+  };
+  this.isDialoguesSourceValid_ = function(data) {
+    var isValid = true;
+    if(!data || !data.dialogues || data.dialogues.length == 0 || !data.actors || data.actors.length <= 1 || !this.hasDialoguesRoot_(data)) {
+      isValid = false
+    }
+    return isValid
+  };
+  this.hasDialoguesRoot_ = function(data) {
+    var roots = [];
+    for(var idx = 0;idx < data.dialogues.length;idx++) {
+      if(!data.dialogues[idx].parent) {
+        roots.push(data.dialogues[idx])
+      }
+    }
+    return roots.length == 1 ? true : false
+  };
+  this.isActive_ = function(dialogue) {
+    var result = true;
+    if(dialogue.conditionsString) {
+      result = this.executeCode_(dialogue.conditionsString)
+    }
+    return result
+  };
+  this.executeCode_ = function(code) {
+    if(code) {
+      if(goog.DEBUG) {
+        window.console.log(" [pike.components.Dialogues] execute code: " + code)
+      }
+      try {
+        return eval(code)
+      }catch(e) {
+        if(e) {
+          throw new Error("Syntax error on your code: " + code);
+        }
+      }
+    }
+  };
+  this.getDialoguesDOMContainer_ = function() {
+    var dialogues = document.getElementById(pike.components.Dialogues.ELEMENT_ID);
+    if(!dialogues) {
+      dialogues = document.createElement("div");
+      dialogues.setAttribute("id", pike.components.Dialogues.ELEMENT_ID);
+      document.getElementsByTagName("body")[0].appendChild(dialogues)
+    }
+    return dialogues
+  };
+  this.onEndDialogue = function(e) {
+    this.dialogue_ = null;
+    this.cleanDialoguesContainer_()
+  };
+  this.handler.listen(this, pike.events.EndDialogue.EVENT_TYPE, goog.bind(this.onEndDialogue, this))
+};
+pike.components.Dialogues.NAME = "pike.components.Dialogues";
+pike.components.Dialogues.ELEMENT_ID = "pike-dialogues";
+pike.components.Dialogues.DIALOGUE_ELEMENT = "p";
 // Input 27
 /*
  Dual licensed under the MIT or GPL licenses.
