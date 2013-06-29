@@ -5,7 +5,7 @@
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 		<meta name="generator" content="JsDoc Toolkit" />
 		
-		<title>JsDoc Reference - pike.core.Viewport</title>
+		<title>JsDoc Reference - pike.components.Hen</title>
 
 		<style type="text/css">
 			/* default.css */
@@ -272,26 +272,24 @@ ul.inheritsList
 <!-- ============================== class title ============================ -->
 			<h1 class="classTitle">
 				
-				Class pike.core.Viewport
+				Class pike.components.Hen
 			</h1>
 
 <!-- ============================== class summary ========================== -->			
 			<p class="description">
 				
-				<br />Extends
-					.<br />
 				
 			
 				
 				
 				
-					<br /><i>Defined in: </i> <a href="../symbols/src/source_core.js.html">core.js</a>.
+					<br /><i>Defined in: </i> <a href="../symbols/src/source_components.js.html">components.js</a>.
 				
 			</p>
 
 <!-- ============================== constructor summary ==================== -->			
 			
-			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class pike.core.Viewport.">
+			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class pike.components.Hen.">
 				<caption>Class Summary</caption>
 				<thead>
 					<tr>
@@ -304,9 +302,10 @@ ul.inheritsList
 						<td class="attributes">&nbsp;</td>
 						<td class="nameDescription" >
 							<div class="fixedFont">
-								<b><a href="../symbols/pike.core.Viewport.html#constructor">pike.core.Viewport</a></b>()
+								<b><a href="../symbols/pike.components.Hen.html#constructor">pike.components.Hen</a></b>()
 							</div>
-							<div class="description">Creates a new Viewport.</div>
+							<div class="description">Hen
+The component adds an entity a ability of movement as a hen.</div>
 						</td>
 					</tr>
 				</tbody>
@@ -317,7 +316,7 @@ ul.inheritsList
 			
 				
 				
-				<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class pike.core.Viewport.">
+				<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class pike.components.Hen.">
 					<caption>Field Summary</caption>
 					<thead>
 						<tr>
@@ -328,10 +327,20 @@ ul.inheritsList
 					<tbody>
 					
 						<tr>
-							<td class="attributes">&nbsp;</td>
+							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
 								<div class="fixedFont">
-								<b><a href="../symbols/pike.core.Viewport.html#handler">handler</a></b>
+								pike.components.Hen.<b><a href="../symbols/pike.components.Hen.html#.NAME">NAME</a></b>
+								</div>
+								<div class="description">Component name</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;private&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								<b><a href="../symbols/pike.components.Hen.html#pike_components_Hen">pike_components_Hen</a></b>
 								</div>
 								<div class="description"></div>
 							</td>
@@ -348,7 +357,7 @@ ul.inheritsList
 			
 				
 				
-				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class pike.core.Viewport.">
+				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class pike.components.Hen.">
 					<caption>Method Summary</caption>
 					<thead>
 						<tr>
@@ -361,27 +370,54 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/pike.core.Viewport.html#getBounds">getBounds</a></b>()
+								<div class="fixedFont"><b><a href="../symbols/pike.components.Hen.html#getStep">getStep</a></b>()
 								</div>
-								<div class="description">Get boundaries of Viewport</div>
+								<div class="description">Get step</div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/pike.core.Viewport.html#setPosition">setPosition</a></b>(x, y)
+								<div class="fixedFont"><b><a href="../symbols/pike.components.Hen.html#isEscaping">isEscaping</a></b>()
 								</div>
-								<div class="description">Set position of Viewport</div>
+								<div class="description">Determine if the hen is in escaping state</div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/pike.core.Viewport.html#setSize">setSize</a></b>(width, height)
+								<div class="fixedFont"><b><a href="../symbols/pike.components.Hen.html#onHenUpdate">onHenUpdate</a></b>(e)
 								</div>
-								<div class="description">Set size of Viewport</div>
+								<div class="description">On update handler</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/pike.components.Hen.html#setDuration">setDuration</a></b>(duration)
+								</div>
+								<div class="description">Set duration for one step</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/pike.components.Hen.html#setHenEscaping">setHenEscaping</a></b>(vx, vy, duration)
+								</div>
+								<div class="description">Set escaping state</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/pike.components.Hen.html#setStep">setStep</a></b>(step)
+								</div>
+								<div class="description">Set step</div>
 							</td>
 						</tr>
 					
@@ -402,13 +438,23 @@ ul.inheritsList
 				</div>
 				
 				<div class="fixedFont">
-						<b>pike.core.Viewport</b>()
+						<b>pike.components.Hen</b>()
 				</div>
 				
 				<div class="description">
-					Creates a new Viewport.
-					
+					Hen
+The component adds an entity a ability of movement as a hen.
+					<br /><i>Author: </i>Tomas Jurman (tomasjurman@gmail.com).
 				</div>
+				
+				
+				
+				<pre class="code">~~~ 
+var hen = new pike.core.Entity( pike.components.Hen );
+hen.handler.listen(timer, pike.events.Update.EVENT_TYPE, goog.bind(function(e){
+		this.onHenUpdate(e);	
+	}, hen));
+~~~</pre>
 				
 				
 				
@@ -430,11 +476,33 @@ ul.inheritsList
 					Field Detail
 				</div>
 				
-					<a name="handler"> </a>
-					<div class="fixedFont">
+					<a name=".NAME"> </a>
+					<div class="fixedFont">&lt;static&gt; 
 					
 					
-					<b>handler</b>
+					<span class="light">pike.components.Hen.</span><b>NAME</b>
+					
+					</div>
+					<div class="description">
+						Component name
+						
+						
+					</div>
+					
+					
+
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="pike_components_Hen"> </a>
+					<div class="fixedFont">&lt;private&gt; 
+					
+					
+					<b>pike_components_Hen</b>
 					
 					</div>
 					<div class="description">
@@ -460,15 +528,15 @@ ul.inheritsList
 					Method Detail
 				</div>
 				
-					<a name="getBounds"> </a>
+					<a name="getStep"> </a>
 					<div class="fixedFont">
 					
-					<span class="light">{<a href="../symbols/pike.graphics.Rectangle.html">pike.graphics.Rectangle</a>}</span>
-					<b>getBounds</b>()
+					<span class="light">{number}</span>
+					<b>getStep</b>()
 					
 					</div>
 					<div class="description">
-						Get boundaries of Viewport
+						Get step
 						
 						
 					</div>
@@ -483,7 +551,7 @@ ul.inheritsList
 							<dl class="detailList">
 							<dt class="heading">Returns:</dt>
 							
-								<dd><span class="light fixedFont">{<a href="../symbols/pike.graphics.Rectangle.html">pike.graphics.Rectangle</a>}</span> </dd>
+								<dd><span class="light fixedFont">{number}</span> </dd>
 							
 							</dl>
 						
@@ -492,15 +560,47 @@ ul.inheritsList
 
 					<hr />
 				
-					<a name="setPosition"> </a>
+					<a name="isEscaping"> </a>
 					<div class="fixedFont">
 					
-					
-					<b>setPosition</b>(x, y)
+					<span class="light">{boolean}</span>
+					<b>isEscaping</b>()
 					
 					</div>
 					<div class="description">
-						Set position of Viewport
+						Determine if the hen is in escaping state
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{boolean}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="onHenUpdate"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>onHenUpdate</b>(e)
+					
+					</div>
+					<div class="description">
+						On update handler
 						
 						
 					</div>
@@ -512,13 +612,7 @@ ul.inheritsList
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{number}</span> <b>x</b>
-									
-								</dt>
-								<dd></dd>
-							
-								<dt>
-									<span class="light fixedFont">{number}</span> <b>y</b>
+									<span class="light fixedFont">{<a href="../symbols/pike.events.Update.html">pike.events.Update</a>}</span> <b>e</b>
 									
 								</dt>
 								<dd></dd>
@@ -534,15 +628,15 @@ ul.inheritsList
 
 					<hr />
 				
-					<a name="setSize"> </a>
+					<a name="setDuration"> </a>
 					<div class="fixedFont">
 					
 					
-					<b>setSize</b>(width, height)
+					<b>setDuration</b>(duration)
 					
 					</div>
 					<div class="description">
-						Set size of Viewport
+						Set duration for one step
 						
 						
 					</div>
@@ -554,16 +648,107 @@ ul.inheritsList
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{number}</span> <b>width</b>
+									<span class="light fixedFont">{number}</span> <b>duration</b>
+									
+								</dt>
+								<dd>- ms</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="setHenEscaping"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>setHenEscaping</b>(vx, vy, duration)
+					
+					</div>
+					<div class="description">
+						Set escaping state
+						
+						
+					</div>
+					
+					
+					
+					<pre class="code">~~~
+var hen = new pike.core.Entity( pike.components.Hen );
+hen.handler.listen(hen, pike.events.Collision.EVENT_TYPE, goog.bind(function(e){
+		this.x = e.oldX;
+		this.y = e.oldY;
+		if(!this.isEscaping()){
+			this.setHenEscaping(100, 100, 1000);
+		}
+}, hen));
+~~~</pre>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{number}</span> <b>vx</b>
 									
 								</dt>
 								<dd></dd>
 							
 								<dt>
-									<span class="light fixedFont">{number}</span> <b>height</b>
+									<span class="light fixedFont">{number}</span> <b>vy</b>
 									
 								</dt>
 								<dd></dd>
+							
+								<dt>
+									<span class="light fixedFont">{number}</span> <b>duration</b>
+									
+								</dt>
+								<dd></dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="setStep"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>setStep</b>(step)
+					
+					</div>
+					<div class="description">
+						Set step
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{number}</span> <b>step</b>
+									
+								</dt>
+								<dd>- px</dd>
 							
 							</dl>
 						
@@ -588,7 +773,7 @@ ul.inheritsList
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Sat Jun 29 2013 18:28:25 GMT+0200 (CEST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Sat Jun 29 2013 18:28:24 GMT+0200 (CEST)
 		</div>
 	</body>
 </html>

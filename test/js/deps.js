@@ -2,7 +2,7 @@
 // Please do not edit.
 goog.addDependency('../../../Pike/source/animation.js', ['pike.animation.Animator'], []);
 goog.addDependency('../../../Pike/source/assets.js', ['pike.assets.ImageManager'], []);
-goog.addDependency('../../../Pike/source/components.js', ['pike.components.Backpack', 'pike.components.Collision', 'pike.components.Dialogues', 'pike.components.Image', 'pike.components.Sprite', 'pike.components.Watch'], ['goog.events', 'pike.animation.Animator', 'pike.events.EndDialogue', 'pike.events.ShowDialogue', 'pike.events.StartDialogue', 'pike.graphics.Rectangle']);
+goog.addDependency('../../../Pike/source/components.js', ['pike.components.Backpack', 'pike.components.Collision', 'pike.components.Dialogues', 'pike.components.Hen', 'pike.components.Image', 'pike.components.Sprite', 'pike.components.Watch'], ['goog.events', 'pike.animation.Animator', 'pike.events.EndDialogue', 'pike.events.ShowDialogue', 'pike.events.StartDialogue', 'pike.graphics.Rectangle']);
 goog.addDependency('../../../Pike/source/core.js', ['pike.core.Entity', 'pike.core.GameWorld', 'pike.core.Stage', 'pike.core.Timer', 'pike.core.Viewport'], ['goog.array', 'goog.events', 'goog.events.EventTarget', 'pike.graphics.Rectangle']);
 goog.addDependency('../../../Pike/source/events.js', ['pike.events.ChangePosition', 'pike.events.ChangeSize', 'pike.events.Collision', 'pike.events.Down', 'pike.events.EndDialogue', 'pike.events.Move', 'pike.events.NewEntity', 'pike.events.RemoveEntity', 'pike.events.Render', 'pike.events.ShowDialogue', 'pike.events.StartDialogue', 'pike.events.Up', 'pike.events.Update'], ['goog.events.Event', 'goog.events.EventTarget']);
 goog.addDependency('../../../Pike/source/graphics.js', ['pike.graphics.Cluster', 'pike.graphics.Rectangle'], []);

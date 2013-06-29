@@ -10,6 +10,7 @@ goog.provide('pike.components.Image');
 goog.provide('pike.components.Watch');
 goog.provide('pike.components.Backpack');
 goog.provide('pike.components.Dialogues');
+goog.provide('pike.components.Hen');
 
 goog.require('goog.events');
 goog.require('pike.graphics.Rectangle');
@@ -72,9 +73,16 @@ pike.components.Collision = function(){
 			if(this.id == entities[idx].id){
 				continue;
 			}
-						
-			if(this.getCBounds(this).intersects( entities[idx].getCBounds() )){								
-				this.dispatchEvent( new pike.events.Collision(e.x, e.y, e.oldX, e.oldY, entities[idx], this));
+			
+			if(this.getCBounds().intersects( entities[idx].getCBounds() )){	
+				var entity = entities[idx];
+				var activeEvent = new pike.events.Collision(e.x, e.y, e.oldX, e.oldY, entity, this);
+				this.dispatchEvent( activeEvent );	
+				if(goog.DEBUG) window.console.log("[pike.components.Collision] collision active #" + this.id + ", x:" + activeEvent.x + ", y:" + activeEvent.y + ", oldX:" + activeEvent.oldX + ", oldY:" + activeEvent.oldY);
+								
+				var passiveEvent = new pike.events.Collision(entity.x, entity.y, entity.x, entity.y, this, this);
+				entity.dispatchEvent( passiveEvent );
+				if(goog.DEBUG) window.console.log("[pike.components.Collision] collision passive #" + entity.id + ", x:" + passiveEvent.x + ", y:" + passiveEvent.y + ", oldX:" + passiveEvent.oldX + ", oldY:" + passiveEvent.oldY);							
 			}					
 		}				
 	};
@@ -161,9 +169,7 @@ pike.components.Sprite = function(){
 		var deltaTime = now - this.spriteSource.lastUpdate;
 		this.spriteSource.lastUpdate = now;		
 		var fraction = this.spriteSource.animator.update(deltaTime);			
-		this.spriteSource.currentFrame = Math.floor(fraction * this.spriteSource.numberOfFrames);
-							
-		this.setDirty(this.getBounds());		
+		this.spriteSource.currentFrame = Math.floor(fraction * this.spriteSource.numberOfFrames);		
 	};
 	
 	/**
@@ -188,25 +194,13 @@ pike.components.Sprite = function(){
 	 * On render handler
 	 * @param {pike.events.Render} e
 	 */
-	this.onSpriteRender = function(e){		
+	this.onSpriteRender = function(e){			
 		this.layer.getOffScreen().context.drawImage(
 				this.spriteSource.image,			
 				this.spriteSource.x + (this.spriteSource.currentFrame * this.spriteSource.w ), this.spriteSource.y + (this.spriteSource.row * this.spriteSource.h), this.spriteSource.w, this.spriteSource.h,
 				this.x, this.y, this.w, this.h				
 		);			
-	};
-	
-	/**
-	 * Set dirty ares
-	 * @param {pike.graphics.Rectangle} rect
-	 */
-	this.setDirty = function(rect){
-		if(this.layer.hasDirtyManager()){
-			this.layer.dirtyManager.markDirty( rect );				
-		}else{		
-			this.layer.getOffScreen().isDirty = true;
-		}
-	};
+	};	
 };
 
 /**
@@ -476,13 +470,9 @@ pike.components.Backpack = function(){
 		this.backpackItem_.setAttribute("data-widget", this.id);
 		this.backpackItem_.setAttribute("draggable", "true");	
 						
-		this.getBackpackElement().appendChild( this.backpackItem_ );
-		
-		if(this.hasComponent( pike.components.Sprite.NAME )){
-			//clear area 
-			this.setDirty( this.getBounds() );
-		}
-								
+		this.getBackpackElement().appendChild( this.backpackItem_ );			
+		this.layer.setDirty( this.getBounds() );
+										
 		var oldX = this.x;
 		var oldY = this.y;						
 		this.y = -this.h; //hide entity						
@@ -574,12 +564,9 @@ pike.components.Backpack = function(){
 		var oldY = entity.y;
 		entity.x = e.offsetX + entity.layer.viewport_.x;
 		entity.y = e.offsetY + entity.layer.viewport_.y;
-				
-		if(this.hasComponent( pike.components.Sprite.NAME )){
-			//clear area 
-			entity.setDirty( entity.getBounds() );
-		}
-					
+						
+		this.layer.setDirty( entity.getBounds() );
+						
 		entity.dispatchEvent( new pike.events.ChangePosition(entity.x, entity.y, oldX, oldY, entity));									    									
 		if(goog.DEBUG) window.console.log("[pike.components.Backpack] drop #" + entity.id);
 		
@@ -962,4 +949,160 @@ pike.components.Dialogues.ELEMENT_ID = "pike-dialogues";
  * @type {string}
  */
 pike.components.Dialogues.DIALOGUE_ELEMENT = "p";
+
+//## Hen #################################
+/**
+ * Hen
+ * The component adds an entity a ability of movement as a hen.
+ * @constructor
+ * @example
+ * ~~~ 
+ * var hen = new pike.core.Entity( pike.components.Hen );
+ * hen.handler.listen(timer, pike.events.Update.EVENT_TYPE, goog.bind(function(e){
+ *		this.onHenUpdate(e);	
+ *	}, hen));
+ * ~~~
+ * @author Tomas Jurman (tomasjurman@gmail.com)
+ */
+pike.components.Hen = function(){
+		
+	/**
+	 * @private
+	 */
+	this.pike_components_Hen = {						
+			isMoving_:true,
+			step_ : 50,
+			duration_:2000,
+			isEscaping_:false,
+			init:function( parent ){
+				this.parent = parent;
+				this.animator = new pike.animation.Animator();
+				this.animator.setRepeatBehavior(pike.animation.Animator.LOOP);
+				this.animator.setRepeatCount(1);
+											
+				this.getNextPosition_();				
+			},
+	
+			getNextPosition_:function( vx, vy, duration ){
+								
+				if(arguments.length == 0){
+					vx = (Math.random() * (2 * this.step_) - this.step_);
+					vy = (Math.random() * (2 * this.step_) - this.step_);
+					duration = this.duration_;									
+				}
+																																				
+				this.parent.vx = vx;
+				this.parent.vy = vy;
+															
+				this.lastUpdate_ = new Date().getTime();			
+				
+				this.animator.stop();		
+				this.animator.setDuration( duration );		
+				this.animator.start();					
+							
+				this.startX_ = this.parent.x; 
+				this.startY_ = this.parent.y;				
+			}				
+	};
+	
+	/**
+	 * Set step
+	 * @param {number} step - px
+	 */
+	this.setStep = function(step){
+		this.pike_components_Hen.step_ = step;
+	};
+	
+	/**
+	 * Get step
+	 * @return {number}
+	 */
+	this.getStep = function(){
+		return this.pike_components_Hen.step_;
+	};
+	
+	/**
+	 * Set duration for one step
+	 * @param {number} duration - ms
+	 */
+	this.setDuration = function(duration){
+		this.pike_components_Hen.duration_ = duration;
+	};
+	
+	/**
+	 * Determine if the hen is in escaping state
+	 * @return {boolean} 
+	 */
+	this.isEscaping = function(){
+		return this.pike_components_Hen.isEscaping_;
+	};
+		
+	/**
+	 * On update handler
+	 * @param {pike.events.Update} e
+	 */
+	this.onHenUpdate = function(e){	
+		if( typeof this.vx == 'undefined' || typeof this.vy == 'undefined' ){		
+			this.pike_components_Hen.init( this );	
+			if(goog.DEBUG) window.console.log("[pike.components.Hen] init");			
+		}
+		
+		var now = e.now;						
+		var fraction = this.pike_components_Hen.animator.update( now - this.pike_components_Hen.lastUpdate_ );
+		this.pike_components_Hen.lastUpdate_ = now;
+					
+		if( typeof fraction == 'undefined'){					
+			this.pike_components_Hen.isMoving_ = !this.pike_components_Hen.isMoving_;	
+			this.pike_components_Hen.isEscaping_ = false;
+			this.pike_components_Hen.getNextPosition_();
+			return
+		};
+		
+		if( this.pike_components_Hen.isMoving_ ){
+			
+			var oldX = this.x;
+			var oldY = this.y;
+			
+			this.x = this.pike_components_Hen.startX_ + (this.vx * fraction);
+			this.y = this.pike_components_Hen.startY_ + (this.vy * fraction);  			
+	    		    	    	    	    					    				   				    					
+	    	this.x = (0.5 + this.x) << 0; //round
+	    	this.y = (0.5 + this.y) << 0; //round
+	    		    		    					    					    					    					    					    					    					    					   
+	    	this.dispatchEvent( new pike.events.ChangePosition(this.x, this.y, oldX, oldY, this) );	
+		}; 				    	    	    	
+	};
+	
+	/**
+	 * Set escaping state
+	 * @param {number} vx
+	 * @param {number} vy
+	 * @param {number} duration
+	 * @example
+	 * ~~~
+	 * var hen = new pike.core.Entity( pike.components.Hen );
+	 * hen.handler.listen(hen, pike.events.Collision.EVENT_TYPE, goog.bind(function(e){
+	 * 		this.x = e.oldX;
+	 * 		this.y = e.oldY;
+	 * 		if(!this.isEscaping()){
+	 * 			this.setHenEscaping(100, 100, 1000);
+	 * 		}
+	 * }, hen));
+	 * ~~~
+	 */
+	this.setHenEscaping = function(vx, vy, duration){		
+		this.pike_components_Hen.isMoving_ = true;
+		this.pike_components_Hen.isEscaping_ = true;
+		this.pike_components_Hen.getNextPosition_(vx, vy, duration);			
+	};		
+};
+
+/**
+ * Component name
+ * @const
+ * @type {string}
+ */
+pike.components.Hen.NAME="pike.components.Hen";
+
+
 

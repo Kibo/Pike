@@ -203,7 +203,8 @@ pike.core.Timer = function(){
 	*/
 	this.handler = new goog.events.EventHandler(this);
 	
-	this.boundTick_ = goog.bind(this.tick, this);
+	this.boundTick_ = goog.bind(this.tick, this);	
+		
 };
 
 goog.inherits(pike.core.Timer, goog.events.EventTarget);
@@ -213,7 +214,26 @@ goog.inherits(pike.core.Timer, goog.events.EventTarget);
  */
 pike.core.Timer.prototype.start = function(){
 	this.stop();	
-	this.tick();
+	this.tick();	
+	if(goog.DEBUG) window.console.log("[pike.core.Timer] start");
+};
+
+/**
+ * Pause Timer
+ * @param {boolean} ispause
+ */
+pike.core.Timer.prototype.setPause = function( ispause ){
+	this.pause_ = ispause;	
+	if(this.pause_){
+		if(goog.DEBUG) window.console.log("[pike.core.Timer] pause");
+	}
+};
+
+/**
+ * Pause Timer
+ */
+pike.core.Timer.prototype.isPaused = function(){
+	return this.pause_;	
 };
 
 /**
@@ -221,7 +241,9 @@ pike.core.Timer.prototype.start = function(){
  */
 pike.core.Timer.prototype.stop = function(){	
 	if(this.requestID_){    		
-		window.cancelAnimationFrame( this.requestID_ );		
+		window.cancelAnimationFrame( this.requestID_ );	
+		this.requestID_ = undefined;
+		if(goog.DEBUG) window.console.log("[pike.core.Timer] stop");
 	}	
 };
 
@@ -230,9 +252,11 @@ pike.core.Timer.prototype.stop = function(){
  * @fires {pike.events.Update} event
  * @fires {pike.events.Render} event
  */
-pike.core.Timer.prototype.tick = function(){	
-	this.dispatchEvent( new pike.events.Update( new Date().getTime(), this));		
-	this.dispatchEvent( new pike.events.Render( new Date().getTime(), this));	
+pike.core.Timer.prototype.tick = function(){
+	if(!this.pause_){
+		this.dispatchEvent( new pike.events.Update( new Date().getTime(), this));
+		this.dispatchEvent( new pike.events.Render( new Date().getTime(), this));
+	}		
 	this.requestID_ = window.requestAnimationFrame( this.boundTick_ );
 };
 

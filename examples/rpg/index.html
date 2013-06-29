@@ -66,7 +66,7 @@
 		goog.require('pike.core.Stage');
 		goog.require('pike.core.Viewport');
 		goog.require('pike.core.GameWorld');
-		goog.require('pike.layers.DirtyManager');			
+				
 		goog.require('pike.layers.Layer');		
 		goog.require('pike.core.Timer');
 		goog.require('pike.core.Entity');
@@ -77,7 +77,8 @@
 	<script>
 		window.onload = function(){
 			
-			goog.DEBUG = true;
+			goog.DEBUG = false;
+			
 															
 			//Assets
 			var imageManager = new pike.assets.ImageManager();
@@ -87,7 +88,7 @@
 				"fg"		:"../img/fg.png"	
 			}, onImageLoaded);
 			
-			function onImageLoaded(){																									
+			function onImageLoaded(){							
 				var timer = new pike.core.Timer();
 				var gameWorld = new pike.core.GameWorld();
 				var viewport = new pike.core.Viewport();				
@@ -97,7 +98,7 @@
 				stage.handler.listen(gameWorld, pike.events.ChangeSize.EVENT_TYPE, goog.bind(stage.onGameWorldChangeSize, stage));
 				stage.handler.listen(viewport, pike.events.ChangeSize.EVENT_TYPE, goog.bind(stage.onViewportChangeSize, stage));
 				stage.handler.listen(viewport, pike.events.ChangePosition.EVENT_TYPE, goog.bind(stage.onViewportChangePosition, stage));
-																																
+											
 				var mouse = new pike.input.MouseInputHandler();
 				mouse.handler.listen(viewport, pike.events.ChangePosition.EVENT_TYPE, goog.bind(mouse.onViewportChangePosition, mouse));
 				mouse.setEventTarget( stage.getRootElement() );				
@@ -126,30 +127,36 @@
 				//Entities
 				var hero = new pike.core.Entity( pike.components.Sprite, pike.components.Watch, pike.components.Collision );
 				hero.setSprite( imageManager.get("entities"), 0, 0, 32, 32, 3, 124);
-				hero.setCollisionBounds(0,29,0,29);
-				hero.onMouseDown = function(e){					
+				hero.setCollisionBounds(0,22,0,22);
+				
+				hero.SPEED = 120; // 2px * 60fps = 120px/sec 
+				hero.positionAnimator = new pike.animation.Animator();
+				hero.positionAnimator.setRepeatBehavior(pike.animation.Animator.LOOP)
+				hero.positionAnimator.setRepeatCount(1);
+				
+				hero.handler.listen( mouse, pike.events.Down.EVENT_TYPE, goog.bind( function(e){					
 					this.targetX = e.posX;
 					this.targetY = e.posY;	
 					
 					this.vx = this.targetX - this.x;
 					this.vy = this.targetY - this.y;
 					var magnitude = Math.sqrt((this.vx*this.vx)+(this.vy*this.vy));
-																							
-					this.positionAnimator = new pike.animation.Animator( (magnitude/ hero.SPEED) * 1000 );
-					this.positionAnimator.setRepeatBehavior(pike.animation.Animator.LOOP)
-					this.positionAnimator.setRepeatCount(1);
-					this.positionAnimator.start();
-					this.lastUpdate = new Date().getTime();	
+														
+					var duration = (magnitude/ hero.SPEED) * 1000;
+					if( duration < 2) return;
 					
+					this.positionAnimator.stop();
+					this.positionAnimator.setDuration( duration );					
+					this.positionAnimator.start();
+					this.lastUpdate = new Date().getTime();
+										
 					this.startX = this.x;
 					this.startY = this.y;	
-					
-					
+										
 					this.dispatchEvent( new pike.events.EndDialogue( this ) );	
-				};
-				
-				hero.SPEED = 120; // 2px * 60fps = 120px/sec 
-				hero.onEnterFrame = function(e){
+				}, hero) );
+																	
+				hero.handler.listen(timer, pike.events.Update.EVENT_TYPE, goog.bind(function(e){
 				
 					if(this.targetX && this.targetX != this.x 
 					|| this.targetY && this.targetY != this.y  ){
@@ -163,8 +170,7 @@
 							this.targetY = this.y;
 							return
 						};
-																																					    					    					    					  
-				    	this.setDirty(this.getBounds());
+													    	
 				    	var oldX = this.x;
 						var oldY = this.y;
 				    	this.x = this.startX + (this.vx * fraction);
@@ -172,52 +178,89 @@
 				    					    				   				    					    
 				    	this.x = (0.5 + this.x) << 0; //round
 				    	this.y = (0.5 + this.y) << 0; //round
-				    					    					    					    					    					    					
-				    	this.setDirty(this.getBounds());				    					    	
+				    
 				    	this.dispatchEvent( new pike.events.ChangePosition(this.x, this.y, oldX, oldY, this) );				    	
-				    	
-				    	this.setSpriteRow(this.vx, this.vy);	
-				    	this.onSpriteUpdate(e);
-				    	
+				    					    		
+				    	this.onSpriteUpdate(e);				    	
 				    	this.watchMe(viewport, gameWorld);						
 					}														
-				};
-				hero.onCollision = function(e){
-					
-					if(e.obj.hasComponent( pike.components.Dialogues.NAME ) ){						
-						e.obj.showDialogue( e.obj.getDialogue() );						
-					}
-					
-					if(e.obj.hasComponent( pike.components.Backpack.NAME ) ){
-						e.obj.putInBackpack();
-						return;
-					}
-					
+				}, hero));
+																
+				hero.handler.listen(hero, pike.events.ChangePosition.EVENT_TYPE, goog.bind(function(e){
+					this.layer.setDirty( new pike.graphics.Rectangle(e.oldX, e.oldY, this.w, this.h));
+					this.setSpriteRow(this.vx, this.vy);	
+				}, hero));
+				
+				hero.handler.listen( hero, pike.events.Collision.EVENT_TYPE, goog.bind( function(e){									
 					this.x = e.oldX;
 					this.y = e.oldY;
 					this.targetX = e.oldX;
 					this.targetY = e.oldY;
-				}
-								
-				hero.handler.listen(timer, pike.events.Update.EVENT_TYPE, goog.bind(hero.onEnterFrame, hero));
+				}, hero) );
+																								
 				hero.handler.listen(hero, pike.events.Render.EVENT_TYPE, goog.bind(hero.onSpriteRender, hero));
-				hero.handler.listen( mouse, pike.events.Down.EVENT_TYPE, goog.bind( hero.onMouseDown, hero) );
-				
-				hero.handler.listen( hero, pike.events.Collision.EVENT_TYPE, goog.bind( hero.onCollision, hero) );				
+								
+							
 				//obsLayer.handler.listen(hero, pike.events.ChangePosition.EVENT_TYPE, goog.bind(obsLayer.onEntityChangePosition, obsLayer));
 				
 				var enemy =  new pike.core.Entity( pike.components.Sprite, pike.components.Collision, pike.components.Dialogues);
 				enemy.x = 150;
 				enemy.y = 200;
 				enemy.setSprite( imageManager.get("entities"), 96, 0, 32, 32, 3, 300);
-				enemy.setCollisionBounds(0,29,0,29);
+				enemy.setCollisionBounds(0,22,0,22);
 				enemy.setDialogues( dialogues.guard );														
-				enemy.handler.listen(enemy, pike.events.Render.EVENT_TYPE, goog.bind(enemy.onSpriteRender, enemy));
-				enemy.handler.listen(hero, pike.events.EndDialogue.EVENT_TYPE, goog.bind(function(e){
-					this.dispatchEvent( new pike.events.EndDialogue( this ) );	
-				}, enemy));	
+				enemy.handler.listen(enemy, pike.events.Render.EVENT_TYPE, goog.bind(enemy.onSpriteRender, enemy));																
 				
+				enemy.handler.listen(hero, pike.events.EndDialogue.EVENT_TYPE, goog.bind(function(e){
+					this.dispatchEvent( new pike.events.EndDialogue( this ) );
+					timer.setPause(false);					
+				}, enemy));	
+																											
+				enemy.handler.listen(enemy, pike.events.Collision.EVENT_TYPE, goog.bind(function(e){	
+					this.x = e.oldX;
+					this.y = e.oldY;
+					
+					if(e.obj === hero ){						
+						this.showDialogue( this.getDialogue() );	
+						timer.setPause(true);
+					}
+					
+				}, enemy));
+																																		
+				var hen = new pike.core.Entity( pike.components.Sprite, pike.components.Collision, pike.components.Hen);
+				hen.x = 350;
+				hen.y = 300;
+				hen.setSprite( imageManager.get("entities"), 96, 0, 32, 32, 3, 300);							
+				hen.handler.listen(timer, pike.events.Update.EVENT_TYPE, goog.bind(function(e){
+					this.onHenUpdate(e);	
+					this.onSpriteUpdate(e);					
+				}, hen));				
+				hen.handler.listen(hen, pike.events.Render.EVENT_TYPE, goog.bind(hen.onSpriteRender, hen));
 								
+				hen.handler.listen(hen, pike.events.ChangePosition.EVENT_TYPE, goog.bind(function(e){													
+					this.layer.setDirty( new pike.graphics.Rectangle(e.oldX, e.oldY, this.w, this.h));					
+					this.setSpriteRow(this.vx, this.vy);					
+				}, hen));
+				
+				hen.handler.listen(hen, pike.events.Collision.EVENT_TYPE, goog.bind(function(e){	
+					
+					this.x = e.oldX;
+					this.y = e.oldY;
+																		
+					if(!this.isEscaping()){															
+						var vx = vy = 0;	
+						
+						if(Math.abs( e.obj.x - this.x ) > Math.abs( e.obj.y - this.y )){ //move on X axis							
+							vx = ( e.obj.x > this.x) ? -1 * this.getStep() : this.getStep();																									
+						}else{ //move on Y axis
+							vy = ( e.obj.y > this.y) ? -1 * this.getStep() : this.getStep()																			
+						}
+											
+						this.setHenEscaping(vx, vy, 1000);						
+					}
+																																																																												
+				}, hen));
+																										
 				var cheese =  new pike.core.Entity( pike.components.Sprite, pike.components.Collision, pike.components.Backpack);
 				cheese.x = 150;
 				cheese.y = 300;
@@ -225,6 +268,11 @@
 				cheese.setIconUrl("../img/cheese.png");
 				cheese.handler.listen(cheese, pike.events.Render.EVENT_TYPE, goog.bind(cheese.onSpriteRender, cheese));
 				cheese.onCollision = function(e){
+					
+					if(e.obj === hero){
+						this.putInBackpack();
+						return;
+					}
 					
 					//player drop entity on collison area
 					if(this.isOnBackpack()){
@@ -238,20 +286,14 @@
 				}
 				cheese.handler.listen( cheese, pike.events.Collision.EVENT_TYPE, goog.bind( cheese.onCollision, cheese) );	
 				//obsLayer.handler.listen(cheese, pike.events.ChangePosition.EVENT_TYPE, goog.bind(obsLayer.onEntityChangePosition, obsLayer));				
-				
-				var mickey =  new pike.core.Entity( pike.components.Sprite, pike.components.Backpack);
-				mickey.x = 300;
-				mickey.y = 300;
-				mickey.setSprite( imageManager.get("entities"), 96, 96, 32, 32, 3, 300);
-				mickey.setIconUrl("../img/mouse.png");
-				mickey.handler.listen(mickey, pike.events.Render.EVENT_TYPE, goog.bind(mickey.onSpriteRender, mickey));
-															
+																						
 				var clustaLayer = new pike.layers.ClusterLayer("Clusta", 250);
 				clustaLayer.setDirtyManager( new pike.layers.DirtyManager() );				
 				clustaLayer.addEntity( hero );	
 				clustaLayer.addEntity( enemy );	
 				clustaLayer.addEntity( cheese );
-				clustaLayer.addEntity( mickey );	
+				clustaLayer.addEntity( hen );
+		
 				stage.addLayer( clustaLayer );
 								
 				//Foreground					
@@ -262,16 +304,14 @@
 				fgEntity.handler.listen(fgEntity, pike.events.Render.EVENT_TYPE, goog.bind(fgEntity.onImageRender, fgEntity));											
 				
 				stage.getLayer('foreground').addEntity( fgEntity );
-																				 	
-				timer.start();						
+																				 						
+				timer.start();				
 			}				
 		}
 	</script>
 	
     </head>
-    <body>                      
-        <h1 align="center">Pike - rpg example</h1>
-               
+    <body>                                         
         <div id="pike-stage"></div>
         <div id="pike-backpack"></div>
         <div id="pike-dialogues"></div>                          

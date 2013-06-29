@@ -54,7 +54,6 @@ pike.layers.Layer = function( name ){
 
 goog.inherits(pike.layers.Layer, goog.events.EventTarget);
 
-
 /**
  * On render handler
  */
@@ -209,6 +208,18 @@ pike.layers.Layer.prototype.hasDirtyManager = function(){
 };
 
 /**
+ * Set a dirty area
+ * @param {pike.graphics.Rectangle} rect
+ */
+pike.layers.Layer.prototype.setDirty = function( rect ){
+	if(this.hasDirtyManager()){
+		this.dirtyManager.markDirty( rect );				
+	}else{		
+		this.offScreen_.isDirty = true;
+	}
+};
+
+/**
  * Get a screen object
  * @returns {Object}
  */
@@ -329,7 +340,7 @@ pike.layers.ClusterLayer.prototype.dispatchEvent = function( e ){
 	for (var i = 0; i < this.cache_.length; i++) {
 		var entity = this.cache_[i];
 		if (entity.getBounds().intersects(this.viewport_)) {
-			entity.dispatchEvent(e);
+			entity.dispatchEvent(e);			
 		}
 	}
 
@@ -631,10 +642,7 @@ pike.layers.DirtyManager.prototype.markDirty = function( rect ){
 		return;
 	}
 		
-	// We are only interested in the rectangles that intersect the viewport
-	rect = this.viewport_.intersection( rect );	
-	
-	if (!rect) {
+	if( !rect.intersects( this.viewport_ ) ){		
 		return;
 	}
 															
