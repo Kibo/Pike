@@ -960,7 +960,7 @@ pike.components.Dialogues.DIALOGUE_ELEMENT = "p";
  * var hen = new pike.core.Entity( pike.components.Hen );
  * hen.handler.listen(timer, pike.events.Update.EVENT_TYPE, goog.bind(function(e){
  *		this.onHenUpdate(e);	
- *	}, hen));
+ * }, hen));
  * ~~~
  * @author Tomas Jurman (tomasjurman@gmail.com)
  */

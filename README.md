@@ -1,4 +1,4 @@
-# Pike v0.2
+# Pike v0.3
 HTML5 gamedeveloper library.
 All classes in this library are based on the [Google Closure Library](https://developers.google.com/closure/library/).
 
