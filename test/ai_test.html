@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+<head>
+<title>Test Case</title>
+</head>
+<body>
+<script src="../../closure-library/closure/goog/base.js"></script>
+<script src="js/deps.js"></script>
+<script>
+	goog.require('goog.testing.ContinuationTestCase');	
+	goog.require('goog.testing.jsunit');	
+</script>
+<script>
+	goog.require('pike.ai.path.Node');
+	goog.require('pike.ai.path.Graph');
+</script>
+<script>
+var graph, nodes;
+
+function setUpPage(){}
+function setUp(){
+	
+}
+
+var testGetNodes= function() {	
+	assertTrue( nodes.length == 8 )
+};
+
+var testFindPath= function() {
+	createGraph();	
+	assertObjectEquals( [nodes[0], nodes[1], nodes[3], nodes[6], nodes[7]], graph.findPath( nodes[0], nodes[7]))	
+};
+
+function tearDown(){}
+
+function createGraph() {
+	var coords = [[248,76],[205,329],[592,230],[420,410], [95,410],[479,230],[420,16],[555,16]];
+	var matrix =
+			[[1, 1, 0, 0, 0, 0, 0, 0],
+			 [1, 1, 0, 1, 0, 0, 0, 0],
+			 [0, 0, 1, 1, 0, 1, 0, 0],
+			 [0, 1, 1, 1, 1, 1, 1, 0],
+			 [0, 0, 0, 1, 1, 0, 0, 0],
+	  	     [0, 0, 1, 1, 0, 1, 1, 0],
+			 [0, 0, 0, 1, 0, 1, 1, 1],
+			 [0, 0, 0, 0, 0, 0, 1, 1]];
+			
+	nodes = [];
+	for (var i = 0; i < coords.length; i++) {
+		nodes.push(new pike.ai.path.Node(i, coords[i][0], coords[i][1]));
+	}
+	graph = new pike.ai.path.Graph(nodes, matrix);
+}
+
+</script>
+</body>
+</html>
