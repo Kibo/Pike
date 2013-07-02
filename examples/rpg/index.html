@@ -72,7 +72,9 @@
 		goog.require('pike.core.Entity');
 		goog.require('pike.components.Sprite');		
 		goog.require('pike.events.ChangePosition');	
-		goog.require('goog.dom');			
+		goog.require('goog.dom');
+		goog.require('pike.ai.path.Node');
+		goog.require('pike.ai.path.Graph');			
 	</script>
 	<script>
 		window.onload = function(){
@@ -301,13 +303,13 @@
 														
 				var fgEntity = new pike.core.Entity( pike.components.Image );
 				fgEntity.setImage( imageManager.get("fg") );				
-				fgEntity.handler.listen(fgEntity, pike.events.Render.EVENT_TYPE, goog.bind(fgEntity.onImageRender, fgEntity));											
-				
+				fgEntity.handler.listen(fgEntity, pike.events.Render.EVENT_TYPE, goog.bind(fgEntity.onImageRender, fgEntity));																																										
 				stage.getLayer('foreground').addEntity( fgEntity );
-																				 						
+																												 			
 				timer.start();				
 			}				
 		}
+				
 	</script>
 	
     </head>

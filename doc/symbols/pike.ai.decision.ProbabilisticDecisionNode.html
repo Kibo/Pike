@@ -5,7 +5,7 @@
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 		<meta name="generator" content="JsDoc Toolkit" />
 		
-		<title>JsDoc Reference - pike.events.Up</title>
+		<title>JsDoc Reference - pike.ai.decision.ProbabilisticDecisionNode</title>
 
 		<style type="text/css">
 			/* default.css */
@@ -282,26 +282,24 @@ ul.inheritsList
 <!-- ============================== class title ============================ -->
 			<h1 class="classTitle">
 				
-				Class pike.events.Up
+				Class pike.ai.decision.ProbabilisticDecisionNode
 			</h1>
 
 <!-- ============================== class summary ========================== -->			
 			<p class="description">
 				
-				<br />Extends
-					.<br />
 				
 			
 				
 				
 				
-					<br /><i>Defined in: </i> <a href="../symbols/src/source_events.js.html">events.js</a>.
+					<br /><i>Defined in: </i> <a href="../symbols/src/source_ai.js.html">ai.js</a>.
 				
 			</p>
 
 <!-- ============================== constructor summary ==================== -->			
 			
-			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class pike.events.Up.">
+			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class pike.ai.decision.ProbabilisticDecisionNode.">
 				<caption>Class Summary</caption>
 				<thead>
 					<tr>
@@ -314,9 +312,13 @@ ul.inheritsList
 						<td class="attributes">&nbsp;</td>
 						<td class="nameDescription" >
 							<div class="fixedFont">
-								<b><a href="../symbols/pike.events.Up.html#constructor">pike.events.Up</a></b>(posX, posY, isMoving, domEvent, target)
+								<b><a href="../symbols/pike.ai.decision.ProbabilisticDecisionNode.html#constructor">pike.ai.decision.ProbabilisticDecisionNode</a></b>(chance, trueNode, falseNode)
 							</div>
-							<div class="description"></div>
+							<div class="description">Create new Decision Node
+Probabilistic decision is executed depending on the chance value
+0 - never
+1 - always
+between 0-1 with the</div>
 						</td>
 					</tr>
 				</tbody>
@@ -325,25 +327,27 @@ ul.inheritsList
 
 <!-- ============================== properties summary ===================== -->
 			
+
+<!-- ============================== methods summary ======================== -->
+			
 				
 				
-				<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class pike.events.Up.">
-					<caption>Field Summary</caption>
+				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class pike.ai.decision.ProbabilisticDecisionNode.">
+					<caption>Method Summary</caption>
 					<thead>
 						<tr>
-							<th scope="col">Field Attributes</th>
-							<th scope="col">Field Name and Description</th>
+							<th scope="col">Method Attributes</th>
+							<th scope="col">Method Name and Description</th>
 						</tr>
 					</thead>
 					<tbody>
 					
 						<tr>
-							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">
-								pike.events.Up.<b><a href="../symbols/pike.events.Up.html#.EVENT_TYPE">EVENT_TYPE</a></b>
+								<div class="fixedFont"><b><a href="../symbols/pike.ai.decision.ProbabilisticDecisionNode.html#execute">execute</a></b>(agent, data)
 								</div>
-								<div class="description">Event type</div>
+								<div class="description"></div>
 							</td>
 						</tr>
 					
@@ -352,9 +356,6 @@ ul.inheritsList
 				
 				
 				
-			
-
-<!-- ============================== methods summary ======================== -->
 			
 <!-- ============================== events summary ======================== -->
 			
@@ -367,13 +368,45 @@ ul.inheritsList
 				</div>
 				
 				<div class="fixedFont">
-						<b>pike.events.Up</b>(posX, posY, isMoving, domEvent, target)
+						<b>pike.ai.decision.ProbabilisticDecisionNode</b>(chance, trueNode, falseNode)
 				</div>
 				
 				<div class="description">
-					
+					Create new Decision Node
+Probabilistic decision is executed depending on the chance value
+0 - never
+1 - always
+between 0-1 with the
 					
 				</div>
+				
+				
+				
+				<pre class="code">~~~
+var hero = new Hero({intelligence:80, strength:30, communication:40});
+
+function WinAction(){}
+		WinAction.prototype.execute = function( hero ){
+		console.log("Won");
+}
+
+function LossAction(){}
+		LossAction.prototype.execute = function( hero ){
+		console.log("Loss");
+}
+
+function decisionTree() {
+	var winAction = new WinAction();
+	var lossAction = new LossAction();
+
+	return new ProbabilisticDecisionNode(0.8, 
+		new NumericDecisionNode("strength", 50, lossAction, winAction),  
+		new ProbabilisticDecisionNode(0.5, lossAction, winAction));
+}
+
+var tree = decisionTree();
+tree.execute( hero );
+~~~</pre>
 				
 				
 				
@@ -383,31 +416,19 @@ ul.inheritsList
 						<dt class="heading">Parameters:</dt>
 						
 							<dt>
-								<span class="light fixedFont">{number}</span>  <b>posX</b>
+								<span class="light fixedFont">{number}</span>  <b>chance</b>
 								
 							</dt>
 								<dd></dd>
 						
 							<dt>
-								<span class="light fixedFont">{number}</span>  <b>posY</b>
+								<span class="light fixedFont">{Object}</span>  <b>trueNode</b>
 								
 							</dt>
 								<dd></dd>
 						
 							<dt>
-								<span class="light fixedFont">{boolean}</span>  <b>isMoving</b>
-								
-							</dt>
-								<dd></dd>
-						
-							<dt>
-								<span class="light fixedFont">{Object}</span>  <b>domEvent</b>
-								
-							</dt>
-								<dd>- DOM event object</dd>
-						
-							<dt>
-								<span class="light fixedFont">{goog.events.EventTarget}</span>  <b>target</b>
+								<span class="light fixedFont">{Object}</span>  <b>falseNode</b>
 								
 							</dt>
 								<dd></dd>
@@ -426,25 +447,48 @@ ul.inheritsList
 
 <!-- ============================== field details ========================== -->		
 			
+
+<!-- ============================== method details ========================= -->		
+			
 				<div class="sectionTitle">
-					Field Detail
+					Method Detail
 				</div>
 				
-					<a name=".EVENT_TYPE"> </a>
-					<div class="fixedFont">&lt;static&gt; 
+					<a name="execute"> </a>
+					<div class="fixedFont">
 					
 					
-					<span class="light">pike.events.Up.</span><b>EVENT_TYPE</b>
+					<b>execute</b>(agent, data)
 					
 					</div>
 					<div class="description">
-						Event type
+						
 						
 						
 					</div>
 					
 					
-
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<b>agent</b>
+									
+								</dt>
+								<dd></dd>
+							
+								<dt>
+									<b>data</b>
+									
+								</dt>
+								<dd></dd>
+							
+							</dl>
+						
+						
+						
 						
 						
 						
@@ -452,9 +496,6 @@ ul.inheritsList
 
 					
 				
-			
-
-<!-- ============================== method details ========================= -->		
 			
 			
 <!-- ============================== event details ========================= -->		
@@ -467,7 +508,7 @@ ul.inheritsList
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Tue Jul 02 2013 13:00:50 GMT+0200 (CEST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Tue Jul 02 2013 13:00:49 GMT+0200 (CEST)
 		</div>
 	</body>
 </html>

@@ -6,11 +6,140 @@
 goog.provide('pike.ai.path.Node');
 goog.provide('pike.ai.path.Graph');
 
+goog.provide('pike.ai.decision.DecisionTreeNode');
+goog.provide('pike.ai.decision.NumericDecisionNode');
+goog.provide('pike.ai.decision.ProbabilisticDecisionNode');
+
+//## NumericDecisionNode #####################################
+/**
+ * Create new Decision Node
+ * Numeric decision is based on the value of the certain agent parameter.
+ * If value is lesser or equal than the threshold, the leNode is executed otherwise - gNode.
+ * @param {string} name - agent property name
+ * @param {number} threshold
+ * @param {Object} leNode - less then threshold Node
+ * @param {Object} gNode - grow then threshold Node
+ * @constructor
+ * @example
+ * ~~~
+ * var hero = new Hero({intelligence:80, strength:30, communication:40});
+ * 
+ * function WinAction(){}
+ *		WinAction.prototype.execute = function( hero ){
+ *		console.log("Won");
+ * }
+ * 
+ * function LossAction(){}
+ * 		LossAction.prototype.execute = function( hero ){
+ * 		console.log("Loss");
+ * }
+ * 
+ * function decisionTree() {
+ *	var winAction = new WinAction();
+ *	var lossAction = new LossAction();
+ *
+ *	return new NumericDecisionNode("intelligence", 80, 
+ *		new NumericDecisionNode("strength", 50, lossAction, winAction), 
+ *		new ProbabilisticDecisionNode(0.5, lossAction, winAction));
+ * }
+ * 
+ * var tree = decisionTree();
+ * tree.execute( hero );
+ * ~~~
+ */
+pike.ai.decision.NumericDecisionNode = function (name, threshold, leNode, gNode) {
+    this.name_ = name;
+    this.threshold_ = threshold;
+    this.leNode_ = leNode;
+    this.gNode_ = gNode;
+};
+
+goog.inherits(pike.ai.decision.NumericDecisionNode, pike.ai.decision.DecisionTreeNode);
+
+/**
+ * @inheritDoc
+ */
+pike.ai.decision.NumericDecisionNode.prototype.execute = function(agent, data) {
+    var node = agent[this.name_] > this.threshold_ ? this.gNode_ : this.leNode_;    
+    node.execute(agent);
+};
+
+//## ProbabilisticDecisionNode #####################################
+/**
+ * Create new Decision Node
+ * Probabilistic decision is executed depending on the chance value
+ * 0 - never
+ * 1 - always
+ * between 0-1 with the
+ * @param {number} chance
+ * @param {Object} trueNode
+ * @param {Object} falseNode
+ * @constructor
+ * @example
+ * ~~~
+ * var hero = new Hero({intelligence:80, strength:30, communication:40});
+ * 
+ * function WinAction(){}
+ *		WinAction.prototype.execute = function( hero ){
+ *		console.log("Won");
+ * }
+ * 
+ * function LossAction(){}
+ * 		LossAction.prototype.execute = function( hero ){
+ * 		console.log("Loss");
+ * }
+ * 
+ * function decisionTree() {
+ *	var winAction = new WinAction();
+ *	var lossAction = new LossAction();
+ *
+ *	return new ProbabilisticDecisionNode(0.8, 
+ *		new NumericDecisionNode("strength", 50, lossAction, winAction),  
+ *		new ProbabilisticDecisionNode(0.5, lossAction, winAction));
+ * }
+ * 
+ * var tree = decisionTree();
+ * tree.execute( hero );
+ * ~~~
+ */
+pike.ai.decision.ProbabilisticDecisionNode = function(chance, trueNode, falseNode) {
+    this.chance_ = chance;
+    this.trueNode_ = trueNode;
+    this.falseNode_ = falseNode;
+};
+
+goog.inherits(pike.ai.decision.ProbabilisticDecisionNode, pike.ai.decision.DecisionTreeNode);
+
+/**
+ * @inheritDoc
+ */
+pike.ai.decision.ProbabilisticDecisionNode.prototype.execute = function(agent, data) {
+    var node = Math.random() < this.chance_ ? this.trueNode_ : this.falseNode_;
+    node.execute(agent);
+};
+
+//## DecisionTreeNode #####################################
+/**
+ * Abstract class for all decision node
+ * @abstract
+ */
+pike.ai.decision.DecisionTreeNode = function(){};
+
+/**
+ * Executes the given node. The "decision" nodes should evaluate the conditions, 
+ * select the child nodes and call execute on them. The action nodes should initiate 
+ * the certain action of the agent
+ * @param {Object} agent - the agent that needs to make a decision
+ * @param {Object} data - any external data (for example, the information about the world)
+ */
+pike.ai.decision.DecisionTreeNode.prototype.execute = function( agent, data) {
+    throw Error("Abstract method - must be overwritten");
+};
 
 //## Graph #####################################
 /**
 * Create a new Graph
-* @param {Array<pike.ai.path.Node>} nodes
+* @param {Array.<pike.ai.path.Node>} nodes
 * @param {Array} connections - matrix of connections
 * @constructor
 * @example
@@ -150,6 +279,19 @@ pike.ai.path.Graph.prototype.findPath = function(startNode, endNode){
 };
 
 /**
+ * Serialize the graph
+ * @return {Object} json
+ */
+pike.ai.path.Graph.serialize = function() {
+    var data = {};
+    data.nodes = [];
+    this.nodes_.forEach(function(it) {
+        data.nodes.push([it.x, it.y]);
+    });
+    return JSON.stringify(data);
+};
+
+/**
  * @param {pike.ai.path.Node} node1
  * @param {pike.ai.path.Node} node2
  * @returns {number}
@@ -185,7 +327,7 @@ pike.ai.path.Node.prototype.addConnection = function(node, weight) {
 
 /**
  * Get a connections of the Node
- * @returns {Array<pike.ai.path.Node>}
+ * @returns {Array.<pike.ai.path.Node>}
  */
 pike.ai.path.Node.prototype.getConnections = function() {
 	return this.connections_;

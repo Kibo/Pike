@@ -4102,6 +4102,7 @@ goog.provide("pike.components.Watch");
 goog.provide("pike.components.Backpack");
 goog.provide("pike.components.Dialogues");
 goog.provide("pike.components.Hen");
+goog.provide("pike.components.VisualizeGraph");
 goog.require("goog.events");
 goog.require("pike.graphics.Rectangle");
 goog.require("pike.animation.Animator");
@@ -4596,6 +4597,89 @@ pike.components.Hen = function() {
   }
 };
 pike.components.Hen.NAME = "pike.components.Hen";
+pike.components.VisualizeGraph = function() {
+  this.drawConnectionLabels_ = true;
+  this.drawConnections_ = true;
+  this.setGraph = function(graph) {
+    this.graph_ = graph
+  };
+  this.setPath = function(path) {
+    this.path_ = path
+  };
+  this.onPathRender = function(e) {
+    this.drawGraph_(this.layer.getOffScreen().context, this.path_)
+  };
+  this.drawGraph_ = function(ctx, path) {
+    var self = this;
+    ctx.strokeStyle = "black";
+    ctx.fillStyle = "white";
+    if(this.drawConnections_) {
+      this.graph_.nodes_.forEach(function(node) {
+        node.getConnections().forEach(function(connection) {
+          self.drawConnection_(ctx, node, connection.node, connection.weight, "black")
+        })
+      })
+    }
+    if(path) {
+      this.drawPath_(ctx, path)
+    }
+    if(this.drawConnectionLabels_) {
+      this.graph_.nodes_.forEach(function(node) {
+        node.getConnections().forEach(function(connection) {
+          self.drawConnectionLabel_(ctx, Math.floor(connection.weight) + "", node, connection.node)
+        })
+      })
+    }
+    this.graph_.nodes_.forEach(function(node) {
+      self.drawNode_(ctx, node)
+    })
+  };
+  this.drawNode_ = function(ctx, node) {
+    ctx.fillStyle = "#6ba4d9";
+    ctx.strokeStyle = "black";
+    ctx.font = "18px Arial";
+    ctx.textBaseline = "middle";
+    ctx.textAlign = "center";
+    ctx.beginPath();
+    ctx.arc(node.x, node.y, 12, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.stroke();
+    var text = "" + node.id;
+    ctx.fillStyle = "black";
+    ctx.fillText(text, node.x, node.y)
+  };
+  this.drawPath_ = function(ctx, path) {
+    ctx.save();
+    ctx.lineWidth = 4;
+    for(var i = 1;i < path.length;i++) {
+      this.drawConnection_(ctx, path[i], path[i - 1], "", "green")
+    }
+    ctx.restore()
+  };
+  this.drawConnection_ = function(ctx, node1, node2, weight, color) {
+    ctx.strokeStyle = color ? color : "black";
+    ctx.beginPath();
+    ctx.moveTo(node1.x, node1.y);
+    ctx.lineTo(node2.x, node2.y);
+    ctx.stroke();
+    ctx.font = "15px Arial";
+    ctx.textBaseline = "middle";
+    ctx.textAlign = "center"
+  };
+  this.drawConnectionLabel_ = function(ctx, text, node1, node2) {
+    var padding = 5;
+    var middleX = Math.floor((node1.x + node2.x) / 2);
+    var middleY = Math.floor((node1.y + node2.y) / 2);
+    var textWidth = ctx.measureText(text).width;
+    var width = textWidth + padding * 2;
+    var height = 20;
+    ctx.fillStyle = "#DDD";
+    ctx.fillRect(middleX - width / 2, middleY - height / 2, width, height);
+    ctx.fillStyle = "black";
+    ctx.fillText(text, middleX, middleY)
+  }
+};
+pike.components.VisualizeGraph.NAME = "pike.components.VisualizeGraph";
 // Input 27
 /*
  Dual licensed under the MIT or GPL licenses.

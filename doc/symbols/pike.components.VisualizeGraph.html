@@ -5,7 +5,7 @@
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 		<meta name="generator" content="JsDoc Toolkit" />
 		
-		<title>JsDoc Reference - pike.components.Watch</title>
+		<title>JsDoc Reference - pike.components.VisualizeGraph</title>
 
 		<style type="text/css">
 			/* default.css */
@@ -282,7 +282,7 @@ ul.inheritsList
 <!-- ============================== class title ============================ -->
 			<h1 class="classTitle">
 				
-				Class pike.components.Watch
+				Class pike.components.VisualizeGraph
 			</h1>
 
 <!-- ============================== class summary ========================== -->			
@@ -299,7 +299,7 @@ ul.inheritsList
 
 <!-- ============================== constructor summary ==================== -->			
 			
-			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class pike.components.Watch.">
+			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class pike.components.VisualizeGraph.">
 				<caption>Class Summary</caption>
 				<thead>
 					<tr>
@@ -312,10 +312,10 @@ ul.inheritsList
 						<td class="attributes">&nbsp;</td>
 						<td class="nameDescription" >
 							<div class="fixedFont">
-								<b><a href="../symbols/pike.components.Watch.html#constructor">pike.components.Watch</a></b>()
+								<b><a href="../symbols/pike.components.VisualizeGraph.html#constructor">pike.components.VisualizeGraph</a></b>()
 							</div>
-							<div class="description">Watch
-Watches a entity on the viewport</div>
+							<div class="description">VisualizeGraph
+Draw a graph and a route.</div>
 						</td>
 					</tr>
 				</tbody>
@@ -326,7 +326,7 @@ Watches a entity on the viewport</div>
 			
 				
 				
-				<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class pike.components.Watch.">
+				<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class pike.components.VisualizeGraph.">
 					<caption>Field Summary</caption>
 					<thead>
 						<tr>
@@ -340,7 +340,7 @@ Watches a entity on the viewport</div>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
 								<div class="fixedFont">
-								pike.components.Watch.<b><a href="../symbols/pike.components.Watch.html#.NAME">NAME</a></b>
+								pike.components.VisualizeGraph.<b><a href="../symbols/pike.components.VisualizeGraph.html#.NAME">NAME</a></b>
 								</div>
 								<div class="description">Component name</div>
 							</td>
@@ -357,7 +357,7 @@ Watches a entity on the viewport</div>
 			
 				
 				
-				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class pike.components.Watch.">
+				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class pike.components.VisualizeGraph.">
 					<caption>Method Summary</caption>
 					<thead>
 						<tr>
@@ -370,7 +370,7 @@ Watches a entity on the viewport</div>
 						<tr>
 							<td class="attributes">&lt;private&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/pike.components.Watch.html#bottomInnerBoundary">bottomInnerBoundary</a></b>(viewport)
+								<div class="fixedFont"><b><a href="../symbols/pike.components.VisualizeGraph.html#drawConnection_">drawConnection_</a></b>(ctx, node1, node2, weight, color)
 								</div>
 								<div class="description"></div>
 							</td>
@@ -379,7 +379,7 @@ Watches a entity on the viewport</div>
 						<tr>
 							<td class="attributes">&lt;private&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/pike.components.Watch.html#leftInnerBoundary">leftInnerBoundary</a></b>(viewport)
+								<div class="fixedFont"><b><a href="../symbols/pike.components.VisualizeGraph.html#drawConnectionLabel_">drawConnectionLabel_</a></b>(ctx, text, node1, node2)
 								</div>
 								<div class="description"></div>
 							</td>
@@ -388,7 +388,7 @@ Watches a entity on the viewport</div>
 						<tr>
 							<td class="attributes">&lt;private&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/pike.components.Watch.html#rightInnerBoundary">rightInnerBoundary</a></b>(viewport)
+								<div class="fixedFont"><b><a href="../symbols/pike.components.VisualizeGraph.html#drawGraph_">drawGraph_</a></b>(ctx, path)
 								</div>
 								<div class="description"></div>
 							</td>
@@ -397,7 +397,16 @@ Watches a entity on the viewport</div>
 						<tr>
 							<td class="attributes">&lt;private&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/pike.components.Watch.html#topInnerBoundary">topInnerBoundary</a></b>(viewport)
+								<div class="fixedFont"><b><a href="../symbols/pike.components.VisualizeGraph.html#drawNode_">drawNode_</a></b>(ctx, node)
+								</div>
+								<div class="description"></div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;private&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/pike.components.VisualizeGraph.html#drawPath_">drawPath_</a></b>(ctx, path)
 								</div>
 								<div class="description"></div>
 							</td>
@@ -406,9 +415,27 @@ Watches a entity on the viewport</div>
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/pike.components.Watch.html#watchMe">watchMe</a></b>(viewport, gameWorld)
+								<div class="fixedFont"><b><a href="../symbols/pike.components.VisualizeGraph.html#onPathRender">onPathRender</a></b>(e)
 								</div>
-								<div class="description">Watch entity on Viewport</div>
+								<div class="description">On path render handler</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/pike.components.VisualizeGraph.html#setGraph">setGraph</a></b>(graph)
+								</div>
+								<div class="description">Set a graph</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/pike.components.VisualizeGraph.html#setPath">setPath</a></b>(path)
+								</div>
+								<div class="description">Set a path</div>
 							</td>
 						</tr>
 					
@@ -429,22 +456,22 @@ Watches a entity on the viewport</div>
 				</div>
 				
 				<div class="fixedFont">
-						<b>pike.components.Watch</b>()
+						<b>pike.components.VisualizeGraph</b>()
 				</div>
 				
 				<div class="description">
-					Watch
-Watches a entity on the viewport
+					VisualizeGraph
+Draw a graph and a route.
 					<br /><i>Author: </i>Tomas Jurman (tomasjurman@gmail.com).
 				</div>
 				
 				
 				
-				<pre class="code">~~~
-var hero = new pike.core.Entity( pike.components.Watch ) 
-hero.onEnterFrame = function(e){
-     this.watchMe(viewport, gameWorld);
-}
+				<pre class="code">~~~ 
+var visuGraph = new pike.core.Entity( pike.components.VisualizeGraph )
+visuGraph.setGraph( graph );
+visuGraph.setPath( route );
+visuGraph.handler.listen(visuGraph, pike.events.Render.EVENT_TYPE, goog.bind(visuGraph.onPathRender, visuGraph));				 
 ~~~</pre>
 				
 				
@@ -456,6 +483,13 @@ hero.onEnterFrame = function(e){
 					
 					
 					
+					
+						<dl class="detailList">
+						<dt class="heading">See:</dt>
+						
+							<dd>pike.ai.Graph</dd>
+						
+						</dl>
 					
 
 			</div>
@@ -471,7 +505,7 @@ hero.onEnterFrame = function(e){
 					<div class="fixedFont">&lt;static&gt; 
 					
 					
-					<span class="light">pike.components.Watch.</span><b>NAME</b>
+					<span class="light">pike.components.VisualizeGraph.</span><b>NAME</b>
 					
 					</div>
 					<div class="description">
@@ -497,11 +531,11 @@ hero.onEnterFrame = function(e){
 					Method Detail
 				</div>
 				
-					<a name="bottomInnerBoundary"> </a>
+					<a name="drawConnection_"> </a>
 					<div class="fixedFont">&lt;private&gt; 
 					
 					
-					<b>bottomInnerBoundary</b>(viewport)
+					<b>drawConnection_</b>(ctx, node1, node2, weight, color)
 					
 					</div>
 					<div class="description">
@@ -517,7 +551,31 @@ hero.onEnterFrame = function(e){
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<b>viewport</b>
+									<b>ctx</b>
+									
+								</dt>
+								<dd></dd>
+							
+								<dt>
+									<b>node1</b>
+									
+								</dt>
+								<dd></dd>
+							
+								<dt>
+									<b>node2</b>
+									
+								</dt>
+								<dd></dd>
+							
+								<dt>
+									<b>weight</b>
+									
+								</dt>
+								<dd></dd>
+							
+								<dt>
+									<b>color</b>
 									
 								</dt>
 								<dd></dd>
@@ -533,11 +591,11 @@ hero.onEnterFrame = function(e){
 
 					<hr />
 				
-					<a name="leftInnerBoundary"> </a>
+					<a name="drawConnectionLabel_"> </a>
 					<div class="fixedFont">&lt;private&gt; 
 					
 					
-					<b>leftInnerBoundary</b>(viewport)
+					<b>drawConnectionLabel_</b>(ctx, text, node1, node2)
 					
 					</div>
 					<div class="description">
@@ -553,7 +611,25 @@ hero.onEnterFrame = function(e){
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<b>viewport</b>
+									<b>ctx</b>
+									
+								</dt>
+								<dd></dd>
+							
+								<dt>
+									<b>text</b>
+									
+								</dt>
+								<dd></dd>
+							
+								<dt>
+									<b>node1</b>
+									
+								</dt>
+								<dd></dd>
+							
+								<dt>
+									<b>node2</b>
 									
 								</dt>
 								<dd></dd>
@@ -569,11 +645,11 @@ hero.onEnterFrame = function(e){
 
 					<hr />
 				
-					<a name="rightInnerBoundary"> </a>
+					<a name="drawGraph_"> </a>
 					<div class="fixedFont">&lt;private&gt; 
 					
 					
-					<b>rightInnerBoundary</b>(viewport)
+					<b>drawGraph_</b>(ctx, path)
 					
 					</div>
 					<div class="description">
@@ -589,7 +665,13 @@ hero.onEnterFrame = function(e){
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<b>viewport</b>
+									<b>ctx</b>
+									
+								</dt>
+								<dd></dd>
+							
+								<dt>
+									<b>path</b>
 									
 								</dt>
 								<dd></dd>
@@ -605,11 +687,11 @@ hero.onEnterFrame = function(e){
 
 					<hr />
 				
-					<a name="topInnerBoundary"> </a>
+					<a name="drawNode_"> </a>
 					<div class="fixedFont">&lt;private&gt; 
 					
 					
-					<b>topInnerBoundary</b>(viewport)
+					<b>drawNode_</b>(ctx, node)
 					
 					</div>
 					<div class="description">
@@ -625,7 +707,13 @@ hero.onEnterFrame = function(e){
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<b>viewport</b>
+									<b>ctx</b>
+									
+								</dt>
+								<dd></dd>
+							
+								<dt>
+									<b>node</b>
 									
 								</dt>
 								<dd></dd>
@@ -641,15 +729,57 @@ hero.onEnterFrame = function(e){
 
 					<hr />
 				
-					<a name="watchMe"> </a>
+					<a name="drawPath_"> </a>
+					<div class="fixedFont">&lt;private&gt; 
+					
+					
+					<b>drawPath_</b>(ctx, path)
+					
+					</div>
+					<div class="description">
+						
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<b>ctx</b>
+									
+								</dt>
+								<dd></dd>
+							
+								<dt>
+									<b>path</b>
+									
+								</dt>
+								<dd></dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="onPathRender"> </a>
 					<div class="fixedFont">
 					
 					
-					<b>watchMe</b>(viewport, gameWorld)
+					<b>onPathRender</b>(e)
 					
 					</div>
 					<div class="description">
-						Watch entity on Viewport
+						On path render handler
 						
 						
 					</div>
@@ -661,13 +791,79 @@ hero.onEnterFrame = function(e){
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{<a href="../symbols/pike.core.Viewport.html">pike.core.Viewport</a>}</span> <b>viewport</b>
+									<span class="light fixedFont">{<a href="../symbols/pike.events.Render.html">pike.events.Render</a>}</span> <b>e</b>
 									
 								</dt>
 								<dd></dd>
 							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="setGraph"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>setGraph</b>(graph)
+					
+					</div>
+					<div class="description">
+						Set a graph
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
 								<dt>
-									<span class="light fixedFont">{pike.core.Gameworld}</span> <b>gameWorld</b>
+									<span class="light fixedFont">{pike.ai.Graph}</span> <b>graph</b>
+									
+								</dt>
+								<dd></dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="setPath"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>setPath</b>(path)
+					
+					</div>
+					<div class="description">
+						Set a path
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{Array.<pike.ai.Node>}</span> <b>path</b>
 									
 								</dt>
 								<dd></dd>

@@ -13,6 +13,8 @@
 <script>
 	goog.require('pike.ai.path.Node');
 	goog.require('pike.ai.path.Graph');
+	goog.require('pike.ai.decision.NumericDecisionNode');
+	goog.require('pike.ai.decision.ProbabilisticDecisionNode');
 </script>
 <script>
 var graph, nodes;
@@ -29,6 +31,59 @@ var testGetNodes= function() {
 var testFindPath= function() {
 	createGraph();	
 	assertObjectEquals( [nodes[0], nodes[1], nodes[3], nodes[6], nodes[7]], graph.findPath( nodes[0], nodes[7]))	
+};
+
+var testDecisionTree = function() {
+	
+	var a;
+	
+	var hero = {
+		iq:80,
+		power:50,		
+		communication:60
+	}
+	
+	function WinAction(){}
+	WinAction.prototype.execute = function( hero ){
+		a = "won"
+	}
+	 
+	function LossAction(){}
+	LossAction.prototype.execute = function( hero ){
+		a = "loss"
+	}
+	
+	function decisionTree() {
+		var winAction = new WinAction();
+		var lossAction = new LossAction();
+	 
+		return new pike.ai.decision.NumericDecisionNode("iq", 80, 
+				new pike.ai.decision.NumericDecisionNode("power", 50, lossAction, winAction), 
+				new pike.ai.decision.NumericDecisionNode("communication", 60, lossAction, winAction));	 
+	}
+		
+	var tree = decisionTree();
+	
+	hero.iq = 120;
+	hero.communication = 60;
+	tree.execute( hero );	
+	assertEquals("loss", a);
+	
+	hero.iq = 81;
+	hero.communication = 61;
+	tree.execute( hero );	
+	assertEquals("won", a);
+		
+	hero.iq = 80;
+	hero.power = 50; 
+	tree.execute( hero );	
+	assertEquals("loss", a);
+	
+	hero.iq = 80;
+	hero.power = 51;
+	tree.execute( hero );	
+	assertEquals("won", a);
+	
 };
 
 function tearDown(){}
