@@ -135,7 +135,7 @@ pike.graphics.Rectangle.prototype.getOverlappingGridCells = function(cellW, cell
     return new pike.graphics.Rectangle(rectX, rectY, rectWidth, rectHeight);
 };
 
-//## Gluster #####################################
+//## Cluster #####################################
 /**
 * Cluster 
 * @param {number} clusterSize - side of the square in px

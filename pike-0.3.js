@@ -3317,6 +3317,270 @@ pike.graphics.Cluster.prototype.removeFromClusters = function(entity, clusterBou
 /*
  Dual licensed under the MIT or GPL licenses.
 */
+goog.provide("pike.input.InputHandlerBase");
+goog.provide("pike.input.MouseInputHandler");
+goog.provide("pike.input.TouchInputHandler");
+goog.require("pike.graphics.Rectangle");
+goog.require("pike.events.Down");
+goog.require("pike.events.Up");
+goog.require("pike.events.Move");
+goog.require("goog.events.EventTarget");
+pike.input.InputHandlerBase = function() {
+  goog.events.EventTarget.call(this);
+  this.handler = new goog.events.EventHandler(this);
+  this.viewport_ = new pike.graphics.Rectangle(0, 0, 0, 0);
+  this.element_ = null;
+  this.moving_ = false;
+  this.lastMoveCoordinates_ = null;
+  this.moveThreshold_ = 10;
+  this.stopDomEvents_ = true
+};
+goog.inherits(pike.input.InputHandlerBase, goog.events.EventTarget);
+pike.input.InputHandlerBase.prototype.onDownDomEvent = function(e) {
+  var coords = this.lastMoveCoordinates_ = this.getInputCoordinates(e);
+  if(goog.DEBUG) {
+    window.console.log("[pike.core.InputHanderBase] down " + coords.posX + ", " + coords.posY)
+  }
+  this.dispatchEvent(new pike.events.Down(coords.posX, coords.posY, e, this));
+  this.stopEventIfRequired_(e)
+};
+pike.input.InputHandlerBase.prototype.onUpDomEvent = function(e) {
+  var coords = this.getInputCoordinates(e);
+  if(goog.DEBUG) {
+    window.console.log("[pike.core.InputHanderBase] up " + coords.posX + ", " + coords.posY + ", moving: " + this.moving_)
+  }
+  this.dispatchEvent(new pike.events.Up(coords.posX, coords.posY, this.moving_, e, this));
+  this.stopEventIfRequired_(e);
+  this.moving_ = false
+};
+pike.input.InputHandlerBase.prototype.onMoveDomEvent = function(e) {
+  var coords = this.getInputCoordinates(e);
+  var deltaX = coords.posX - this.lastMoveCoordinates_.posX;
+  var deltaY = coords.posY - this.lastMoveCoordinates_.posY;
+  if(!this.moving_ && Math.sqrt(deltaX * deltaX + deltaY * deltaY) > this.moveThreshold_) {
+    this.moving_ = true
+  }
+  if(this.moving_) {
+    if(goog.DEBUG) {
+      window.console.log("[pike.core.InputHanderBase] move " + coords.posX + ", " + coords.posY + ", deltaX: " + deltaX + ", deltaY: " + deltaY)
+    }
+    this.dispatchEvent(new pike.events.Move(coords.posX, coords.posY, deltaX, deltaY, e, this));
+    this.lastMoveCoordinates_ = coords
+  }
+  this.stopEventIfRequired_(e)
+};
+pike.input.InputHandlerBase.prototype.stopEventIfRequired_ = function(e) {
+  if(this.stopDomEvents_) {
+    e.stopPropagation();
+    e.preventDefault()
+  }
+};
+pike.input.InputHandlerBase.prototype.getInputCoordinates = function(e) {
+  return{posX:e.offsetX + this.viewport_.x, posY:e.offsetY + this.viewport_.y}
+};
+pike.input.InputHandlerBase.prototype.onViewportChangePosition = function(e) {
+  this.viewport_.x = e.x;
+  this.viewport_.y = e.y
+};
+pike.input.MouseInputHandler = function() {
+  pike.input.InputHandlerBase.call(this);
+  this.mouseDown_ = false
+};
+goog.inherits(pike.input.MouseInputHandler, pike.input.InputHandlerBase);
+pike.input.MouseInputHandler.prototype.setEventTarget = function(eventTarget) {
+  this.element_ = eventTarget;
+  this.attachDomListeners_()
+};
+pike.input.MouseInputHandler.prototype.attachDomListeners_ = function() {
+  var el = this.element_;
+  this.handler.listen(el, goog.events.EventType.MOUSEDOWN, goog.bind(this.onDownDomEvent, this));
+  this.handler.listen(el, goog.events.EventType.MOUSEUP, goog.bind(this.onUpDomEvent, this));
+  this.handler.listen(el, goog.events.EventType.MOUSEMOVE, goog.bind(this.onMoveDomEvent, this));
+  this.handler.listen(el, goog.events.EventType.MOUSEOUT, goog.bind(this.onMouseOut, this))
+};
+pike.input.MouseInputHandler.prototype.onDownDomEvent = function(e) {
+  this.mouseDown_ = true;
+  pike.input.InputHandlerBase.prototype.onDownDomEvent.call(this, e)
+};
+pike.input.MouseInputHandler.prototype.onUpDomEvent = function(e) {
+  this.mouseDown_ = false;
+  pike.input.InputHandlerBase.prototype.onUpDomEvent.call(this, e)
+};
+pike.input.MouseInputHandler.prototype.onMoveDomEvent = function(e) {
+  if(this.mouseDown_) {
+    pike.input.InputHandlerBase.prototype.onMoveDomEvent.call(this, e)
+  }
+};
+pike.input.MouseInputHandler.prototype.onMouseOut = function() {
+  this.mouseDown_ = false
+};
+pike.input.TouchInputHandler = function() {
+  pike.input.InputHandlerBase.call(this);
+  this.lastInteractionCoordinates_ = null
+};
+goog.inherits(pike.input.TouchInputHandler, pike.input.InputHandlerBase);
+pike.input.TouchInputHandler.prototype.setEventTarget = function(eventTarget) {
+  this.element_ = eventTarget;
+  this.attachDomListeners_()
+};
+pike.input.TouchInputHandler.prototype.attachDomListeners_ = function() {
+  var el = this.element_;
+  this.handler.listen(el, goog.events.EventType.TOUCHSTART, goog.bind(this.onDownDomEvent, this));
+  this.handler.listen(el, goog.events.EventType.TOUCHEND, goog.bind(this.onUpDomEvent, this));
+  this.handler.listen(el, goog.events.EventType.TOUCHMOVE, goog.bind(this.onMoveDomEvent, this))
+};
+pike.input.TouchInputHandler.prototype.onDownDomEvent = function(e) {
+  this.lastInteractionCoordinates_ = this.getInputCoordinates(e);
+  pike.input.InputHandlerBase.prototype.onDownDomEvent.call(this, e)
+};
+pike.input.TouchInputHandler.prototype.onUpDomEvent = function(e) {
+  if(goog.DEBUG) {
+    window.console.log("[pike.core.TouchHanderBase] up " + this.lastInteractionCoordinates_.posX + ", " + this.lastInteractionCoordinates_.posY + ", moving: " + this.moving_)
+  }
+  this.dispatchEvent(new pike.events.Up(this.lastInteractionCoordinates_.posX, this.lastInteractionCoordinates_.posY, this.moving_, e, this));
+  this.stopEventIfRequired_(e);
+  this.lastInteractionCoordinates_ = null;
+  this.moving_ = false
+};
+pike.input.TouchInputHandler.prototype.onMoveDomEvent = function(e) {
+  this.lastInteractionCoordinates_ = this.getInputCoordinates(e);
+  pike.input.InputHandlerBase.prototype.onMoveDomEvent.call(this, e)
+};
+// Input 23
+/*
+ Dual licensed under the MIT or GPL licenses.
+*/
+goog.provide("pike.ai.path.Node");
+goog.provide("pike.ai.path.Graph");
+goog.provide("pike.ai.decision.DecisionTreeNode");
+goog.provide("pike.ai.decision.NumericDecisionNode");
+goog.provide("pike.ai.decision.ProbabilisticDecisionNode");
+pike.ai.decision.NumericDecisionNode = function(name, threshold, leNode, gNode) {
+  this.name_ = name;
+  this.threshold_ = threshold;
+  this.leNode_ = leNode;
+  this.gNode_ = gNode
+};
+goog.inherits(pike.ai.decision.NumericDecisionNode, pike.ai.decision.DecisionTreeNode);
+pike.ai.decision.NumericDecisionNode.prototype.execute = function(agent, data) {
+  var node = agent[this.name_] > this.threshold_ ? this.gNode_ : this.leNode_;
+  node.execute(agent)
+};
+pike.ai.decision.ProbabilisticDecisionNode = function(chance, trueNode, falseNode) {
+  this.chance_ = chance;
+  this.trueNode_ = trueNode;
+  this.falseNode_ = falseNode
+};
+goog.inherits(pike.ai.decision.ProbabilisticDecisionNode, pike.ai.decision.DecisionTreeNode);
+pike.ai.decision.ProbabilisticDecisionNode.prototype.execute = function(agent, data) {
+  var node = Math.random() < this.chance_ ? this.trueNode_ : this.falseNode_;
+  node.execute(agent)
+};
+pike.ai.decision.DecisionTreeNode = function() {
+};
+pike.ai.decision.DecisionTreeNode.prototype.execute = function(agent, data) {
+  throw Error("Abstract method - must be overwritten");
+};
+pike.ai.path.Graph = function(nodes, connections) {
+  this.nodes_ = nodes;
+  if(!connections) {
+    return
+  }
+  for(var i = 0;i < connections.length;i++) {
+    for(var j = 0;j < connections[i].length;j++) {
+      if(connections[i][j]) {
+        nodes[i].addConnection(nodes[j], pike.ai.path.Graph.distance(nodes[i], nodes[j]))
+      }
+    }
+  }
+};
+pike.ai.path.Graph.prototype.findPath = function(startNode, endNode) {
+  function updateNodeValues(node, prevNode, routeCost) {
+    node.routeCost = routeCost;
+    node.estimatedCost = routeCost + pike.ai.path.Graph.distance(node, endNode);
+    node.prevNode = prevNode
+  }
+  var openList = [];
+  var closedList = [];
+  startNode.routeCost = 0;
+  openList.push(startNode);
+  var routeFound = false;
+  while(openList.length > 0) {
+    var currentNode = openList.sort(function(a, b) {
+      return a.estimatedCost - b.estimatedCost
+    })[0];
+    if(currentNode == endNode) {
+      routeFound = true;
+      break
+    }
+    currentNode.getConnections().forEach(function(connection) {
+      var node = connection.node;
+      var newRouteCost = currentNode.routeCost + connection.weight;
+      if(closedList.indexOf(node) > -1) {
+        if(newRouteCost < node.routeCost) {
+          closedList.splice(closedList.indexOf(node), 1);
+          updateNodeValues(node, currentNode, newRouteCost);
+          openList.push(node)
+        }
+      }else {
+        if(openList.indexOf(node) > -1) {
+          if(newRouteCost < node.routeCost) {
+            updateNodeValues(node, currentNode, newRouteCost)
+          }
+        }else {
+          updateNodeValues(node, currentNode, newRouteCost);
+          openList.push(node)
+        }
+      }
+      if(openList.indexOf(currentNode) != -1) {
+        openList.splice(openList.indexOf(currentNode), 1)
+      }
+      closedList.push(currentNode)
+    })
+  }
+  var route = [];
+  if(routeFound) {
+    var routeNode = endNode;
+    while(routeNode) {
+      route.push(routeNode);
+      routeNode = routeNode.prevNode
+    }
+    route.reverse()
+  }
+  this.nodes_.forEach(function(node) {
+    delete node.routeCost;
+    delete node.estimatedCost;
+    delete node.prevNode
+  });
+  return route
+};
+pike.ai.path.Graph.serialize = function() {
+  var data = {};
+  data.nodes = [];
+  this.nodes_.forEach(function(it) {
+    data.nodes.push([it.x, it.y])
+  });
+  return JSON.stringify(data)
+};
+pike.ai.path.Graph.distance = function(node1, node2) {
+  return Math.sqrt((node1.x - node2.x) * (node1.x - node2.x) + (node1.y - node2.y) * (node1.y - node2.y))
+};
+pike.ai.path.Node = function(id, x, y) {
+  this.id = id;
+  this.x = x;
+  this.y = y;
+  this.connections_ = []
+};
+pike.ai.path.Node.prototype.addConnection = function(node, weight) {
+  this.connections_.push({node:node, weight:weight})
+};
+pike.ai.path.Node.prototype.getConnections = function() {
+  return this.connections_
+};
+// Input 24
+/*
+ Dual licensed under the MIT or GPL licenses.
+*/
 goog.provide("pike.core.Entity");
 goog.provide("pike.core.Viewport");
 goog.provide("pike.core.GameWorld");
@@ -3528,570 +3792,7 @@ pike.core.Stage.prototype.setViewportPosition_ = function(x, y) {
     this.layers_[idx].setViewportPosition(this.viewport_.x, this.viewport_.y)
   }
 };
-// Input 23
-/*
- Dual licensed under the MIT or GPL licenses.
-*/
-goog.provide("pike.input.InputHandlerBase");
-goog.provide("pike.input.MouseInputHandler");
-goog.provide("pike.input.TouchInputHandler");
-goog.require("pike.graphics.Rectangle");
-goog.require("pike.events.Down");
-goog.require("pike.events.Up");
-goog.require("pike.events.Move");
-goog.require("goog.events.EventTarget");
-pike.input.InputHandlerBase = function() {
-  goog.events.EventTarget.call(this);
-  this.handler = new goog.events.EventHandler(this);
-  this.viewport_ = new pike.graphics.Rectangle(0, 0, 0, 0);
-  this.element_ = null;
-  this.moving_ = false;
-  this.lastMoveCoordinates_ = null;
-  this.moveThreshold_ = 10;
-  this.stopDomEvents_ = true
-};
-goog.inherits(pike.input.InputHandlerBase, goog.events.EventTarget);
-pike.input.InputHandlerBase.prototype.onDownDomEvent = function(e) {
-  var coords = this.lastMoveCoordinates_ = this.getInputCoordinates(e);
-  if(goog.DEBUG) {
-    window.console.log("[pike.core.InputHanderBase] down " + coords.posX + ", " + coords.posY)
-  }
-  this.dispatchEvent(new pike.events.Down(coords.posX, coords.posY, e, this));
-  this.stopEventIfRequired_(e)
-};
-pike.input.InputHandlerBase.prototype.onUpDomEvent = function(e) {
-  var coords = this.getInputCoordinates(e);
-  if(goog.DEBUG) {
-    window.console.log("[pike.core.InputHanderBase] up " + coords.posX + ", " + coords.posY + ", moving: " + this.moving_)
-  }
-  this.dispatchEvent(new pike.events.Up(coords.posX, coords.posY, this.moving_, e, this));
-  this.stopEventIfRequired_(e);
-  this.moving_ = false
-};
-pike.input.InputHandlerBase.prototype.onMoveDomEvent = function(e) {
-  var coords = this.getInputCoordinates(e);
-  var deltaX = coords.posX - this.lastMoveCoordinates_.posX;
-  var deltaY = coords.posY - this.lastMoveCoordinates_.posY;
-  if(!this.moving_ && Math.sqrt(deltaX * deltaX + deltaY * deltaY) > this.moveThreshold_) {
-    this.moving_ = true
-  }
-  if(this.moving_) {
-    if(goog.DEBUG) {
-      window.console.log("[pike.core.InputHanderBase] move " + coords.posX + ", " + coords.posY + ", deltaX: " + deltaX + ", deltaY: " + deltaY)
-    }
-    this.dispatchEvent(new pike.events.Move(coords.posX, coords.posY, deltaX, deltaY, e, this));
-    this.lastMoveCoordinates_ = coords
-  }
-  this.stopEventIfRequired_(e)
-};
-pike.input.InputHandlerBase.prototype.stopEventIfRequired_ = function(e) {
-  if(this.stopDomEvents_) {
-    e.stopPropagation();
-    e.preventDefault()
-  }
-};
-pike.input.InputHandlerBase.prototype.getInputCoordinates = function(e) {
-  return{posX:e.offsetX + this.viewport_.x, posY:e.offsetY + this.viewport_.y}
-};
-pike.input.InputHandlerBase.prototype.onViewportChangePosition = function(e) {
-  this.viewport_.x = e.x;
-  this.viewport_.y = e.y
-};
-pike.input.MouseInputHandler = function() {
-  pike.input.InputHandlerBase.call(this);
-  this.mouseDown_ = false
-};
-goog.inherits(pike.input.MouseInputHandler, pike.input.InputHandlerBase);
-pike.input.MouseInputHandler.prototype.setEventTarget = function(eventTarget) {
-  this.element_ = eventTarget;
-  this.attachDomListeners_()
-};
-pike.input.MouseInputHandler.prototype.attachDomListeners_ = function() {
-  var el = this.element_;
-  this.handler.listen(el, goog.events.EventType.MOUSEDOWN, goog.bind(this.onDownDomEvent, this));
-  this.handler.listen(el, goog.events.EventType.MOUSEUP, goog.bind(this.onUpDomEvent, this));
-  this.handler.listen(el, goog.events.EventType.MOUSEMOVE, goog.bind(this.onMoveDomEvent, this));
-  this.handler.listen(el, goog.events.EventType.MOUSEOUT, goog.bind(this.onMouseOut, this))
-};
-pike.input.MouseInputHandler.prototype.onDownDomEvent = function(e) {
-  this.mouseDown_ = true;
-  pike.input.InputHandlerBase.prototype.onDownDomEvent.call(this, e)
-};
-pike.input.MouseInputHandler.prototype.onUpDomEvent = function(e) {
-  this.mouseDown_ = false;
-  pike.input.InputHandlerBase.prototype.onUpDomEvent.call(this, e)
-};
-pike.input.MouseInputHandler.prototype.onMoveDomEvent = function(e) {
-  if(this.mouseDown_) {
-    pike.input.InputHandlerBase.prototype.onMoveDomEvent.call(this, e)
-  }
-};
-pike.input.MouseInputHandler.prototype.onMouseOut = function() {
-  this.mouseDown_ = false
-};
-pike.input.TouchInputHandler = function() {
-  pike.input.InputHandlerBase.call(this);
-  this.lastInteractionCoordinates_ = null
-};
-goog.inherits(pike.input.TouchInputHandler, pike.input.InputHandlerBase);
-pike.input.TouchInputHandler.prototype.setEventTarget = function(eventTarget) {
-  this.element_ = eventTarget;
-  this.attachDomListeners_()
-};
-pike.input.TouchInputHandler.prototype.attachDomListeners_ = function() {
-  var el = this.element_;
-  this.handler.listen(el, goog.events.EventType.TOUCHSTART, goog.bind(this.onDownDomEvent, this));
-  this.handler.listen(el, goog.events.EventType.TOUCHEND, goog.bind(this.onUpDomEvent, this));
-  this.handler.listen(el, goog.events.EventType.TOUCHMOVE, goog.bind(this.onMoveDomEvent, this))
-};
-pike.input.TouchInputHandler.prototype.onDownDomEvent = function(e) {
-  this.lastInteractionCoordinates_ = this.getInputCoordinates(e);
-  pike.input.InputHandlerBase.prototype.onDownDomEvent.call(this, e)
-};
-pike.input.TouchInputHandler.prototype.onUpDomEvent = function(e) {
-  if(goog.DEBUG) {
-    window.console.log("[pike.core.TouchHanderBase] up " + this.lastInteractionCoordinates_.posX + ", " + this.lastInteractionCoordinates_.posY + ", moving: " + this.moving_)
-  }
-  this.dispatchEvent(new pike.events.Up(this.lastInteractionCoordinates_.posX, this.lastInteractionCoordinates_.posY, this.moving_, e, this));
-  this.stopEventIfRequired_(e);
-  this.lastInteractionCoordinates_ = null;
-  this.moving_ = false
-};
-pike.input.TouchInputHandler.prototype.onMoveDomEvent = function(e) {
-  this.lastInteractionCoordinates_ = this.getInputCoordinates(e);
-  pike.input.InputHandlerBase.prototype.onMoveDomEvent.call(this, e)
-};
-// Input 24
-goog.provide("goog.events.EventHandler");
-goog.require("goog.Disposable");
-goog.require("goog.events");
-goog.require("goog.object");
-goog.events.EventHandler = function(opt_handler) {
-  goog.Disposable.call(this);
-  this.handler_ = opt_handler;
-  this.keys_ = {}
-};
-goog.inherits(goog.events.EventHandler, goog.Disposable);
-goog.events.EventHandler.typeArray_ = [];
-goog.events.EventHandler.prototype.listen = function(src, type, opt_fn, opt_capture, opt_handler) {
-  if(!goog.isArray(type)) {
-    goog.events.EventHandler.typeArray_[0] = (type);
-    type = goog.events.EventHandler.typeArray_
-  }
-  for(var i = 0;i < type.length;i++) {
-    var listenerObj = goog.events.listen(src, type[i], opt_fn || this, opt_capture || false, opt_handler || this.handler_ || this);
-    if(goog.DEBUG && !listenerObj) {
-      return this
-    }
-    var key = listenerObj.key;
-    this.keys_[key] = listenerObj
-  }
-  return this
-};
-goog.events.EventHandler.prototype.listenOnce = function(src, type, opt_fn, opt_capture, opt_handler) {
-  if(goog.isArray(type)) {
-    for(var i = 0;i < type.length;i++) {
-      this.listenOnce(src, type[i], opt_fn, opt_capture, opt_handler)
-    }
-  }else {
-    var listenerObj = goog.events.listenOnce(src, type, opt_fn || this, opt_capture, opt_handler || this.handler_ || this);
-    var key = listenerObj.key;
-    this.keys_[key] = listenerObj
-  }
-  return this
-};
-goog.events.EventHandler.prototype.listenWithWrapper = function(src, wrapper, listener, opt_capt, opt_handler) {
-  wrapper.listen(src, listener, opt_capt, opt_handler || this.handler_ || this, this);
-  return this
-};
-goog.events.EventHandler.prototype.getListenerCount = function() {
-  var count = 0;
-  for(var key in this.keys_) {
-    if(Object.prototype.hasOwnProperty.call(this.keys_, key)) {
-      count++
-    }
-  }
-  return count
-};
-goog.events.EventHandler.prototype.unlisten = function(src, type, opt_fn, opt_capture, opt_handler) {
-  if(goog.isArray(type)) {
-    for(var i = 0;i < type.length;i++) {
-      this.unlisten(src, type[i], opt_fn, opt_capture, opt_handler)
-    }
-  }else {
-    var listener = goog.events.getListener(src, type, opt_fn || this, opt_capture, opt_handler || this.handler_ || this);
-    if(listener) {
-      goog.events.unlistenByKey(listener);
-      delete this.keys_[listener.key]
-    }
-  }
-  return this
-};
-goog.events.EventHandler.prototype.unlistenWithWrapper = function(src, wrapper, listener, opt_capt, opt_handler) {
-  wrapper.unlisten(src, listener, opt_capt, opt_handler || this.handler_ || this, this);
-  return this
-};
-goog.events.EventHandler.prototype.removeAll = function() {
-  goog.object.forEach(this.keys_, goog.events.unlistenByKey);
-  this.keys_ = {}
-};
-goog.events.EventHandler.prototype.disposeInternal = function() {
-  goog.events.EventHandler.superClass_.disposeInternal.call(this);
-  this.removeAll()
-};
-goog.events.EventHandler.prototype.handleEvent = function(e) {
-  throw Error("EventHandler.handleEvent not implemented");
-};
 // Input 25
-/*
- Dual licensed under the MIT or GPL licenses.
-*/
-goog.provide("pike.layers.Layer");
-goog.provide("pike.layers.ClusterLayer");
-goog.provide("pike.layers.ObstacleLayer");
-goog.provide("pike.layers.DirtyManager");
-goog.require("goog.events.EventHandler");
-goog.require("goog.events.EventTarget");
-goog.require("pike.graphics.Rectangle");
-goog.require("pike.events.NewEntity");
-goog.require("pike.events.RemoveEntity");
-pike.layers.Layer = function(name) {
-  goog.events.EventTarget.call(this);
-  this.name = name;
-  this.handler = new goog.events.EventHandler(this);
-  this.viewport_ = new pike.graphics.Rectangle(0, 0, 0, 0);
-  this.gameWorld_ = new pike.graphics.Rectangle(0, 0, 0, 0);
-  this.entities_ = [];
-  this.screen_ = {};
-  this.offScreen_ = {};
-  this.screen_.canvas = document.createElement("canvas");
-  this.screen_.canvas.style.position = "absolute";
-  this.screen_.canvas.style.top = "0";
-  this.screen_.canvas.style.left = "0";
-  this.screen_.context = this.screen_.canvas.getContext("2d");
-  this.screen_.isDirty = false;
-  this.offScreen_.canvas = document.createElement("canvas");
-  this.offScreen_.context = this.offScreen_.canvas.getContext("2d");
-  this.offScreen_.isDirty = false
-};
-goog.inherits(pike.layers.Layer, goog.events.EventTarget);
-pike.layers.Layer.prototype.onRender = function() {
-  if(this.hasDirtyManager()) {
-    this.renderDirty_()
-  }else {
-    if(this.offScreen_.isDirty) {
-      this.renderOffScreen_()
-    }
-  }
-  if(this.screen_.isDirty) {
-    this.renderScreen_()
-  }
-};
-pike.layers.Layer.prototype.renderDirty_ = function() {
-  if(this.dirtyManager.isClean()) {
-    return
-  }
-  this.offScreen_.context.clearRect(this.dirtyManager.getDirtyRectangle().x, this.dirtyManager.getDirtyRectangle().y, this.dirtyManager.getDirtyRectangle().w, this.dirtyManager.getDirtyRectangle().h);
-  this.dispatchEvent(new pike.events.Render((new Date).getTime(), this));
-  if(!this.screen_.isDirty) {
-    this.screen_.context.clearRect(this.dirtyManager.getDirtyRectangle().x - this.viewport_.x, this.dirtyManager.getDirtyRectangle().y - this.viewport_.y, this.dirtyManager.getDirtyRectangle().w, this.dirtyManager.getDirtyRectangle().h);
-    this.screen_.context.drawImage(this.offScreen_.canvas, this.dirtyManager.getDirtyRectangle().x, this.dirtyManager.getDirtyRectangle().y, this.dirtyManager.getDirtyRectangle().w, this.dirtyManager.getDirtyRectangle().h, this.dirtyManager.getDirtyRectangle().x - this.viewport_.x, this.dirtyManager.getDirtyRectangle().y - this.viewport_.y, this.dirtyManager.getDirtyRectangle().w, this.dirtyManager.getDirtyRectangle().h)
-  }
-  this.dirtyManager.clear()
-};
-pike.layers.Layer.prototype.renderOffScreen_ = function() {
-  this.offScreen_.context.clearRect(0, 0, this.gameWorld_.w, this.gameWorld_.h);
-  this.dispatchEvent(new pike.events.Render((new Date).getTime(), this));
-  this.offScreen_.isDirty = false;
-  this.screen_.isDirty = true;
-  if(goog.DEBUG) {
-    window.console.log("[pike.core.Layer] " + this.name + " redraw offScreen")
-  }
-};
-pike.layers.Layer.prototype.renderScreen_ = function() {
-  this.screen_.context.clearRect(0, 0, this.viewport_.w, this.viewport_.h);
-  this.screen_.context.drawImage(this.offScreen_.canvas, this.viewport_.x, this.viewport_.y, this.viewport_.w, this.viewport_.h, 0, 0, this.viewport_.w, this.viewport_.h);
-  this.screen_.isDirty = false;
-  if(goog.DEBUG) {
-    window.console.log("[pike.core.Layer] " + this.name + " redraw screen")
-  }
-};
-pike.layers.Layer.prototype.setViewportSize = function(width, height) {
-  this.viewport_.w = width;
-  this.viewport_.h = height;
-  this.screen_.canvas.width = this.viewport_.w;
-  this.screen_.canvas.height = this.viewport_.h;
-  this.screen_.isDirty = true;
-  if(this.hasDirtyManager()) {
-    this.dirtyManager.setSize(this.viewport_.w, this.viewport_.h)
-  }
-};
-pike.layers.Layer.prototype.setGameWorldSize = function(width, height) {
-  this.gameWorld_.w = width;
-  this.gameWorld_.h = height;
-  this.offScreen_.canvas.width = this.gameWorld_.w;
-  this.offScreen_.canvas.height = this.gameWorld_.h;
-  this.offScreen_.isDirty = true
-};
-pike.layers.Layer.prototype.setViewportPosition = function(x, y) {
-  this.viewport_.x = x;
-  this.viewport_.y = y;
-  this.getScreen().isDirty = true;
-  if(this.hasDirtyManager()) {
-    this.dirtyManager.setPosition(this.viewport_.x, this.viewport_.y)
-  }
-};
-pike.layers.Layer.prototype.setDirtyManager = function(dirtyManager) {
-  this.dirtyManager = dirtyManager
-};
-pike.layers.Layer.prototype.hasDirtyManager = function() {
-  return this.dirtyManager
-};
-pike.layers.Layer.prototype.setDirty = function(rect) {
-  if(this.hasDirtyManager()) {
-    this.dirtyManager.markDirty(rect)
-  }else {
-    this.offScreen_.isDirty = true
-  }
-};
-pike.layers.Layer.prototype.getScreen = function() {
-  return this.screen_
-};
-pike.layers.Layer.prototype.getOffScreen = function() {
-  return this.offScreen_
-};
-pike.layers.Layer.prototype.addEntity = function(entity) {
-  this.entities_.push(entity);
-  entity.layer = this;
-  this.dispatchEvent(new pike.events.NewEntity(entity, this));
-  if(goog.DEBUG) {
-    window.console.log("[pike.core.Layer] Layer: " + this.name + " has newentity #" + entity.id)
-  }
-};
-pike.layers.Layer.prototype.removeEntity = function(entity) {
-  entity.dispose();
-  goog.array.remove(this.entities_, entity);
-  delete entity.layer;
-  this.dispatchEvent(new pike.events.RemoveEntity(entity, this));
-  if(goog.DEBUG) {
-    window.console.log("[pike.core.Layer] removeentity")
-  }
-};
-pike.layers.Layer.prototype.getEntity = function(id) {
-  for(var idx = 0;idx < this.entities_.length;idx++) {
-    if(this.entities_[idx].id == id) {
-      return this.entities_[idx]
-    }
-  }
-};
-pike.layers.Layer.prototype.dispatchEvent = function(e) {
-  for(var idx = 0;idx < this.entities_.length;idx++) {
-    this.entities_[idx].dispatchEvent(e)
-  }
-  goog.events.EventTarget.prototype.dispatchEvent.call(this, e)
-};
-pike.layers.ClusterLayer = function(name, clusterSize) {
-  pike.layers.Layer.call(this, name);
-  this.clusters_ = new pike.graphics.Cluster(clusterSize, 0, 0);
-  this.visibleClusterBounds_ = {};
-  this.cache_ = [];
-  this.cacheDirty_ = true;
-  this.cacheUnsorted_ = false
-};
-goog.inherits(pike.layers.ClusterLayer, pike.layers.Layer);
-pike.layers.ClusterLayer.prototype.getCluster = function() {
-  return this.clusters_
-};
-pike.layers.ClusterLayer.prototype.dispatchEvent = function(e) {
-  if(this.cacheDirty_) {
-    this.resetCache_()
-  }else {
-    if(this.cacheUnsorted_) {
-      this.sortCache_()
-    }
-  }
-  for(var i = 0;i < this.cache_.length;i++) {
-    var entity = this.cache_[i];
-    if(entity.getBounds().intersects(this.viewport_)) {
-      entity.dispatchEvent(e)
-    }
-  }
-  goog.events.EventTarget.prototype.dispatchEvent.call(this, e)
-};
-pike.layers.ClusterLayer.prototype.addEntity = function(entity) {
-  pike.layers.Layer.prototype.addEntity.call(this, entity);
-  this.handler.listen(entity, pike.events.ChangePosition.EVENT_TYPE, goog.bind(this.onEntityMove, this));
-  if(this.clusters_.getClusters().length == 0) {
-    return
-  }
-  var clusters = this.clusters_.addToClusters(entity);
-  if(clusters.intersects(this.visibleClusterBounds_)) {
-    this.cache_.push(entity);
-    this.cacheUnsorted_ = true
-  }
-};
-pike.layers.ClusterLayer.prototype.removeEntity = function(entity) {
-  this.clusters_.removeFromClusters(entity);
-  pike.layers.Layer.prototype.removeEntity.call(this, entity)
-};
-pike.layers.ClusterLayer.prototype.resetCache_ = function() {
-  var cache = this.cache_ = [];
-  for(var i = this.visibleClusterBounds_.y;i < this.visibleClusterBounds_.y + this.visibleClusterBounds_.h;i++) {
-    for(var j = this.visibleClusterBounds_.x;j < this.visibleClusterBounds_.x + this.visibleClusterBounds_.w;j++) {
-      var cluster = this.clusters_.getClusters()[i][j];
-      for(var k = 0;k < cluster.length;k++) {
-        if(cache.indexOf(cluster[k]) == -1) {
-          cache.push(cluster[k])
-        }
-      }
-    }
-  }
-  if(goog.DEBUG) {
-    window.console.log("[pike.layers.ClusterLayer] resetcache")
-  }
-  this.sortCache_();
-  this.cacheDirty_ = false;
-  this.cacheUnsorted_ = false
-};
-pike.layers.ClusterLayer.prototype.sortCache_ = function() {
-  this.cache_.sort(function(a, b) {
-    var aBounds = a.getBounds();
-    var bBounds = b.getBounds();
-    return aBounds.y + aBounds.h - (bBounds.y + bBounds.h)
-  });
-  this.cacheUnsorted_ = false;
-  if(goog.DEBUG) {
-    window.console.log("[pike.layers.ClusterLayer] sortcache")
-  }
-};
-pike.layers.ClusterLayer.prototype.resetClusters_ = function() {
-  this.clusters_.build();
-  if(goog.DEBUG) {
-    window.console.log("[pike.layers.ClusterLayer] resetcluster")
-  }
-  for(var i = 0;i < this.entities_.length;i++) {
-    var entity = this.entities_[i];
-    this.clusters_.addToClusters(entity)
-  }
-};
-pike.layers.ClusterLayer.prototype.updateVisibleClusters_ = function() {
-  var newRect = this.viewport_.getOverlappingGridCells(this.clusters_.getClusterSize(), this.clusters_.getClusterSize(), this.clusters_.getClusters()[0].length, this.clusters_.getClusters().length);
-  if(!newRect.equals(this.visibleClusterBounds_)) {
-    this.visibleClusterBounds_ = newRect;
-    this.cacheDirty_ = true
-  }
-};
-pike.layers.ClusterLayer.prototype.setViewportSize = function(width, height) {
-  pike.layers.Layer.prototype.setViewportSize.call(this, width, height);
-  this.setGameWorldSize.call(this, Math.max(this.gameWorld_.w, width), Math.max(this.gameWorld_.h, height));
-  this.updateVisibleClusters_()
-};
-pike.layers.ClusterLayer.prototype.setViewportPosition = function(x, y) {
-  pike.layers.Layer.prototype.setViewportPosition.call(this, x, y);
-  this.updateVisibleClusters_()
-};
-pike.layers.ClusterLayer.prototype.setGameWorldSize = function(width, height) {
-  pike.layers.Layer.prototype.setGameWorldSize.call(this, width, height);
-  this.clusters_.setSize(width, height);
-  this.resetClusters_()
-};
-pike.layers.ClusterLayer.prototype.onEntityMove = function(e) {
-  var entity = e.target;
-  var newClusters = entity.getBounds().getOverlappingGridCells(this.clusters_.getClusterSize(), this.clusters_.getClusterSize(), this.clusters_.getClusters()[0].length, this.clusters_.getClusters().length);
-  var oldClusters = this.clusters_.getIdToClusterBounds(entity.id);
-  if(!oldClusters.equals(newClusters)) {
-    this.moveObjectBetweenClusters_(entity, oldClusters, newClusters)
-  }
-  if(newClusters.intersects(this.visibleClusterBounds_) && e.y != e.oldY) {
-    this.cacheUnsorted_ = true
-  }
-};
-pike.layers.ClusterLayer.prototype.moveObjectBetweenClusters_ = function(entity, oldClusters, newClusters) {
-  this.clusters_.removeFromClusters(entity, oldClusters);
-  this.clusters_.addToClusters(entity, newClusters);
-  this.clusters_.setIdToClusterBounds(entity.id, newClusters);
-  if(newClusters.intersects(this.visibleClusterBounds_)) {
-    if(!goog.array.contains(this.cache_, entity)) {
-      this.cache_.push(entity)
-    }
-  }else {
-    goog.array.remove(this.cache_, entity)
-  }
-};
-pike.layers.ObstacleLayer = function(name) {
-  pike.layers.Layer.call(this, name)
-};
-goog.inherits(pike.layers.ObstacleLayer, pike.layers.Layer);
-pike.layers.ObstacleLayer.prototype.setViewportSize = function(width, height) {
-  pike.layers.Layer.prototype.setViewportSize.call(this, width, height);
-  this.screen_.isDirty = false
-};
-pike.layers.ObstacleLayer.prototype.setViewportPosition = function(x, y) {
-  pike.layers.Layer.prototype.setViewportPosition.call(this, x, y);
-  this.screen_.isDirty = false
-};
-pike.layers.ObstacleLayer.prototype.renderOffScreen_ = function() {
-  pike.layers.Layer.prototype.renderOffScreen_.call(this);
-  this.screen_.isDirty = false;
-  if(goog.DEBUG) {
-    window.console.log("[pike.core.ObstacleLayer] " + this.name + " redraw offScreen")
-  }
-};
-pike.layers.ObstacleLayer.prototype.onEntityChangePosition = function(e) {
-  var entity = e.target;
-  var collisionBounds = entity.getCBounds();
-  if(this.offScreen_.context.getImageData(collisionBounds.x, collisionBounds.y, 1, 1).data[3] != 0 || this.offScreen_.context.getImageData(collisionBounds.x + collisionBounds.w, collisionBounds.y, 1, 1).data[3] != 0 || this.offScreen_.context.getImageData(collisionBounds.x + collisionBounds.w, collisionBounds.y + collisionBounds.h, 1, 1).data[3] != 0 || this.offScreen_.context.getImageData(collisionBounds.x, collisionBounds.y + collisionBounds.h, 1, 1).data[3] != 0) {
-    entity.dispatchEvent(new pike.events.Collision(e.x, e.y, e.oldX, e.oldY, new pike.core.Entity, entity))
-  }
-};
-pike.layers.DirtyManager = function(allDirtyThreshold) {
-  this.viewport_ = new pike.graphics.Rectangle(0, 0, 0, 0);
-  this.handler = new goog.events.EventHandler(this);
-  this.dirtyRect_ = null;
-  this.allDirtyThreshold_ = allDirtyThreshold == undefined ? 0.5 : allDirtyThreshold;
-  this.allDirty_ = true;
-  this.markAllDirty()
-};
-pike.layers.DirtyManager.prototype.getDirtyRectangle = function() {
-  return this.dirtyRect_
-};
-pike.layers.DirtyManager.prototype.markAllDirty = function() {
-  this.allDirty_ = true;
-  this.dirtyRect_ = this.viewport_.copy()
-};
-pike.layers.DirtyManager.prototype.markDirty = function(rect) {
-  if(!(rect.w || rect.h) || this.allDirty_) {
-    return
-  }
-  if(!rect.intersects(this.viewport_)) {
-    return
-  }
-  if(this.dirtyRect_) {
-    this.dirtyRect_ = this.dirtyRect_.convexHull(rect)
-  }else {
-    this.dirtyRect_ = rect
-  }
-  if(this.dirtyRect_.w * this.dirtyRect_.h > this.allDirtyThreshold_ * this.viewport_.w * this.viewport_.h) {
-    this.markAllDirty()
-  }
-};
-pike.layers.DirtyManager.prototype.isClean = function() {
-  return!this.dirtyRect_
-};
-pike.layers.DirtyManager.prototype.clear = function() {
-  this.dirtyRect_ = null;
-  this.allDirty_ = false
-};
-pike.layers.DirtyManager.prototype.setSize = function(width, height) {
-  this.viewport_.w = width;
-  this.viewport_.h = height;
-  this.markAllDirty()
-};
-pike.layers.DirtyManager.prototype.setPosition = function(x, y) {
-  this.viewport_.x = x;
-  this.viewport_.y = y
-};
-// Input 26
 /*
  Dual licensed under the MIT or GPL licenses.
 */
@@ -4680,7 +4381,437 @@ pike.components.VisualizeGraph = function() {
   }
 };
 pike.components.VisualizeGraph.NAME = "pike.components.VisualizeGraph";
+// Input 26
+goog.provide("goog.events.EventHandler");
+goog.require("goog.Disposable");
+goog.require("goog.events");
+goog.require("goog.object");
+goog.events.EventHandler = function(opt_handler) {
+  goog.Disposable.call(this);
+  this.handler_ = opt_handler;
+  this.keys_ = {}
+};
+goog.inherits(goog.events.EventHandler, goog.Disposable);
+goog.events.EventHandler.typeArray_ = [];
+goog.events.EventHandler.prototype.listen = function(src, type, opt_fn, opt_capture, opt_handler) {
+  if(!goog.isArray(type)) {
+    goog.events.EventHandler.typeArray_[0] = (type);
+    type = goog.events.EventHandler.typeArray_
+  }
+  for(var i = 0;i < type.length;i++) {
+    var listenerObj = goog.events.listen(src, type[i], opt_fn || this, opt_capture || false, opt_handler || this.handler_ || this);
+    if(goog.DEBUG && !listenerObj) {
+      return this
+    }
+    var key = listenerObj.key;
+    this.keys_[key] = listenerObj
+  }
+  return this
+};
+goog.events.EventHandler.prototype.listenOnce = function(src, type, opt_fn, opt_capture, opt_handler) {
+  if(goog.isArray(type)) {
+    for(var i = 0;i < type.length;i++) {
+      this.listenOnce(src, type[i], opt_fn, opt_capture, opt_handler)
+    }
+  }else {
+    var listenerObj = goog.events.listenOnce(src, type, opt_fn || this, opt_capture, opt_handler || this.handler_ || this);
+    var key = listenerObj.key;
+    this.keys_[key] = listenerObj
+  }
+  return this
+};
+goog.events.EventHandler.prototype.listenWithWrapper = function(src, wrapper, listener, opt_capt, opt_handler) {
+  wrapper.listen(src, listener, opt_capt, opt_handler || this.handler_ || this, this);
+  return this
+};
+goog.events.EventHandler.prototype.getListenerCount = function() {
+  var count = 0;
+  for(var key in this.keys_) {
+    if(Object.prototype.hasOwnProperty.call(this.keys_, key)) {
+      count++
+    }
+  }
+  return count
+};
+goog.events.EventHandler.prototype.unlisten = function(src, type, opt_fn, opt_capture, opt_handler) {
+  if(goog.isArray(type)) {
+    for(var i = 0;i < type.length;i++) {
+      this.unlisten(src, type[i], opt_fn, opt_capture, opt_handler)
+    }
+  }else {
+    var listener = goog.events.getListener(src, type, opt_fn || this, opt_capture, opt_handler || this.handler_ || this);
+    if(listener) {
+      goog.events.unlistenByKey(listener);
+      delete this.keys_[listener.key]
+    }
+  }
+  return this
+};
+goog.events.EventHandler.prototype.unlistenWithWrapper = function(src, wrapper, listener, opt_capt, opt_handler) {
+  wrapper.unlisten(src, listener, opt_capt, opt_handler || this.handler_ || this, this);
+  return this
+};
+goog.events.EventHandler.prototype.removeAll = function() {
+  goog.object.forEach(this.keys_, goog.events.unlistenByKey);
+  this.keys_ = {}
+};
+goog.events.EventHandler.prototype.disposeInternal = function() {
+  goog.events.EventHandler.superClass_.disposeInternal.call(this);
+  this.removeAll()
+};
+goog.events.EventHandler.prototype.handleEvent = function(e) {
+  throw Error("EventHandler.handleEvent not implemented");
+};
 // Input 27
+/*
+ Dual licensed under the MIT or GPL licenses.
+*/
+goog.provide("pike.layers.Layer");
+goog.provide("pike.layers.ClusterLayer");
+goog.provide("pike.layers.ObstacleLayer");
+goog.provide("pike.layers.DirtyManager");
+goog.require("goog.events.EventHandler");
+goog.require("goog.events.EventTarget");
+goog.require("pike.graphics.Rectangle");
+goog.require("pike.events.NewEntity");
+goog.require("pike.events.RemoveEntity");
+pike.layers.Layer = function(name) {
+  goog.events.EventTarget.call(this);
+  this.name = name;
+  this.handler = new goog.events.EventHandler(this);
+  this.viewport_ = new pike.graphics.Rectangle(0, 0, 0, 0);
+  this.gameWorld_ = new pike.graphics.Rectangle(0, 0, 0, 0);
+  this.entities_ = [];
+  this.screen_ = {};
+  this.offScreen_ = {};
+  this.screen_.canvas = document.createElement("canvas");
+  this.screen_.canvas.style.position = "absolute";
+  this.screen_.canvas.style.top = "0";
+  this.screen_.canvas.style.left = "0";
+  this.screen_.context = this.screen_.canvas.getContext("2d");
+  this.screen_.isDirty = false;
+  this.offScreen_.canvas = document.createElement("canvas");
+  this.offScreen_.context = this.offScreen_.canvas.getContext("2d");
+  this.offScreen_.isDirty = false
+};
+goog.inherits(pike.layers.Layer, goog.events.EventTarget);
+pike.layers.Layer.prototype.onRender = function() {
+  if(this.hasDirtyManager()) {
+    this.renderDirty_()
+  }else {
+    if(this.offScreen_.isDirty) {
+      this.renderOffScreen_()
+    }
+  }
+  if(this.screen_.isDirty) {
+    this.renderScreen_()
+  }
+};
+pike.layers.Layer.prototype.renderDirty_ = function() {
+  if(this.dirtyManager.isClean()) {
+    return
+  }
+  this.offScreen_.context.clearRect(this.dirtyManager.getDirtyRectangle().x, this.dirtyManager.getDirtyRectangle().y, this.dirtyManager.getDirtyRectangle().w, this.dirtyManager.getDirtyRectangle().h);
+  this.dispatchEvent(new pike.events.Render((new Date).getTime(), this));
+  if(!this.screen_.isDirty) {
+    this.screen_.context.clearRect(this.dirtyManager.getDirtyRectangle().x - this.viewport_.x, this.dirtyManager.getDirtyRectangle().y - this.viewport_.y, this.dirtyManager.getDirtyRectangle().w, this.dirtyManager.getDirtyRectangle().h);
+    this.screen_.context.drawImage(this.offScreen_.canvas, this.dirtyManager.getDirtyRectangle().x, this.dirtyManager.getDirtyRectangle().y, this.dirtyManager.getDirtyRectangle().w, this.dirtyManager.getDirtyRectangle().h, this.dirtyManager.getDirtyRectangle().x - this.viewport_.x, this.dirtyManager.getDirtyRectangle().y - this.viewport_.y, this.dirtyManager.getDirtyRectangle().w, this.dirtyManager.getDirtyRectangle().h)
+  }
+  this.dirtyManager.clear()
+};
+pike.layers.Layer.prototype.renderOffScreen_ = function() {
+  this.offScreen_.context.clearRect(0, 0, this.gameWorld_.w, this.gameWorld_.h);
+  this.dispatchEvent(new pike.events.Render((new Date).getTime(), this));
+  this.offScreen_.isDirty = false;
+  this.screen_.isDirty = true;
+  if(goog.DEBUG) {
+    window.console.log("[pike.core.Layer] " + this.name + " redraw offScreen")
+  }
+};
+pike.layers.Layer.prototype.renderScreen_ = function() {
+  this.screen_.context.clearRect(0, 0, this.viewport_.w, this.viewport_.h);
+  this.screen_.context.drawImage(this.offScreen_.canvas, this.viewport_.x, this.viewport_.y, this.viewport_.w, this.viewport_.h, 0, 0, this.viewport_.w, this.viewport_.h);
+  this.screen_.isDirty = false;
+  if(goog.DEBUG) {
+    window.console.log("[pike.core.Layer] " + this.name + " redraw screen")
+  }
+};
+pike.layers.Layer.prototype.setViewportSize = function(width, height) {
+  this.viewport_.w = width;
+  this.viewport_.h = height;
+  this.screen_.canvas.width = this.viewport_.w;
+  this.screen_.canvas.height = this.viewport_.h;
+  this.screen_.isDirty = true;
+  if(this.hasDirtyManager()) {
+    this.dirtyManager.setSize(this.viewport_.w, this.viewport_.h)
+  }
+};
+pike.layers.Layer.prototype.setGameWorldSize = function(width, height) {
+  this.gameWorld_.w = width;
+  this.gameWorld_.h = height;
+  this.offScreen_.canvas.width = this.gameWorld_.w;
+  this.offScreen_.canvas.height = this.gameWorld_.h;
+  this.offScreen_.isDirty = true
+};
+pike.layers.Layer.prototype.setViewportPosition = function(x, y) {
+  this.viewport_.x = x;
+  this.viewport_.y = y;
+  this.getScreen().isDirty = true;
+  if(this.hasDirtyManager()) {
+    this.dirtyManager.setPosition(this.viewport_.x, this.viewport_.y)
+  }
+};
+pike.layers.Layer.prototype.setDirtyManager = function(dirtyManager) {
+  this.dirtyManager = dirtyManager
+};
+pike.layers.Layer.prototype.hasDirtyManager = function() {
+  return this.dirtyManager
+};
+pike.layers.Layer.prototype.setDirty = function(rect) {
+  if(this.hasDirtyManager()) {
+    this.dirtyManager.markDirty(rect)
+  }else {
+    this.offScreen_.isDirty = true
+  }
+};
+pike.layers.Layer.prototype.getScreen = function() {
+  return this.screen_
+};
+pike.layers.Layer.prototype.getOffScreen = function() {
+  return this.offScreen_
+};
+pike.layers.Layer.prototype.addEntity = function(entity) {
+  this.entities_.push(entity);
+  entity.layer = this;
+  this.dispatchEvent(new pike.events.NewEntity(entity, this));
+  if(goog.DEBUG) {
+    window.console.log("[pike.core.Layer] Layer: " + this.name + " has newentity #" + entity.id)
+  }
+};
+pike.layers.Layer.prototype.removeEntity = function(entity) {
+  entity.dispose();
+  goog.array.remove(this.entities_, entity);
+  delete entity.layer;
+  this.dispatchEvent(new pike.events.RemoveEntity(entity, this));
+  if(goog.DEBUG) {
+    window.console.log("[pike.core.Layer] removeentity")
+  }
+};
+pike.layers.Layer.prototype.getEntity = function(id) {
+  for(var idx = 0;idx < this.entities_.length;idx++) {
+    if(this.entities_[idx].id == id) {
+      return this.entities_[idx]
+    }
+  }
+};
+pike.layers.Layer.prototype.dispatchEvent = function(e) {
+  for(var idx = 0;idx < this.entities_.length;idx++) {
+    this.entities_[idx].dispatchEvent(e)
+  }
+  goog.events.EventTarget.prototype.dispatchEvent.call(this, e)
+};
+pike.layers.ClusterLayer = function(name, clusterSize) {
+  pike.layers.Layer.call(this, name);
+  this.clusters_ = new pike.graphics.Cluster(clusterSize, 0, 0);
+  this.visibleClusterBounds_ = {};
+  this.cache_ = [];
+  this.cacheDirty_ = true;
+  this.cacheUnsorted_ = false
+};
+goog.inherits(pike.layers.ClusterLayer, pike.layers.Layer);
+pike.layers.ClusterLayer.prototype.getCluster = function() {
+  return this.clusters_
+};
+pike.layers.ClusterLayer.prototype.dispatchEvent = function(e) {
+  if(this.cacheDirty_) {
+    this.resetCache_()
+  }else {
+    if(this.cacheUnsorted_) {
+      this.sortCache_()
+    }
+  }
+  for(var i = 0;i < this.cache_.length;i++) {
+    var entity = this.cache_[i];
+    if(entity.getBounds().intersects(this.viewport_)) {
+      entity.dispatchEvent(e)
+    }
+  }
+  goog.events.EventTarget.prototype.dispatchEvent.call(this, e)
+};
+pike.layers.ClusterLayer.prototype.addEntity = function(entity) {
+  pike.layers.Layer.prototype.addEntity.call(this, entity);
+  this.handler.listen(entity, pike.events.ChangePosition.EVENT_TYPE, goog.bind(this.onEntityMove, this));
+  if(this.clusters_.getClusters().length == 0) {
+    return
+  }
+  var clusters = this.clusters_.addToClusters(entity);
+  if(clusters.intersects(this.visibleClusterBounds_)) {
+    this.cache_.push(entity);
+    this.cacheUnsorted_ = true
+  }
+};
+pike.layers.ClusterLayer.prototype.removeEntity = function(entity) {
+  this.clusters_.removeFromClusters(entity);
+  pike.layers.Layer.prototype.removeEntity.call(this, entity)
+};
+pike.layers.ClusterLayer.prototype.resetCache_ = function() {
+  var cache = this.cache_ = [];
+  for(var i = this.visibleClusterBounds_.y;i < this.visibleClusterBounds_.y + this.visibleClusterBounds_.h;i++) {
+    for(var j = this.visibleClusterBounds_.x;j < this.visibleClusterBounds_.x + this.visibleClusterBounds_.w;j++) {
+      var cluster = this.clusters_.getClusters()[i][j];
+      for(var k = 0;k < cluster.length;k++) {
+        if(cache.indexOf(cluster[k]) == -1) {
+          cache.push(cluster[k])
+        }
+      }
+    }
+  }
+  if(goog.DEBUG) {
+    window.console.log("[pike.layers.ClusterLayer] resetcache")
+  }
+  this.sortCache_();
+  this.cacheDirty_ = false;
+  this.cacheUnsorted_ = false
+};
+pike.layers.ClusterLayer.prototype.sortCache_ = function() {
+  this.cache_.sort(function(a, b) {
+    var aBounds = a.getBounds();
+    var bBounds = b.getBounds();
+    return aBounds.y + aBounds.h - (bBounds.y + bBounds.h)
+  });
+  this.cacheUnsorted_ = false;
+  if(goog.DEBUG) {
+    window.console.log("[pike.layers.ClusterLayer] sortcache")
+  }
+};
+pike.layers.ClusterLayer.prototype.resetClusters_ = function() {
+  this.clusters_.build();
+  if(goog.DEBUG) {
+    window.console.log("[pike.layers.ClusterLayer] resetcluster")
+  }
+  for(var i = 0;i < this.entities_.length;i++) {
+    var entity = this.entities_[i];
+    this.clusters_.addToClusters(entity)
+  }
+};
+pike.layers.ClusterLayer.prototype.updateVisibleClusters_ = function() {
+  var newRect = this.viewport_.getOverlappingGridCells(this.clusters_.getClusterSize(), this.clusters_.getClusterSize(), this.clusters_.getClusters()[0].length, this.clusters_.getClusters().length);
+  if(!newRect.equals(this.visibleClusterBounds_)) {
+    this.visibleClusterBounds_ = newRect;
+    this.cacheDirty_ = true
+  }
+};
+pike.layers.ClusterLayer.prototype.setViewportSize = function(width, height) {
+  pike.layers.Layer.prototype.setViewportSize.call(this, width, height);
+  this.setGameWorldSize.call(this, Math.max(this.gameWorld_.w, width), Math.max(this.gameWorld_.h, height));
+  this.updateVisibleClusters_()
+};
+pike.layers.ClusterLayer.prototype.setViewportPosition = function(x, y) {
+  pike.layers.Layer.prototype.setViewportPosition.call(this, x, y);
+  this.updateVisibleClusters_()
+};
+pike.layers.ClusterLayer.prototype.setGameWorldSize = function(width, height) {
+  pike.layers.Layer.prototype.setGameWorldSize.call(this, width, height);
+  this.clusters_.setSize(width, height);
+  this.resetClusters_()
+};
+pike.layers.ClusterLayer.prototype.onEntityMove = function(e) {
+  var entity = e.target;
+  var newClusters = entity.getBounds().getOverlappingGridCells(this.clusters_.getClusterSize(), this.clusters_.getClusterSize(), this.clusters_.getClusters()[0].length, this.clusters_.getClusters().length);
+  var oldClusters = this.clusters_.getIdToClusterBounds(entity.id);
+  if(!oldClusters.equals(newClusters)) {
+    this.moveObjectBetweenClusters_(entity, oldClusters, newClusters)
+  }
+  if(newClusters.intersects(this.visibleClusterBounds_) && e.y != e.oldY) {
+    this.cacheUnsorted_ = true
+  }
+};
+pike.layers.ClusterLayer.prototype.moveObjectBetweenClusters_ = function(entity, oldClusters, newClusters) {
+  this.clusters_.removeFromClusters(entity, oldClusters);
+  this.clusters_.addToClusters(entity, newClusters);
+  this.clusters_.setIdToClusterBounds(entity.id, newClusters);
+  if(newClusters.intersects(this.visibleClusterBounds_)) {
+    if(!goog.array.contains(this.cache_, entity)) {
+      this.cache_.push(entity)
+    }
+  }else {
+    goog.array.remove(this.cache_, entity)
+  }
+};
+pike.layers.ObstacleLayer = function(name) {
+  pike.layers.Layer.call(this, name)
+};
+goog.inherits(pike.layers.ObstacleLayer, pike.layers.Layer);
+pike.layers.ObstacleLayer.prototype.setViewportSize = function(width, height) {
+  pike.layers.Layer.prototype.setViewportSize.call(this, width, height);
+  this.screen_.isDirty = false
+};
+pike.layers.ObstacleLayer.prototype.setViewportPosition = function(x, y) {
+  pike.layers.Layer.prototype.setViewportPosition.call(this, x, y);
+  this.screen_.isDirty = false
+};
+pike.layers.ObstacleLayer.prototype.renderOffScreen_ = function() {
+  pike.layers.Layer.prototype.renderOffScreen_.call(this);
+  this.screen_.isDirty = false;
+  if(goog.DEBUG) {
+    window.console.log("[pike.core.ObstacleLayer] " + this.name + " redraw offScreen")
+  }
+};
+pike.layers.ObstacleLayer.prototype.onEntityChangePosition = function(e) {
+  var entity = e.target;
+  var collisionBounds = entity.getCBounds();
+  if(this.offScreen_.context.getImageData(collisionBounds.x, collisionBounds.y, 1, 1).data[3] != 0 || this.offScreen_.context.getImageData(collisionBounds.x + collisionBounds.w, collisionBounds.y, 1, 1).data[3] != 0 || this.offScreen_.context.getImageData(collisionBounds.x + collisionBounds.w, collisionBounds.y + collisionBounds.h, 1, 1).data[3] != 0 || this.offScreen_.context.getImageData(collisionBounds.x, collisionBounds.y + collisionBounds.h, 1, 1).data[3] != 0) {
+    entity.dispatchEvent(new pike.events.Collision(e.x, e.y, e.oldX, e.oldY, new pike.core.Entity, entity))
+  }
+};
+pike.layers.DirtyManager = function(allDirtyThreshold) {
+  this.viewport_ = new pike.graphics.Rectangle(0, 0, 0, 0);
+  this.handler = new goog.events.EventHandler(this);
+  this.dirtyRect_ = null;
+  this.allDirtyThreshold_ = allDirtyThreshold == undefined ? 0.5 : allDirtyThreshold;
+  this.allDirty_ = true;
+  this.markAllDirty()
+};
+pike.layers.DirtyManager.prototype.getDirtyRectangle = function() {
+  return this.dirtyRect_
+};
+pike.layers.DirtyManager.prototype.markAllDirty = function() {
+  this.allDirty_ = true;
+  this.dirtyRect_ = this.viewport_.copy()
+};
+pike.layers.DirtyManager.prototype.markDirty = function(rect) {
+  if(!(rect.w || rect.h) || this.allDirty_) {
+    return
+  }
+  if(!rect.intersects(this.viewport_)) {
+    return
+  }
+  if(this.dirtyRect_) {
+    this.dirtyRect_ = this.dirtyRect_.convexHull(rect)
+  }else {
+    this.dirtyRect_ = rect
+  }
+  if(this.dirtyRect_.w * this.dirtyRect_.h > this.allDirtyThreshold_ * this.viewport_.w * this.viewport_.h) {
+    this.markAllDirty()
+  }
+};
+pike.layers.DirtyManager.prototype.isClean = function() {
+  return!this.dirtyRect_
+};
+pike.layers.DirtyManager.prototype.clear = function() {
+  this.dirtyRect_ = null;
+  this.allDirty_ = false
+};
+pike.layers.DirtyManager.prototype.setSize = function(width, height) {
+  this.viewport_.w = width;
+  this.viewport_.h = height;
+  this.markAllDirty()
+};
+pike.layers.DirtyManager.prototype.setPosition = function(x, y) {
+  this.viewport_.x = x;
+  this.viewport_.y = y
+};
+// Input 28
 /*
  Dual licensed under the MIT or GPL licenses.
 */
@@ -4721,7 +4852,13 @@ pike.assets.ImageManager.prototype.loadImage_ = function(queueItem, itemCounter,
 pike.assets.ImageManager.prototype.onItemLoaded_ = function(queueItem, itemCounter, onDone, onProgress, success) {
   itemCounter.loaded++;
   onProgress && onProgress(itemCounter.loaded, itemCounter.total, queueItem.key, queueItem.path, success);
+  if(goog.DEBUG) {
+    window.console.log("[pike.assets.ImageManager] item  " + queueItem.path + " loaded")
+  }
   if(itemCounter.loaded == itemCounter.total) {
+    if(goog.DEBUG) {
+      window.console.log("[pike.assets.ImageManager] done")
+    }
     onDone && onDone()
   }
 };

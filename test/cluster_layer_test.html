@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+<head>
+<title>Test Case</title>
+</head>
+<body>
+<script src="../../closure-library/closure/goog/base.js"></script>
+<script src="js/deps.js"></script>
+<script>
+	goog.require('goog.testing.ContinuationTestCase');	
+	goog.require('goog.testing.jsunit');	
+</script>
+<script>	
+	goog.require('pike.layers.ClusterLayer');	
+	goog.require('pike.core.Entity');
+	goog.require('goog.events.EventTarget');
+	goog.require('goog.events');
+</script>
+<script>
+function setUpPage(){}
+function setUp(){}
+
+function testRemoveEntityFromLayer(){
+	var entity = new pike.core.Entity();
+	var eTarget = new goog.events.EventTarget();
+	var listener = function(){}
+	entity.handler.listen( eTarget, pike.events.Down.EVENT_TYPE, listener );
+	assertTrue( entity.handler.getListenerCount() == 1 );
+			
+	var layer = new pike.layers.ClusterLayer("Clusta", 100 );
+	layer.setViewportSize(1000,1000);
+	assertTrue( layer.handler.getListenerCount() == 0 );
+	
+	layer.addEntity( entity );	
+	assertTrue(layer.getAllEntities().length == 1 );
+	assertTrue( layer.handler.getListenerCount() == 1 );
+	
+	layer.handler.listen(eTarget, pike.events.Down.EVENT_TYPE, listener);
+	assertTrue( layer.handler.getListenerCount() == 2 );
+	
+	layer.removeEntity( entity );
+	assertTrue(layer.getAllEntities().length == 0 );
+	assertEquals( 1, layer.handler.getListenerCount() );
+	assertEquals( 1, entity.handler.getListenerCount() );
+	
+	assertEquals( pike.events.Down.EVENT_TYPE, goog.events.getListener(eTarget, pike.events.Down.EVENT_TYPE, listener, false, entity).type );
+	assertEquals( pike.events.Down.EVENT_TYPE, goog.events.getListener(eTarget, pike.events.Down.EVENT_TYPE, listener, false, layer).type );	
+};
+
+function tearDown(){}
+</script>
+</body>
+</html>

@@ -9,6 +9,7 @@ OUTPUT_FILE="../pike"
 
 #For Python 2.7 >
 $PATH_TO_BUILDER \
+--input ../source/ai.js \
 --input ../source/animation.js \
 --input ../source/assets.js \
 --input ../source/components.js \
@@ -28,6 +29,7 @@ $PATH_TO_BUILDER \
 > $OUTPUT_FILE-$VERSION.js
 
 $PATH_TO_BUILDER \
+--input ../source/ai.js \
 --input ../source/animation.js \
 --input ../source/assets.js \
 --input ../source/components.js \
@@ -45,6 +47,7 @@ $PATH_TO_BUILDER \
 > $OUTPUT_FILE-$VERSION.min.js
 
 $PATH_TO_BUILDER \
+--input ../source/ai.js \
 --input ../source/animation.js \
 --input ../source/assets.js \
 --input ../source/components.js \

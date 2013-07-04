@@ -21,19 +21,20 @@ function setUp(){}
 
 var testMarkDirty = function(){
 	var dm = new pike.layers.DirtyManager();	
-	dm.setPosition(100,200);
-	dm.setSize(800,600);
+	dm.setPosition(0,0);
+	dm.setSize(640,480);
 	dm.clear();
 		
-	dm.markDirty( new pike.graphics.Rectangle(0, 0, 500, 400))
-	assertObjectEquals (new pike.graphics.Rectangle(100, 200, 400, 200), dm.getDirtyRectangle());
+	dm.markDirty( new pike.graphics.Rectangle(-10, -10, 50, 50))
+	assertObjectEquals (new pike.graphics.Rectangle(-10, -10, 50, 50), dm.getDirtyRectangle());
 	
-	dm.markDirty( new pike.graphics.Rectangle(0, 0, 500, 500))
-	assertObjectEquals (new pike.graphics.Rectangle(100, 200, 400, 300), dm.getDirtyRectangle());
+	dm.clear();
 	
-	dm.markDirty( new pike.graphics.Rectangle(100, 200, 800, 500))
-	assertObjectEquals (new pike.graphics.Rectangle(100, 200, 800, 600), dm.getDirtyRectangle());
-	
+	dm.markDirty( new pike.graphics.Rectangle(-100, -100, 10, 10))
+	assertTrue(dm.isClean() );
+			
+	dm.markDirty( new pike.graphics.Rectangle(0, 0, 600, 400))
+	assertObjectEquals (new pike.graphics.Rectangle(0, 0, 640, 480), dm.getDirtyRectangle());
 	assertTrue( dm.allDirty_ )
 	
 	dm.clear();

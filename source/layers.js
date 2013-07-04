@@ -14,6 +14,7 @@ goog.require('pike.graphics.Rectangle');
 
 goog.require('pike.events.NewEntity');
 goog.require('pike.events.RemoveEntity');
+goog.require('goog.events');
 
 //## Layer #################################
 /**
@@ -252,8 +253,7 @@ pike.layers.Layer.prototype.addEntity = function( entity ){
  * @param {pike.core.Entity} entity
  * @fires {pike.events.RemoveEntity} removeentity
  */
-pike.layers.Layer.prototype.removeEntity = function( entity ){
-	entity.dispose();
+pike.layers.Layer.prototype.removeEntity = function( entity ){	
 	goog.array.remove(this.entities_, entity);
 	delete entity.layer;
 	this.dispatchEvent( new pike.events.RemoveEntity( entity, this));	
@@ -271,6 +271,14 @@ pike.layers.Layer.prototype.getEntity = function(id){
 			return this.entities_[idx];
 		}
 	}	
+};
+
+/**
+ * Get all entities in layer
+ * @return {Array.<pike.core.Entity>} 
+ */
+pike.layers.Layer.prototype.getAllEntities = function(){
+	return this.entities_;
 };
 
 /**
@@ -355,7 +363,7 @@ pike.layers.ClusterLayer.prototype.dispatchEvent = function( e ){
  */
 pike.layers.ClusterLayer.prototype.addEntity = function( entity ){	
 	pike.layers.Layer.prototype.addEntity.call(this, entity);	
-	this.handler.listen(entity, pike.events.ChangePosition.EVENT_TYPE, goog.bind( this.onEntityMove, this ));
+	this.handler.listen(entity, pike.events.ChangePosition.EVENT_TYPE, this.onEntityMove, false, this);
 		
 	//Cluster will build after attached to stage
 	if( this.clusters_.getClusters().length == 0 ){
@@ -377,6 +385,7 @@ pike.layers.ClusterLayer.prototype.addEntity = function( entity ){
  */
 pike.layers.ClusterLayer.prototype.removeEntity = function( entity ){
 	this.clusters_.removeFromClusters(entity);	
+	this.handler.unlisten(entity, pike.events.ChangePosition.EVENT_TYPE, this.onEntityMove, false, this );
 	pike.layers.Layer.prototype.removeEntity.call(this, entity);
 };
 

@@ -37,7 +37,7 @@ pike.assets.ImageManager.prototype.load = function( images, onDone, onProgress){
             path: images[name]
         });        
     }
-    
+           
     if (queue.length == 0) {
 		onProgress && onProgress(0, 0, null, null, true);
 		onDone && onDone();
@@ -84,10 +84,13 @@ pike.assets.ImageManager.prototype.loadImage_ = function( queueItem, itemCounter
  * @private
  */
 pike.assets.ImageManager.prototype.onItemLoaded_ = function( queueItem, itemCounter, onDone, onProgress, success ){
-	itemCounter.loaded++;
+	itemCounter.loaded++;	
 	onProgress && onProgress(itemCounter.loaded, itemCounter.total, queueItem.key, queueItem.path, success);
+	if(goog.DEBUG) window.console.log("[pike.assets.ImageManager] item  " + queueItem.path + " loaded");
+	
 	if (itemCounter.loaded == itemCounter.total) {
-		onDone && onDone();
+		if(goog.DEBUG) window.console.log("[pike.assets.ImageManager] done");
+		onDone && onDone();		
 	}	
 };
 
