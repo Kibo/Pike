@@ -5,6 +5,7 @@ PATH_TO_CLOSURE_LIBRARY="../../closure-library"
 PATH_TO_SOURCES="../source"
 
 $PATH_TO_BUILDER \
+--input ../source/ai.js \
 --input ../source/animation.js \
 --input ../source/assets.js \
 --input ../source/components.js \

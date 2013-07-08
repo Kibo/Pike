@@ -12,8 +12,11 @@ goog.provide('pike.components.Backpack');
 goog.provide('pike.components.Dialogues');
 goog.provide('pike.components.Hen');
 goog.provide('pike.components.VisualizeGraph');
+goog.provide('pike.components.VisualizeRectangle');
 
 goog.require('goog.events');
+goog.require('goog.array');
+goog.require('goog.dom');
 goog.require('pike.graphics.Rectangle');
 goog.require('pike.animation.Animator');
 goog.require('pike.events.StartDialogue');
@@ -1261,4 +1264,73 @@ pike.components.VisualizeGraph = function(){
  */
 pike.components.VisualizeGraph.NAME="pike.components.VisualizeGraph";
 
+//## VisualizeRectangle #################################
+/**
+ * VisualizeRectangle
+ * Draw a rectangle
+ * @constructor
+ * @example
+ * ~~~
+ * var vRect = new pike.core.Entity( pike.components.VisualizeRectangle )
+ * vRect.setRectangle( new pike.graphics.Rectangle(50,50,60,100) ); 
+ * vRect.setColor("#333333");
+ * vRect.handler.listen(vRect, pike.events.Render.EVENT_TYPE, vRect.onRectangleRender, false, vRect); 
+ * ~~~
+ * @author Tomas Jurman (tomasjurman@gmail.com)
+ */
+pike.components.VisualizeRectangle = function(){
+		
+	/**
+	 * @private
+	 */
+	this.pike_components_VisualizeRectangle = {};
+		
+	/**
+	 * Set source rectangle
+	 * @param {pike.graphics.Rectangle} rect
+	 */
+	this.setRectangle = function( rect ){
+		this.x = rect.x;
+		this.y = rect.y;
+		this.w = rect.w;
+		this.h = rect.h;
+		this.pike_components_VisualizeRectangle.rectangle = rect;
+	};
+	
+	/**
+	 * Get source rectangle
+	 * @return {pike.graphics.Rectangle}
+	 */
+	this.getRectangle = function(){
+		return this.pike_components_VisualizeRectangle.rectangle;
+	};
+	
+	/**
+	 * Set color of rectangle
+	 * @param {string} color - 24-bit hex string
+	 * @example
+	 * ~~~
+	 * this.setColor("#36584d");
+	 * ~~~
+	 */
+	this.setColor = function( color ){
+		this.pike_components_VisualizeRectangle.color = color;
+	};
+		
+	/**
+	 * On render handler
+	 * @param {pike.events.Render} e
+	 */
+	this.onRectangleRender = function(e){		
+		this.layer.getOffScreen().context.fillStyle = this.pike_components_VisualizeRectangle.color;
+		this.layer.getOffScreen().context.fillRect(this.x, this.y, this.w, this.h);					
+	};	
+};
+
+/**
+ * Component name
+ * @const
+ * @type {string}
+ */
+pike.components.VisualizeRectangle.NAME="pike.components.VisualizeRectangle";
 

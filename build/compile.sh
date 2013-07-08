@@ -28,39 +28,4 @@ $PATH_TO_BUILDER \
 --compiler_flags="--formatting=PRINT_INPUT_DELIMITER" \
 > $OUTPUT_FILE-$VERSION.js
 
-$PATH_TO_BUILDER \
---input ../source/ai.js \
---input ../source/animation.js \
---input ../source/assets.js \
---input ../source/components.js \
---input ../source/core.js \
---input ../source/events.js \
---input ../source/graphics.js \
---input ../source/input.js \
---input ../source/layers.js \
---root=$PATH_TO_CLOSURE_LIBRARY \
---root=$PATH_TO_SOURCES \
---output_mode=compiled \
---compiler_jar=$PATH_TO_COMPILER \
---compiler_flags="--compilation_level=SIMPLE_OPTIMIZATIONS" \
---compiler_flags="--warning_level=VERBOSE" \
-> $OUTPUT_FILE-$VERSION.min.js
-
-$PATH_TO_BUILDER \
---input ../source/ai.js \
---input ../source/animation.js \
---input ../source/assets.js \
---input ../source/components.js \
---input ../source/core.js \
---input ../source/events.js \
---input ../source/graphics.js \
---input ../source/input.js \
---input ../source/layers.js \
---root=$PATH_TO_CLOSURE_LIBRARY \
---root=$PATH_TO_SOURCES \
---output_mode=compiled \
---compiler_jar=$PATH_TO_COMPILER \
---compiler_flags="--compilation_level=SIMPLE_OPTIMIZATIONS" \
---compiler_flags="--warning_level=VERBOSE" \
-> $OUTPUT_FILE-latest.js
 

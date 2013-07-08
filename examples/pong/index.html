@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    	<meta charset="utf-8">       
+        <title>Pike - pong example</title>
+         <style>
+        
+	        html, body {
+				overflow: hidden;
+				width: 100%;
+				height: 100%;
+				margin:0;
+				padding:0;
+				border: 0;
+			}
+	        		
+			#pike-stage{
+				background:#eeeeee;
+				margin:0 auto;
+				border:5px solid #333;			
+			}
+													
+													
+			.xstats {
+				position: absolute;
+				top: 0;
+				right: 0;
+			 }			
+		</style>
+				   
+    <script src="../../../closure-library/closure/goog/base.js"></script>
+    <script src="../../test/js/deps.js"></script> 
+    <script>
+		goog.require('pike.assets.ImageManager');
+		goog.require('pike.input.MouseInputHandler');
+		goog.require('pike.core.Stage');
+		goog.require('pike.core.Viewport');
+		goog.require('pike.core.GameWorld');
+				
+		goog.require('pike.layers.Layer');		
+		goog.require('pike.core.Timer');
+		goog.require('pike.core.Entity');
+		goog.require('pike.components.Sprite');		
+		goog.require('pike.events.ChangePosition');	
+		goog.require('goog.dom');
+		goog.require('pike.ai.path.Node');
+		goog.require('pike.ai.path.Graph');			
+	</script>
+	<script>
+		window.onload = function(){
+			
+			goog.DEBUG = true;
+										
+			var timer = new pike.core.Timer();
+			var gameWorld = new pike.core.GameWorld();
+			var viewport = new pike.core.Viewport();				
+			var stage = new pike.core.Stage();						
+																			
+			stage.handler.listen(timer, pike.events.Render.EVENT_TYPE, goog.bind(stage.onRender, stage));
+			stage.handler.listen(gameWorld, pike.events.ChangeSize.EVENT_TYPE, goog.bind(stage.onGameWorldChangeSize, stage));
+			stage.handler.listen(viewport, pike.events.ChangeSize.EVENT_TYPE, goog.bind(stage.onViewportChangeSize, stage));
+			stage.handler.listen(viewport, pike.events.ChangePosition.EVENT_TYPE, goog.bind(stage.onViewportChangePosition, stage));
+										
+			var mouse = new pike.input.MouseInputHandler();
+			mouse.handler.listen(viewport, pike.events.ChangePosition.EVENT_TYPE, goog.bind(mouse.onViewportChangePosition, mouse));
+			mouse.setEventTarget( stage.getRootElement() );				
+	
+			viewport.setSize(640,480);
+																			
+			stage.addLayer( new pike.layers.Layer("playground") );
+							
+			var paddle = new pike.core.Entity( pike.components.VisualizeRectangle );
+			paddle.setColor( "#ee0000" );				
+			paddle.setRectangle( new pike.graphics.Rectangle(50,50,20,100));
+			paddle.handler.listen(paddle, pike.events.Render.EVENT_TYPE, goog.bind(paddle.onRectangleRender, paddle));				
+									
+			stage.getLayer("playground").addEntity( paddle );
+																														 		
+			timer.start();										
+		}
+				
+	</script>
+	
+    </head>
+    <body>   
+    	<h1 align="center">Pong example</h1>                                      
+        <div id="pike-stage"></div>
+        <div id="pike-backpack"></div>
+        <div id="pike-dialogues"></div>                          
+                              
+        <script src="../../libs/xstats/xstats.js"></script>
+        <script>
+        	var stats = new xStats;
+			document.body.appendChild(stats.element);	
+        </script>            
+    </body>
+</html>
