@@ -87,7 +87,8 @@ pike.layers.Layer.prototype.renderDirty_ = function(){
 			this.dirtyManager.getDirtyRectangle().w,
 			this.dirtyManager.getDirtyRectangle().h
 	);
-	
+		
+	//this method is override. See: pike.layers.Layer.prototype.dispatchEvent
 	this.dispatchEvent( new pike.events.Render( new Date().getTime(), this));
 									
 	if(!this.screen_.isDirty){

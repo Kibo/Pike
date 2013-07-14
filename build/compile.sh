@@ -28,4 +28,6 @@ $PATH_TO_BUILDER \
 --compiler_flags="--formatting=PRINT_INPUT_DELIMITER" \
 > $OUTPUT_FILE-$VERSION.js
 
+cp $OUTPUT_FILE-$VERSION.js $OUTPUT_FILE-latest.js
+
 

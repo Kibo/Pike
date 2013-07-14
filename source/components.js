@@ -476,11 +476,7 @@ pike.components.Backpack = function(){
 						
 		this.getBackpackElement().appendChild( this.backpackItem_ );			
 		this.layer.setDirty( this.getBounds() );
-										
-		var oldX = this.x;
-		var oldY = this.y;						
-		this.y = -this.h; //hide entity						
-		this.dispatchEvent( new pike.events.ChangePosition(this.x, this.y, oldX, oldY, this) );
+		
 		this.isOnBackpack_ = true;		
 		if(goog.DEBUG) window.console.log("[pike.components.Backpack] putInBag #" + this.id);
 		
