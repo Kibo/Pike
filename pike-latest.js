@@ -3674,22 +3674,12 @@ pike.core.Timer = function() {
 };
 goog.inherits(pike.core.Timer, goog.events.EventTarget);
 pike.core.Timer.prototype.start = function() {
-  this.stop();
-  this.tick();
-  if(goog.DEBUG) {
-    window.console.log("[pike.core.Timer] start")
-  }
-};
-pike.core.Timer.prototype.setPause = function(ispause) {
-  this.pause_ = ispause;
-  if(this.pause_) {
+  if(!this.requestID_) {
+    this.tick();
     if(goog.DEBUG) {
-      window.console.log("[pike.core.Timer] pause")
+      window.console.log("[pike.core.Timer] start")
     }
   }
-};
-pike.core.Timer.prototype.isPaused = function() {
-  return this.pause_
 };
 pike.core.Timer.prototype.stop = function() {
   if(this.requestID_) {
@@ -3700,12 +3690,13 @@ pike.core.Timer.prototype.stop = function() {
     }
   }
 };
+pike.core.Timer.prototype.isRunning = function() {
+  return this.requestID_ ? true : false
+};
 pike.core.Timer.prototype.tick = function() {
-  if(!this.pause_) {
-    this.dispatchEvent(new pike.events.Update((new Date).getTime(), this));
-    this.dispatchEvent(new pike.events.Render((new Date).getTime(), this))
-  }
-  this.requestID_ = window.requestAnimationFrame(this.boundTick_)
+  this.requestID_ = window.requestAnimationFrame(this.boundTick_);
+  this.dispatchEvent(new pike.events.Update((new Date).getTime(), this));
+  this.dispatchEvent(new pike.events.Render((new Date).getTime(), this))
 };
 pike.core.Stage = function() {
   goog.events.EventTarget.call(this);
@@ -6082,6 +6073,9 @@ pike.layers.ObstacleLayer.prototype.onEntityChangePosition = function(e) {
   var entity = e.target;
   var collisionBounds = entity.getCBounds();
   if(this.offScreen_.context.getImageData(collisionBounds.x, collisionBounds.y, 1, 1).data[3] != 0 || this.offScreen_.context.getImageData(collisionBounds.x + collisionBounds.w, collisionBounds.y, 1, 1).data[3] != 0 || this.offScreen_.context.getImageData(collisionBounds.x + collisionBounds.w, collisionBounds.y + collisionBounds.h, 1, 1).data[3] != 0 || this.offScreen_.context.getImageData(collisionBounds.x, collisionBounds.y + collisionBounds.h, 1, 1).data[3] != 0) {
+    if(goog.DEBUG) {
+      window.console.log("[pike.core.ObstacleLayer] obstacle collision entity #" + e.target.id)
+    }
     entity.dispatchEvent(new pike.events.Collision(e.x, e.y, e.oldX, e.oldY, new pike.core.Entity, entity))
   }
 };

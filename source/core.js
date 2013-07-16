@@ -203,7 +203,7 @@ pike.core.Timer = function(){
 	*/
 	this.handler = new goog.events.EventHandler(this);
 	
-	this.boundTick_ = this.tick.bind(this);		
+	this.boundTick_ = goog.bind(this.tick, this);	
 };
 
 goog.inherits(pike.core.Timer, goog.events.EventTarget);
@@ -242,10 +242,9 @@ pike.core.Timer.prototype.isRunning = function(){
  * @fires {pike.events.Render} event
  */
 pike.core.Timer.prototype.tick = function(){	
-	this.dispatchEvent( new pike.events.Update( new Date().getTime(), this));
-	this.dispatchEvent( new pike.events.Render( new Date().getTime(), this));
-		
 	this.requestID_ = window.requestAnimationFrame( this.boundTick_ );
+	this.dispatchEvent( new pike.events.Update( new Date().getTime(), this));
+	this.dispatchEvent( new pike.events.Render( new Date().getTime(), this));		
 };
 
 //## Stage #####################################

@@ -595,7 +595,8 @@ pike.layers.ObstacleLayer.prototype.onEntityChangePosition = function(e){
 	if(this.offScreen_.context.getImageData(collisionBounds.x, collisionBounds.y, 1, 1).data[3] != 0 
 	|| this.offScreen_.context.getImageData(collisionBounds.x + collisionBounds.w, collisionBounds.y, 1, 1).data[3] != 0
 	|| this.offScreen_.context.getImageData(collisionBounds.x + collisionBounds.w, collisionBounds.y + collisionBounds.h, 1, 1).data[3] != 0
-	|| this.offScreen_.context.getImageData(collisionBounds.x, collisionBounds.y + collisionBounds.h, 1, 1).data[3] != 0 ){		
+	|| this.offScreen_.context.getImageData(collisionBounds.x, collisionBounds.y + collisionBounds.h, 1, 1).data[3] != 0 ){				
+		if(goog.DEBUG) window.console.log("[pike.core.ObstacleLayer] obstacle collision entity #" + e.target.id);
 		entity.dispatchEvent( new pike.events.Collision(e.x, e.y, e.oldX, e.oldY, new pike.core.Entity(), entity ));
 	}		
 };
