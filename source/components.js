@@ -614,6 +614,20 @@ pike.components.Backpack.ELEMENT_ID = "pike-backpack";
  * @author Tomas Jurman (tomasjurman@gmail.com)
  */
 pike.components.Dialogues = function(){
+	
+	/**
+	 * @private
+	 */
+	this.pike_components_Dialogues_ = {
+			codeBeforeDialogueText:null,
+			codeAfterDialogueText:null,
+			
+			codeBeforeDialogueElement:null,
+			codeAfterDialogueElement:null,
+			
+			codeBeforeChoiceElement:null,
+			codeAfterChoiceElement:null
+	};
 		
 	/**
 	 * Set source data
@@ -678,7 +692,7 @@ pike.components.Dialogues = function(){
     	if(this.dialogue_){
     		this.executeCode_(this.dialogue_.codeAfter);
     	}
-    	
+    	    	    
     	if(!id){    		
     		if(goog.DEBUG) window.console.log("[pike.components.Dialogues] enddialogue");
     		this.dispatchEvent( new pike.events.EndDialogue( this ) );	
@@ -769,9 +783,19 @@ pike.components.Dialogues = function(){
 	 */
 	this.getSentenceDialogueAsHTML_ = function( dialogue ){
 		var container = document.createElement("div");
-		container.setAttribute("class", this.getActor( dialogue.actor ).name );
-		container.appendChild( this.createDialogueElement_(dialogue) );	
-		return container
+		container.setAttribute("class", this.getActor( dialogue.actor ).name );	
+		
+		if(this.pike_components_Dialogues_.codeBeforeDialogueElement){
+			container.appendChild( this.pike_components_Dialogues_.codeBeforeDialogueElement );
+		}
+			
+		container.appendChild( this.createDialogueElement_(dialogue) );
+		
+		if( this.pike_components_Dialogues_.codeAfterDialogueElement ){
+			container.appendChild( this.pike_components_Dialogues_.codeAfterDialogueElement );
+		}
+		
+		return container;
 	};
 	
 	/**
@@ -783,14 +807,44 @@ pike.components.Dialogues = function(){
 		var container = document.createElement("div");
 		container.setAttribute("class", "choice");
 		
+		if(this.pike_components_Dialogues_.codeBeforeChoiceElement){
+			container.appendChild( this.pike_components_Dialogues_.codeBeforeChoiceElement );
+		}
+		
 		for(var idx = 0; idx < choice.outgoingLinks.length; idx++ ){
 			var dialogue = this.findDialogueById( choice.outgoingLinks[idx] );
 			if( !this.isActive_( dialogue )) continue;
 			
-			container.appendChild( this.createDialogueElement_(dialogue) );			
+			container.appendChild( this.createChoiceElement_(dialogue) );			
+		}
+		
+		if(this.pike_components_Dialogues_.codeAfterChoiceElement){
+			container.appendChild( this.pike_components_Dialogues_.codeAfterChoiceElement );
 		}
 		
 		return container;
+	};
+		
+	/**
+	 * Create choice item DOM element
+	 * @private
+	 */
+	this.createChoiceElement_ = function( dialogue ){
+		var container = document.createElement( pike.components.Dialogues.DIALOGUE_ELEMENT );
+		container.setAttribute("data-dialogue", dialogue.id);
+		
+		goog.events.listen(container, goog.events.EventType.CLICK, goog.bind(function(e){
+			var currentDialogue = this.findDialogueById( e.target.getAttribute("data-dialogue") );					
+			this.setDialogue_( currentDialogue.id );
+			if( this.dialogue_ ){
+				this.showDialogue( this.getDialogue() );
+			}			
+		}, this));
+		
+			
+		container.appendChild( document.createTextNode( dialogue.menuText));
+						
+		return container;		
 	};
 	
 	/**
@@ -810,9 +864,65 @@ pike.components.Dialogues = function(){
 				this.showDialogue( this.getDialogue() );
 			}			
 		}, this));
-				
-		container.appendChild( document.createTextNode( dialogue.dialogueText));
+							
+		if(this.pike_components_Dialogues_.codeBeforeDialogueText){
+			container.appendChild( this.pike_components_Dialogues_.codeBeforeDialogueText );
+		}
+		container.appendChild( document.createTextNode( dialogue.dialogueText) );
+		
+		if(this.pike_components_Dialogues_.codeAfterDialogueText){
+			container.appendChild( this.pike_components_Dialogues_.codeAfterDialogueText );
+		}
+		
 		return container;
+	};
+		
+	/**
+	 * Set code before dialogue text
+	 * @param {Object} domElement - DOM Element
+	 */
+	this.setCodeBeforeDialogueText = function( domElement ){
+		this.pike_components_Dialogues_.codeBeforeDialogueText = domElement;
+	};
+	
+	/**
+	 * Set code before dialogue text
+	 * @param {Object} domElement - DOM Element
+	 */
+	this.setCodeAfterDialogueText = function(domElement){
+		this.pike_components_Dialogues_.codeAfterDialogueText = domElement;
+	};
+	
+	/**
+	 * Set code before dialogue element
+	 * @param {Object} domElement - DOM Element
+	 */
+	this.setCodeBeforeDialogueElement = function(domElement){
+		this.pike_components_Dialogues_.codeBeforeDialogueElement = domElement;
+	};
+	
+	/**
+	 * Set code before dialogue element
+	 * @param {Object} domElement - DOM Element
+	 */
+	this.setCodeAfterDialogueElement = function(domElement){
+		this.pike_components_Dialogues_.codeAfterDialogueElement = domElement;
+	};
+	
+	/**
+	 * Set code before choice element
+	 * @param {Object} domElement - DOM Element
+	 */
+	this.setCodeBeforeChoiceElement = function(domElement){
+		this.pike_components_Dialogues_.codeBeforeChoiceElement = domElement;
+	};
+	
+	/**
+	 * Set code before choice element
+	 * @param {Object} domElement - DOM Element
+	 */
+	this.setCodeAfterChoiceElement = function(domElement){
+		this.pike_components_Dialogues_.codeAfterChoiceElement = domElement;
 	};
 		
 	/**

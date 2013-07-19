@@ -5343,6 +5343,7 @@ pike.components.Backpack = function() {
 pike.components.Backpack.NAME = "pike.components.Backpack";
 pike.components.Backpack.ELEMENT_ID = "pike-backpack";
 pike.components.Dialogues = function() {
+  this.pike_components_Dialogues_ = {codeBeforeDialogueText:null, codeAfterDialogueText:null, codeBeforeDialogueElement:null, codeAfterDialogueElement:null, codeBeforeChoiceElement:null, codeAfterChoiceElement:null};
   this.setDialogues = function(data) {
     if(!this.isDialoguesSourceValid_(data)) {
       throw new Error("Data is not valid.");
@@ -5431,19 +5432,44 @@ pike.components.Dialogues = function() {
   this.getSentenceDialogueAsHTML_ = function(dialogue) {
     var container = document.createElement("div");
     container.setAttribute("class", this.getActor(dialogue.actor).name);
+    if(this.pike_components_Dialogues_.codeBeforeDialogueElement) {
+      container.appendChild(this.pike_components_Dialogues_.codeBeforeDialogueElement)
+    }
     container.appendChild(this.createDialogueElement_(dialogue));
+    if(this.pike_components_Dialogues_.codeAfterDialogueElement) {
+      container.appendChild(this.pike_components_Dialogues_.codeAfterDialogueElement)
+    }
     return container
   };
   this.getChoiceDialogueAsHTML_ = function(choice) {
     var container = document.createElement("div");
     container.setAttribute("class", "choice");
+    if(this.pike_components_Dialogues_.codeBeforeChoiceElement) {
+      container.appendChild(this.pike_components_Dialogues_.codeBeforeChoiceElement)
+    }
     for(var idx = 0;idx < choice.outgoingLinks.length;idx++) {
       var dialogue = this.findDialogueById(choice.outgoingLinks[idx]);
       if(!this.isActive_(dialogue)) {
         continue
       }
-      container.appendChild(this.createDialogueElement_(dialogue))
+      container.appendChild(this.createChoiceElement_(dialogue))
     }
+    if(this.pike_components_Dialogues_.codeAfterChoiceElement) {
+      container.appendChild(this.pike_components_Dialogues_.codeAfterChoiceElement)
+    }
+    return container
+  };
+  this.createChoiceElement_ = function(dialogue) {
+    var container = document.createElement(pike.components.Dialogues.DIALOGUE_ELEMENT);
+    container.setAttribute("data-dialogue", dialogue.id);
+    goog.events.listen(container, goog.events.EventType.CLICK, goog.bind(function(e) {
+      var currentDialogue = this.findDialogueById(e.target.getAttribute("data-dialogue"));
+      this.setDialogue_(currentDialogue.id);
+      if(this.dialogue_) {
+        this.showDialogue(this.getDialogue())
+      }
+    }, this));
+    container.appendChild(document.createTextNode(dialogue.menuText));
     return container
   };
   this.createDialogueElement_ = function(dialogue) {
@@ -5457,8 +5483,32 @@ pike.components.Dialogues = function() {
         this.showDialogue(this.getDialogue())
       }
     }, this));
+    if(this.pike_components_Dialogues_.codeBeforeDialogueText) {
+      container.appendChild(this.pike_components_Dialogues_.codeBeforeDialogueText)
+    }
     container.appendChild(document.createTextNode(dialogue.dialogueText));
+    if(this.pike_components_Dialogues_.codeAfterDialogueText) {
+      container.appendChild(this.pike_components_Dialogues_.codeAfterDialogueText)
+    }
     return container
+  };
+  this.setCodeBeforeDialogueText = function(domElement) {
+    this.pike_components_Dialogues_.codeBeforeDialogueText = domElement
+  };
+  this.setCodeAfterDialogueText = function(domElement) {
+    this.pike_components_Dialogues_.codeAfterDialogueText = domElement
+  };
+  this.setCodeBeforeDialogueElement = function(domElement) {
+    this.pike_components_Dialogues_.codeBeforeDialogueElement = domElement
+  };
+  this.setCodeAfterDialogueElement = function(domElement) {
+    this.pike_components_Dialogues_.codeAfterDialogueElement = domElement
+  };
+  this.setCodeBeforeChoiceElement = function(domElement) {
+    this.pike_components_Dialogues_.codeBeforeChoiceElement = domElement
+  };
+  this.setCodeAfterChoiceElement = function(domElement) {
+    this.pike_components_Dialogues_.codeAfterChoiceElement = domElement
   };
   this.cleanDialoguesContainer_ = function() {
     this.getDialoguesDOMContainer_().innerHTML = ""
