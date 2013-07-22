@@ -17,12 +17,12 @@
 			#pike-stage{
 				background:#eeeeee;
 				margin:0 auto;
-				border:5px solid #333;			
+				border:15px solid #333; 			
 			}
 			
 			#pike-dialogues{
 				width:800px;
-				margin:0 auto;	
+				margin:5em auto;	
 			}
 			
 			#pike-dialogues div{						
@@ -75,13 +75,13 @@
 		goog.require('goog.dom');
 		goog.require('pike.ai.path.Node');
 		goog.require('pike.ai.path.Graph');			
+		goog.require('pike.Utils');	
 	</script>
 	<script>
 		window.onload = function(){
 			
 			goog.DEBUG = true;
-			
-															
+																	
 			//Assets
 			var imageManager = new pike.assets.ImageManager();
 			imageManager.load({
@@ -102,6 +102,7 @@
 				stage.handler.listen(viewport, pike.events.ChangePosition.EVENT_TYPE, goog.bind(stage.onViewportChangePosition, stage));
 											
 				var mouse = new pike.input.MouseInputHandler();
+				//var mouse = new pike.input.TouchInputHandler();
 				mouse.handler.listen(viewport, pike.events.ChangePosition.EVENT_TYPE, goog.bind(mouse.onViewportChangePosition, mouse));
 				mouse.setEventTarget( stage.getRootElement() );				
 		
@@ -201,68 +202,9 @@
 				}, hero) );
 																								
 				hero.handler.listen(hero, pike.events.Render.EVENT_TYPE, goog.bind(hero.onSpriteRender, hero));
-								
-							
+														
 				//obsLayer.handler.listen(hero, pike.events.ChangePosition.EVENT_TYPE, goog.bind(obsLayer.onEntityChangePosition, obsLayer));
-				
-				var enemy =  new pike.core.Entity( pike.components.Sprite, pike.components.Collision, pike.components.Dialogues);
-				enemy.x = 150;
-				enemy.y = 200;
-				enemy.setSprite( imageManager.get("entities"), 96, 0, 32, 32, 3, 300);
-				enemy.setCollisionBounds(0,22,0,22);
-				enemy.setDialogues( dialogues.guard );														
-				enemy.handler.listen(enemy, pike.events.Render.EVENT_TYPE, goog.bind(enemy.onSpriteRender, enemy));																
-				
-				enemy.handler.listen(hero, pike.events.EndDialogue.EVENT_TYPE, goog.bind(function(e){
-					this.dispatchEvent( new pike.events.EndDialogue( this ) );
-					timer.setPause(false);					
-				}, enemy));	
-																											
-				enemy.handler.listen(enemy, pike.events.Collision.EVENT_TYPE, goog.bind(function(e){	
-					this.x = e.oldX;
-					this.y = e.oldY;
-					
-					if(e.obj === hero ){						
-						this.showDialogue( this.getDialogue() );	
-						timer.setPause(true);
-					}
-					
-				}, enemy));
-																																		
-				var hen = new pike.core.Entity( pike.components.Sprite, pike.components.Collision, pike.components.Hen);
-				hen.x = 350;
-				hen.y = 300;
-				hen.setSprite( imageManager.get("entities"), 96, 0, 32, 32, 3, 300);							
-				hen.handler.listen(timer, pike.events.Update.EVENT_TYPE, goog.bind(function(e){
-					this.onHenUpdate(e);	
-					this.onSpriteUpdate(e);					
-				}, hen));				
-				hen.handler.listen(hen, pike.events.Render.EVENT_TYPE, goog.bind(hen.onSpriteRender, hen));
-								
-				hen.handler.listen(hen, pike.events.ChangePosition.EVENT_TYPE, goog.bind(function(e){													
-					this.layer.setDirty( new pike.graphics.Rectangle(e.oldX, e.oldY, this.w, this.h));					
-					this.setSpriteRow(this.vx, this.vy);					
-				}, hen));
-				
-				hen.handler.listen(hen, pike.events.Collision.EVENT_TYPE, goog.bind(function(e){	
-					
-					this.x = e.oldX;
-					this.y = e.oldY;
-																		
-					if(!this.isEscaping()){															
-						var vx = vy = 0;	
-						
-						if(Math.abs( e.obj.x - this.x ) > Math.abs( e.obj.y - this.y )){ //move on X axis							
-							vx = ( e.obj.x > this.x) ? -1 * this.getStep() : this.getStep();																									
-						}else{ //move on Y axis
-							vy = ( e.obj.y > this.y) ? -1 * this.getStep() : this.getStep()																			
-						}
-											
-						this.setHenEscaping(vx, vy, 1000);						
-					}
-																																																																												
-				}, hen));
-																										
+																																																																									
 				var cheese =  new pike.core.Entity( pike.components.Sprite, pike.components.Collision, pike.components.Backpack);
 				cheese.x = 150;
 				cheese.y = 300;
@@ -292,9 +234,9 @@
 				var clustaLayer = new pike.layers.ClusterLayer("Clusta", 250);
 				clustaLayer.setDirtyManager( new pike.layers.DirtyManager() );				
 				clustaLayer.addEntity( hero );	
-				clustaLayer.addEntity( enemy );	
+			
 				clustaLayer.addEntity( cheese );
-				clustaLayer.addEntity( hen );
+				
 		
 				stage.addLayer( clustaLayer );
 								

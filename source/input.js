@@ -12,6 +12,7 @@ goog.require('pike.events.Down');
 goog.require('pike.events.Up');
 goog.require('pike.events.Move');
 goog.require('goog.events.EventTarget');
+goog.require('goog.style');
 
 //## InputHandlerBase ###############################################
 /**
@@ -109,10 +110,16 @@ pike.input.InputHandlerBase.prototype.stopEventIfRequired_ = function(e){
  * @returns {Object}
  */
 pike.input.InputHandlerBase.prototype.getInputCoordinates = function(e){		
+	var pureBrowserEvent = e.getBrowserEvent();
+	var element = this.element_;
+	var coords = pureBrowserEvent.targetTouches ? pureBrowserEvent.targetTouches[0] : pureBrowserEvent;
+		
+	var offset = goog.style.getPageOffset(element);	
+	
 	return {
-		posX: e.offsetX + this.viewport_.x,
-		posY: e.offsetY + this.viewport_.y
-	};	
+		posX: (coords.pageX || coords.clientX + document.body.scrollLeft ) - offset.x + this.viewport_.x,
+		posY: (coords.pageY || coords.clientY + document.body.scrollTop ) - offset.y + this.viewport_.y
+	};
 };
 
 /**
@@ -226,7 +233,7 @@ pike.input.TouchInputHandler.prototype.attachDomListeners_ = function(){
 /**
  * @param {Object} e - DOM Event
  */
-pike.input.TouchInputHandler.prototype.onDownDomEvent = function(e) {
+pike.input.TouchInputHandler.prototype.onDownDomEvent = function(e) {	
     this.lastInteractionCoordinates_ = this.getInputCoordinates(e);
     pike.input.InputHandlerBase.prototype.onDownDomEvent.call(this, e);
 };

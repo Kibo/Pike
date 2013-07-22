@@ -22,6 +22,7 @@ goog.require('pike.animation.Animator');
 goog.require('pike.events.StartDialogue');
 goog.require('pike.events.ShowDialogue');
 goog.require('pike.events.EndDialogue');
+goog.require('pike.Utils');
 
 //## Collision #################################
 /**
@@ -833,8 +834,10 @@ pike.components.Dialogues = function(){
 		var container = document.createElement( pike.components.Dialogues.DIALOGUE_ELEMENT );
 		container.setAttribute("data-dialogue", dialogue.id);
 		
-		goog.events.listen(container, goog.events.EventType.CLICK, goog.bind(function(e){
-			var currentDialogue = this.findDialogueById( e.target.getAttribute("data-dialogue") );					
+		var inputHandler = pike.Utils.getDeviceInputHandler();
+		inputHandler.setEventTarget( container );		
+		goog.events.listen(inputHandler, pike.events.Down.EVENT_TYPE, goog.bind(function(e){		
+			var currentDialogue = this.findDialogueById( e.domEvent.target.getAttribute("data-dialogue") );					
 			this.setDialogue_( currentDialogue.id );
 			if( this.dialogue_ ){
 				this.showDialogue( this.getDialogue() );
@@ -854,8 +857,11 @@ pike.components.Dialogues = function(){
 	this.createDialogueElement_ = function( dialogue ){
 		var container = document.createElement( pike.components.Dialogues.DIALOGUE_ELEMENT );
 		container.setAttribute("data-dialogue", dialogue.id);
-		goog.events.listen(container, goog.events.EventType.CLICK, goog.bind(function(e){
-			var currentDialogue = this.findDialogueById( e.target.getAttribute("data-dialogue") );		
+		
+		var inputHandler = pike.Utils.getDeviceInputHandler();
+		inputHandler.setEventTarget( container );		
+		goog.events.listen(inputHandler, pike.events.Down.EVENT_TYPE, goog.bind(function(e){		
+			var currentDialogue = this.findDialogueById( e.domEvent.target.getAttribute("data-dialogue") );		
 			var nextDialogueId = currentDialogue.outgoingLinks.length == 1 
 				? currentDialogue.outgoingLinks[0] 
 				: null; //final node
@@ -1037,6 +1043,7 @@ pike.components.Dialogues = function(){
     };
     
     this.handler.listen(this, pike.events.EndDialogue.EVENT_TYPE, goog.bind(this.onEndDialogue, this));	
+    
 };
 
 /**

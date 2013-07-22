@@ -18,6 +18,7 @@ $PATH_TO_BUILDER \
 --input ../source/graphics.js \
 --input ../source/input.js \
 --input ../source/layers.js \
+--input ../source/utils.js \
 --root=$PATH_TO_CLOSURE_LIBRARY \
 --root=$PATH_TO_SOURCES \
 --output_mode=compiled \
