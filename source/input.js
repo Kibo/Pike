@@ -6,6 +6,7 @@
 goog.provide('pike.input.InputHandlerBase');
 goog.provide('pike.input.MouseInputHandler');
 goog.provide('pike.input.TouchInputHandler');
+goog.provide('pike.input.Utils');
 
 goog.require('pike.graphics.Rectangle');
 goog.require('pike.events.Down');
@@ -52,7 +53,7 @@ pike.input.InputHandlerBase.prototype.onDownDomEvent = function( e ){
 	var coords = this.lastMoveCoordinates_ = this.getInputCoordinates(e);	
 		
 	if(goog.DEBUG) window.console.log("[pike.core.InputHanderBase] down " + coords.posX + ", " + coords.posY );
-	this.dispatchEvent( new pike.events.Down(coords.posX, coords.posY, e, this) );	
+	this.dispatchEvent( new pike.events.Down(coords.posX, coords.posY, e, this.element_) );	
 	this.stopEventIfRequired_(e);
 };
 
@@ -64,7 +65,7 @@ pike.input.InputHandlerBase.prototype.onUpDomEvent = function(e){
 	var coords = this.getInputCoordinates(e);
 	
 	if(goog.DEBUG) window.console.log("[pike.core.InputHanderBase] up " + coords.posX + ", " + coords.posY + ", moving: " + this.moving_ );
-	this.dispatchEvent( new pike.events.Up( coords.posX, coords.posY, this.moving_, e, this) );
+	this.dispatchEvent( new pike.events.Up( coords.posX, coords.posY, this.moving_, e, this.element_) );
 	this.stopEventIfRequired_(e);
 	this.moving_ = false;	
 };
@@ -85,7 +86,7 @@ pike.input.InputHandlerBase.prototype.onMoveDomEvent = function(e){
     
     if (this.moving_) {
     	if(goog.DEBUG) window.console.log("[pike.core.InputHanderBase] move " + coords.posX + ", " + coords.posY + ", deltaX: " + deltaX + ", deltaY: " + deltaY );
-    	this.dispatchEvent( new pike.events.Move( coords.posX, coords.posY, deltaX, deltaY, e, this) );    	             
+    	this.dispatchEvent( new pike.events.Move( coords.posX, coords.posY, deltaX, deltaY, e, this.element_));    	             
     	this.lastMoveCoordinates_ = coords;
     }
 
@@ -110,15 +111,10 @@ pike.input.InputHandlerBase.prototype.stopEventIfRequired_ = function(e){
  * @returns {Object}
  */
 pike.input.InputHandlerBase.prototype.getInputCoordinates = function(e){		
-	var pureBrowserEvent = e.getBrowserEvent();
-	var element = this.element_;
-	var coords = pureBrowserEvent.targetTouches ? pureBrowserEvent.targetTouches[0] : pureBrowserEvent;
-		
-	var offset = goog.style.getPageOffset(element);	
-	
+	var coords = pike.input.Utils.getInputCoordinates( e.getBrowserEvent(), this.element_ );
 	return {
-		posX: (coords.pageX || coords.clientX + document.body.scrollLeft ) - offset.x + this.viewport_.x,
-		posY: (coords.pageY || coords.clientY + document.body.scrollTop ) - offset.y + this.viewport_.y
+		posX: coords.posX + this.viewport_.x,
+		posY: coords.posY + + this.viewport_.y
 	};
 };
 
@@ -262,5 +258,42 @@ pike.input.TouchInputHandler.prototype.onUpDomEvent = function(e) {
 pike.input.TouchInputHandler.prototype.onMoveDomEvent = function(e) {
     this.lastInteractionCoordinates_ = this.getInputCoordinates(e);
     pike.input.InputHandlerBase.prototype.onMoveDomEvent.call(this, e);
+};
+
+//## Utils ###############################################
+/**
+ * Is touch device
+ * @return {boolean}
+ */
+pike.input.Utils.isTouchDevice = function(){
+	return ('ontouchstart' in document.documentElement);	
+};
+
+/**
+ * Get input handler
+ * mouse or touch
+ * @return {pike.input.MouseInputHandler | pike.input.TouchInputHandler} 
+ */
+pike.input.Utils.getDeviceInputHandler = function(){
+	//TODO
+	//return pike.input.Utils.isTouchDevice() ? new pike.input.TouchInputHandler() : new pike.input.MouseInputHandler();
+	return new pike.input.TouchInputHandler();
+};
+
+/**
+ * Calculate a input coordinates
+ * @param {Object} e - DOM event
+ * @param {Object} element - DOM element
+ * @returns {Object}
+ */
+pike.input.Utils.getInputCoordinates = function(e, element){
+	var coords = e.targetTouches ? e.targetTouches[0] : e;
+	
+	var offset = goog.style.getPageOffset(element);	
+	
+	return {
+		posX: (coords.pageX || coords.clientX + document.body.scrollLeft ) - offset.x,
+		posY: (coords.pageY || coords.clientY + document.body.scrollTop ) - offset.y
+	};
 };
 

@@ -22,7 +22,7 @@ goog.require('pike.animation.Animator');
 goog.require('pike.events.StartDialogue');
 goog.require('pike.events.ShowDialogue');
 goog.require('pike.events.EndDialogue');
-goog.require('pike.Utils');
+goog.require('goog.style');
 
 //## Collision #################################
 /**
@@ -413,7 +413,7 @@ pike.components.Watch.NAME="pike.components.Watch";
  * @author Tomas Jurman (tomasjurman@gmail.com)
  */
 pike.components.Backpack = function(){
-	
+				
 	/**
 	 * Set a icon for item in backpack
 	 * @param {string} url - icon
@@ -470,32 +470,102 @@ pike.components.Backpack = function(){
 		
 		this.backpackItem_ = document.createElement('img');
 		this.backpackItem_.src = this.iconUrl_;
+			
 		this.backpackItem_.style.cursor = "pointer";
 		this.backpackItem_.style.padding = "2px 2px";
-		this.backpackItem_.setAttribute("data-widget", this.id);
-		this.backpackItem_.setAttribute("draggable", "true");	
-						
+							
 		this.getBackpackElement().appendChild( this.backpackItem_ );			
 		this.layer.setDirty( this.getBounds() );
 		
 		this.isOnBackpack_ = true;		
 		if(goog.DEBUG) window.console.log("[pike.components.Backpack] putInBag #" + this.id);
 		
-		//set listener
-		goog.events.listen(this.backpackItem_, goog.events.EventType.DRAGSTART, goog.bind(this.dragStart_, this));
-		goog.events.listen(this.backpackItem_, goog.events.EventType.DRAGEND, goog.bind(this.dragEnd_, this));
-																		
-		var stageElement = document.getElementById( pike.core.Stage.ELEMENT_ID )
-		if(!goog.events.hasListener( stageElement, goog.events.EventType.DRAGOVER)){						
-			goog.events.listen(stageElement, goog.events.EventType.DRAGOVER, goog.bind(this.dragOver_, this));
-			if(goog.DEBUG) window.console.log("[pike.components.Backpack] set Stage listener: dragover");
-		};
-		
-		if(!goog.events.hasListener( stageElement, goog.events.EventType.DROP)){
-			goog.events.listen(stageElement, goog.events.EventType.DROP, goog.bind(this.drop_, this));							
-			if(goog.DEBUG) window.console.log("[pike.components.Backpack] set Stage listener: drop");
-		};				
+		var itemEventHandler = pike.input.Utils.getDeviceInputHandler();
+		itemEventHandler.setEventTarget( this.backpackItem_ );		
+		goog.events.listen(itemEventHandler, pike.events.Down.EVENT_TYPE, this.dragStart_, false, this);							
 	};	
+		
+	/**
+	 * Drag start handler
+	 * @param {pike.events.Down} e
+	 * @private
+	 */
+	this.dragStart_ = function(e){	
+					
+		var draggableArea = document.createElement('div');
+		draggableArea.setAttribute("id", pike.components.Backpack.DRAG_ELEMENT_ID);
+		draggableArea.style.position = "absolute";
+		draggableArea.style.top = "0px";
+		draggableArea.style.left = "0px";
+		//draggableArea.style.backgroundColor="blue";
+		draggableArea.style.width = "100%";
+		draggableArea.style.height = "100%";
+		draggableArea.style.zIndex = "99";		
+		draggableArea.style.cursor = "move";
+							
+		var areaEventHandler = pike.input.Utils.getDeviceInputHandler();
+		areaEventHandler.setEventTarget( draggableArea );				
+		goog.events.listen(areaEventHandler, pike.events.Up.EVENT_TYPE, this.drop_, false, this);
+		goog.events.listen(areaEventHandler, pike.events.Down.EVENT_TYPE, this.dragEnd_, false, this);
+		
+		document.body.appendChild( draggableArea );
+													
+		this.isDropAcceptable_ = true;			
+		if(goog.DEBUG) window.console.log("[pike.components.Backpack] dragstart");
+		console.log("drag start")
+	};
+		
+	/**
+	 * Drop over handler	
+	 * @param {pike.events.Up} e
+	 * @private
+	 */
+	this.drop_ = function(e){
+		console.log("drop")
+		this.dragEnd_(e);
+		
+		var oldX = this.x;
+		var oldY = this.y;
+		
+		var coords = pike.input.Utils.getInputCoordinates(e.domEvent, document.getElementById( pike.core.Stage.ELEMENT_ID ));		
+		var x = coords.posX ;
+		var y = coords.posY ;
+				
+		if( x < 0 	
+		 || x > this.layer.viewport_.w
+		 || y < 0
+		 || y > this.layer.viewport_.h ){
+			if(goog.DEBUG) window.console.log("[pike.components.Backpack] drop out of game area.");
+			return;
+		}
+				
+		this.x = x + this.layer.viewport_.x;						
+		this.y = y + this.layer.viewport_.y;
+					
+		this.dispatchEvent( new pike.events.ChangePosition(this.x, this.y, oldX, oldY, this));
+		if( !this.isDropAcceptable_ ){
+			this.x = oldX;
+			this.y = oldY;
+			if(goog.DEBUG) window.console.log("[pike.components.Backpack] drop is not accepted");
+			return; //comes back to backpack
+		}
+				
+		this.layer.setDirty( this.getBounds() );											    								
+		if(goog.DEBUG) window.console.log("[pike.components.Backpack] drop #" + this.id);		
+					
+		this.removeFromBackpack();		
+	};	
+	
+	/**
+	 * Drag end handler
+	 * @param {Object} e - Closure DOM event
+	 * @private
+	 */
+	this.dragEnd_ = function(e){
+		console.log("drag end")
+		goog.dom.removeNode( document.getElementById( pike.components.Backpack.DRAG_ELEMENT_ID ));		
+		if(goog.DEBUG) window.console.log("[pike.components.Backpack] dragend");		
+	};
 	
 	/**
 	 * Remove DOM item from DOM backpack container
@@ -503,82 +573,9 @@ pike.components.Backpack = function(){
 	this.removeFromBackpack = function(){		
 		goog.dom.removeNode( this.backpackItem_ );
 		this.backpackItem_ = null;
-		this.inOnBackpack_ = false;
+		this.isOnBackpack_ = false;			
 		if(goog.DEBUG) window.console.log("[pike.components.Backpack] removeFromBag #" + this.id);
 	};
-	
-	/**
-	 * Drag start handler
-	 * @param {Object} e -Closure DOM event
-	 * @private
-	 */
-	this.dragStart_ = function(e){
-		var event = e.getBrowserEvent();
-		event.dataTransfer.effectAllowed = 'move';
-		event.dataTransfer.setData("text/plain", event.target.getAttribute("data-widget"));   			 								
-		event.dataTransfer.setDragImage(e.target, 15, 15); //TODO
-		this.isDropAcceptable_ = true;
-		if(goog.DEBUG) window.console.log("[pike.components.Backpack] dragstart");
-		return true;						
-	};
-	
-	/**
-	 * Drag end handler
-	 * @param {Object} e -Closure DOM event
-	 * @private
-	 */
-	this.dragEnd_ = function(e){
-		var event = e.getBrowserEvent();		
-		event.dataTransfer.clearData("text/plain");
-		if(goog.DEBUG) window.console.log("[pike.components.Backpack] dragend");
-		return true;
-	};
-	
-	
-	/**
-	 * Drag over handler
-	 * Common for all items - dont use "this"
-	 * @param {Object} e -Closure DOM event
-	 * @private
-	 */
-	this.dragOver_ = function(e){
-		var event = e.getBrowserEvent();
-		event.preventDefault();
-		event.dataTransfer.dropEffect = 'move';
-		if(goog.DEBUG) window.console.log("[pike.components.Backpack] dragover");
-		return false;
-	};
-	
-	/**
-	 * Drop over handler
-	 * Common for all items - dont use "this"
-	 * @param {Object} e -Closure DOM event
-	 * @private
-	 */
-	this.drop_ = function(e){
-		var event = e.getBrowserEvent();
-		event.stopPropagation();
-		var entityId = event.dataTransfer.getData("text/plain");						
-								
-		var entity = this.layer.getEntity( entityId ); //TODO potential bug - if entities is not in the same layer
-		var oldX = entity.x;
-		var oldY = entity.y;
-		entity.x = e.offsetX + entity.layer.viewport_.x;
-		entity.y = e.offsetY + entity.layer.viewport_.y;
-						
-		this.layer.setDirty( entity.getBounds() );
-						
-		entity.dispatchEvent( new pike.events.ChangePosition(entity.x, entity.y, oldX, oldY, entity));									    									
-		if(goog.DEBUG) window.console.log("[pike.components.Backpack] drop #" + entity.id);
-		
-		if( !entity.isDropAcceptable_ ){
-			if(goog.DEBUG) window.console.log("[pike.components.Backpack] drop is not accepted");
-			return true; //comes back to backpack
-		}
-					
-		entity.removeFromBackpack();
-		return false; //success
-	};																												
 };
 
 /**
@@ -595,6 +592,12 @@ pike.components.Backpack.NAME="pike.components.Backpack";
  */
 pike.components.Backpack.ELEMENT_ID = "pike-backpack";
 
+/**
+ * DOM Element id for dragArea
+ * @const
+ * @type {string}
+ */
+pike.components.Backpack.DRAG_ELEMENT_ID = "dragArea";
 
 //## Dialogues #################################
 /**
@@ -627,7 +630,7 @@ pike.components.Dialogues = function(){
 			codeAfterDialogueElement:null,
 			
 			codeBeforeChoiceElement:null,
-			codeAfterChoiceElement:null
+			codeAfterChoiceElement:null					
 	};
 		
 	/**
@@ -834,7 +837,7 @@ pike.components.Dialogues = function(){
 		var container = document.createElement( pike.components.Dialogues.DIALOGUE_ELEMENT );
 		container.setAttribute("data-dialogue", dialogue.id);
 		
-		var inputHandler = pike.Utils.getDeviceInputHandler();
+		var inputHandler = pike.input.Utils.getDeviceInputHandler();
 		inputHandler.setEventTarget( container );		
 		goog.events.listen(inputHandler, pike.events.Down.EVENT_TYPE, goog.bind(function(e){		
 			var currentDialogue = this.findDialogueById( e.domEvent.target.getAttribute("data-dialogue") );					
@@ -858,7 +861,7 @@ pike.components.Dialogues = function(){
 		var container = document.createElement( pike.components.Dialogues.DIALOGUE_ELEMENT );
 		container.setAttribute("data-dialogue", dialogue.id);
 		
-		var inputHandler = pike.Utils.getDeviceInputHandler();
+		var inputHandler = pike.input.Utils.getDeviceInputHandler();
 		inputHandler.setEventTarget( container );		
 		goog.events.listen(inputHandler, pike.events.Down.EVENT_TYPE, goog.bind(function(e){		
 			var currentDialogue = this.findDialogueById( e.domEvent.target.getAttribute("data-dialogue") );		

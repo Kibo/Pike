@@ -74,13 +74,13 @@
 		goog.require('pike.events.ChangePosition');	
 		goog.require('goog.dom');
 		goog.require('pike.ai.path.Node');
-		goog.require('pike.ai.path.Graph');			
-		goog.require('pike.Utils');	
+		goog.require('pike.ai.path.Graph');
+		goog.require('pike.input.Utils');	
 	</script>
 	<script>
 		window.onload = function(){
 			
-			goog.DEBUG = true;
+			goog.DEBUG = false;
 																	
 			//Assets
 			var imageManager = new pike.assets.ImageManager();
@@ -100,9 +100,8 @@
 				stage.handler.listen(gameWorld, pike.events.ChangeSize.EVENT_TYPE, goog.bind(stage.onGameWorldChangeSize, stage));
 				stage.handler.listen(viewport, pike.events.ChangeSize.EVENT_TYPE, goog.bind(stage.onViewportChangeSize, stage));
 				stage.handler.listen(viewport, pike.events.ChangePosition.EVENT_TYPE, goog.bind(stage.onViewportChangePosition, stage));
-											
-				var mouse = new pike.input.MouseInputHandler();
-				//var mouse = new pike.input.TouchInputHandler();
+															
+				var mouse = pike.input.Utils.getDeviceInputHandler();
 				mouse.handler.listen(viewport, pike.events.ChangePosition.EVENT_TYPE, goog.bind(mouse.onViewportChangePosition, mouse));
 				mouse.setEventTarget( stage.getRootElement() );				
 		
@@ -214,7 +213,8 @@
 				cheese.onCollision = function(e){
 					
 					if(e.obj === hero){
-						this.putInBackpack();
+						this.putInBackpack();									
+						this.y = -this.h;										
 						return;
 					}
 					

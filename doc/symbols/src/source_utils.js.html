@@ -12,23 +12,29 @@
 <span class='line'>  5</span> */</span><span class="WHIT">
 <span class='line'>  6</span> </span><span class="NAME">goog.provide</span><span class="PUNC">(</span><span class="STRN">'pike.Utils'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>  7</span> 
-<span class='line'>  8</span> </span><span class="NAME">goog.require</span><span class="PUNC">(</span><span class="STRN">'pike.input.InputHandlerBase'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>  9</span> </span><span class="NAME">goog.require</span><span class="PUNC">(</span><span class="STRN">'pike.input.MouseInputHandler'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 10</span> </span><span class="NAME">goog.require</span><span class="PUNC">(</span><span class="STRN">'pike.input.TouchInputHandler'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 11</span> 
-<span class='line'> 12</span> </span><span class="COMM">/**
-<span class='line'> 13</span>  * Is touch device
-<span class='line'> 14</span>  * @return {boolean}
-<span class='line'> 15</span>  */</span><span class="WHIT">
-<span class='line'> 16</span> </span><span class="NAME">pike.Utils.isTouchDevice</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 17</span> </span><span class="WHIT">	</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="STRN">'ontouchstart'</span><span class="WHIT"> </span><span class="KEYW">in</span><span class="WHIT"> </span><span class="NAME">document.documentElement</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">	
-<span class='line'> 18</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 19</span> 
-<span class='line'> 20</span> </span><span class="COMM">/**
-<span class='line'> 21</span>  * Get input handler
-<span class='line'> 22</span>  * mouse or touch
-<span class='line'> 23</span>  * @return {pike.input.MouseInputHandler | pike.input.TouchInputHandler} 
-<span class='line'> 24</span>  */</span><span class="WHIT">
-<span class='line'> 25</span> </span><span class="NAME">pike.Utils.getDeviceInputHandler</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'> 26</span> </span><span class="WHIT">	</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">pike.Utils.isTouchDevice</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">?</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">pike.input.TouchInputHandler</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">pike.input.MouseInputHandler</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 27</span> </span><span class="PUNC">}</span><span class="PUNC">;</span></pre></body></html>
+<span class='line'>  8</span> </span><span class="NAME">goog.require</span><span class="PUNC">(</span><span class="STRN">'goog.style'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>  9</span> 
+<span class='line'> 10</span> </span><span class="COMM">/**
+<span class='line'> 11</span>  * Is touch device
+<span class='line'> 12</span>  * @return {boolean}
+<span class='line'> 13</span>  */</span><span class="WHIT">
+<span class='line'> 14</span> </span><span class="NAME">pike.Utils.isTouchDevice</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 15</span> </span><span class="WHIT">	</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="STRN">'ontouchstart'</span><span class="WHIT"> </span><span class="KEYW">in</span><span class="WHIT"> </span><span class="NAME">document.documentElement</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">	
+<span class='line'> 16</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 17</span> 
+<span class='line'> 18</span> </span><span class="COMM">/**
+<span class='line'> 19</span>  * Calculate a input coordinates
+<span class='line'> 20</span>  * @param {Object} e - DOM event
+<span class='line'> 21</span>  * @param {Object} element - DOM element
+<span class='line'> 22</span>  * @returns {Object}
+<span class='line'> 23</span>  */</span><span class="WHIT">
+<span class='line'> 24</span> </span><span class="NAME">pike.Utils.getInputCoordinates</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">e</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">element</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 25</span> </span><span class="WHIT">	</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">coords</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">e.targetTouches</span><span class="WHIT"> </span><span class="PUNC">?</span><span class="WHIT"> </span><span class="NAME">e.targetTouches</span><span class="PUNC">[</span><span class="NUMB">0</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">e</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 26</span> </span><span class="WHIT">	
+<span class='line'> 27</span> 	</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">offset</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">goog.style.getPageOffset</span><span class="PUNC">(</span><span class="NAME">element</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">	
+<span class='line'> 28</span> 	
+<span class='line'> 29</span> 	</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 30</span> </span><span class="WHIT">		</span><span class="NAME">posX</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">coords.pageX</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NAME">coords.clientX</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">document.body.scrollLeft</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">offset.x</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 31</span> </span><span class="WHIT">		</span><span class="NAME">posY</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">coords.pageY</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NAME">coords.clientY</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">document.body.scrollTop</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">offset.y</span><span class="WHIT">
+<span class='line'> 32</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 33</span> </span><span class="PUNC">}</span><span class="PUNC">;</span></pre></body></html>
