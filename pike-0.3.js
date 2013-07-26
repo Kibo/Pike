@@ -5890,8 +5890,7 @@ pike.input.InputHandlerBase.prototype.stopEventIfRequired_ = function(e) {
   }
 };
 pike.input.InputHandlerBase.prototype.getInputCoordinates = function(e) {
-  var coords = pike.input.Utils.getInputCoordinates(e.getBrowserEvent(), this.element_);
-  return{posX:coords.posX + this.viewport_.x, posY:coords.posY + +this.viewport_.y}
+  return pike.input.Utils.getInputCoordinates(e.getBrowserEvent(), this.element_)
 };
 pike.input.InputHandlerBase.prototype.onViewportChangePosition = function(e) {
   this.viewport_.x = e.x;
@@ -5908,10 +5907,10 @@ pike.input.MouseInputHandler.prototype.setEventTarget = function(eventTarget) {
 };
 pike.input.MouseInputHandler.prototype.attachDomListeners_ = function() {
   var el = this.element_;
-  this.handler.listen(el, goog.events.EventType.MOUSEDOWN, goog.bind(this.onDownDomEvent, this));
-  this.handler.listen(el, goog.events.EventType.MOUSEUP, goog.bind(this.onUpDomEvent, this));
-  this.handler.listen(el, goog.events.EventType.MOUSEMOVE, goog.bind(this.onMoveDomEvent, this));
-  this.handler.listen(el, goog.events.EventType.MOUSEOUT, goog.bind(this.onMouseOut, this))
+  this.handler.listen(el, goog.events.EventType.MOUSEDOWN, this.onDownDomEvent, false, this);
+  this.handler.listen(el, goog.events.EventType.MOUSEUP, this.onUpDomEvent, false, this);
+  this.handler.listen(el, goog.events.EventType.MOUSEMOVE, this.onMoveDomEvent, false, this);
+  this.handler.listen(el, goog.events.EventType.MOUSEOUT, this.onMouseOut, false, this)
 };
 pike.input.MouseInputHandler.prototype.onDownDomEvent = function(e) {
   this.mouseDown_ = true;
@@ -6460,7 +6459,6 @@ pike.components.Watch = function() {
 };
 pike.components.Watch.NAME = "pike.components.Watch";
 pike.components.Backpack = function() {
-  this.pike_components_Backpack_ = {currentlyDragWidgetId:null};
   this.setIconUrl = function(url) {
     this.iconUrl_ = url
   };
@@ -6472,6 +6470,9 @@ pike.components.Backpack = function() {
   };
   this.setDropAcceptable = function(isAcceptable) {
     this.isDropAcceptable_ = isAcceptable
+  };
+  this.setGameEventHandler = function(eventHandler) {
+    this.gameEventHandler_ = eventHandler
   };
   this.getBackpackElement = function() {
     var backpack = document.getElementById(pike.components.Backpack.ELEMENT_ID);
@@ -6485,82 +6486,83 @@ pike.components.Backpack = function() {
   this.putInBackpack = function() {
     this.backpackItem_ = document.createElement("img");
     this.backpackItem_.src = this.iconUrl_;
+    this.backpackItem_.style.position = "relative";
+    this.backpackItem_.style.left = "0px";
+    this.backpackItem_.style.top = "0px";
     this.backpackItem_.style.cursor = "pointer";
     this.backpackItem_.style.padding = "2px 2px";
-    this.backpackItem_.setAttribute("data-widget", this.id);
     this.backpackItem_.setAttribute("data-isDraggable", "true");
+    this.backpackItem_.setAttribute("data-widget", this.id);
     this.getBackpackElement().appendChild(this.backpackItem_);
     this.layer.setDirty(this.getBounds());
     this.isOnBackpack_ = true;
     if(goog.DEBUG) {
       window.console.log("[pike.components.Backpack] putInBag #" + this.id)
     }
-    var itemEventHandler = pike.input.Utils.getDeviceInputHandler();
-    itemEventHandler.setEventTarget(this.backpackItem_);
-    goog.events.listen(itemEventHandler, pike.events.Down.EVENT_TYPE, this.dragStart_, false, this)
+    goog.events.listen(this.gameEventHandler_, pike.events.Down.EVENT_TYPE, this.dragStart_, false, this)
   };
   this.dragStart_ = function(e) {
-    var draggableArea = document.createElement("div");
-    draggableArea.setAttribute("id", pike.components.Backpack.DRAG_ELEMENT_ID);
-    draggableArea.style.position = "absolute";
-    draggableArea.style.top = "0px";
-    draggableArea.style.left = "0px";
-    draggableArea.style.width = "100%";
-    draggableArea.style.height = "100%";
-    draggableArea.style.zIndex = "99";
-    draggableArea.style.cursor = "url(" + this.backpackItem_.src + "), move";
-    document.body.appendChild(draggableArea);
-    var areaEventHandler = pike.input.Utils.getDeviceInputHandler();
-    areaEventHandler.setEventTarget(draggableArea);
-    goog.events.listen(areaEventHandler, pike.events.Up.EVENT_TYPE, this.drop_, false, this);
-    goog.events.listen(areaEventHandler, pike.events.Down.EVENT_TYPE, this.dragEnd_, false, this);
-    this.pike_components_Backpack_.currentlyDragWidgetId = event.target.getAttribute("data-widget");
+    if(e.posY < this.layer.viewport_.h) {
+      return
+    }
+    var position = goog.style.getRelativePosition(this.backpackItem_, e.target);
+    var size = goog.style.getSize(this.backpackItem_);
+    var bounds = new pike.graphics.Rectangle(position.x, position.y, size.width, size.height);
+    if(!bounds.containsPoint(e.posX, e.posY)) {
+      return
+    }
     this.isDropAcceptable_ = true;
+    goog.events.listen(this.gameEventHandler_, pike.events.Move.EVENT_TYPE, this.dragMove_, false, this);
+    goog.events.listen(this.gameEventHandler_, pike.events.Up.EVENT_TYPE, this.drop_, false, this);
     if(goog.DEBUG) {
       window.console.log("[pike.components.Backpack] dragstart")
     }
   };
+  this.dragMove_ = function(e) {
+    this.backpackItem_.style.left = parseInt(this.backpackItem_.style.left) + e.deltaX + "px";
+    this.backpackItem_.style.top = parseInt(this.backpackItem_.style.top) + e.deltaY + "px"
+  };
   this.drop_ = function(e) {
-    var entityId = this.pike_components_Backpack_.currentlyDragWidgetId;
-    var entity = this.layer.getEntity(entityId);
-    var oldX = entity.x;
-    var oldY = entity.y;
-    this.dragEnd_(e);
-    var coords = pike.input.Utils.getInputCoordinates(e.domEvent, document.getElementById(pike.core.Stage.ELEMENT_ID));
-    var x = coords.posX;
-    var y = coords.posY;
-    if(x < 0 || x > entity.layer.viewport_.w || y < 0 || y > entity.layer.viewport_.h) {
+    this.dragEnd_();
+    var viewport = this.layer.viewport_;
+    var oldX = this.x;
+    var oldY = this.y;
+    var x = e.posX + viewport.x;
+    var y = e.posY + viewport.y;
+    if(e.posX < 0 || e.posX > viewport.w || e.posY < 0 || e.posY > viewport.h) {
       if(goog.DEBUG) {
         window.console.log("[pike.components.Backpack] drop out of game area.")
       }
       return
     }
-    entity.x = x + entity.layer.viewport_.x;
-    entity.y = y + entity.layer.viewport_.y;
-    entity.dispatchEvent(new pike.events.ChangePosition(entity.x, entity.y, oldX, oldY, entity));
-    if(!entity.isDropAcceptable_) {
-      entity.x = oldX;
-      entity.y = oldY;
+    this.x = x;
+    this.y = y;
+    this.dispatchEvent(new pike.events.ChangePosition(this.x, this.y, oldX, oldY, this));
+    if(!this.isDropAcceptable_) {
+      this.x = oldX;
+      this.y = oldY;
       if(goog.DEBUG) {
         window.console.log("[pike.components.Backpack] drop is not accepted")
       }
       return
     }
-    this.layer.setDirty(entity.getBounds());
+    this.layer.setDirty(this.getBounds());
     if(goog.DEBUG) {
-      window.console.log("[pike.components.Backpack] drop #" + entity.id)
+      window.console.log("[pike.components.Backpack] drop #" + this.id)
     }
-    entity.removeFromBackpack();
-    return false
+    this.removeFromBackpack()
   };
-  this.dragEnd_ = function(e) {
-    goog.dom.removeNode(document.getElementById(pike.components.Backpack.DRAG_ELEMENT_ID));
-    this.pike_components_Backpack_.currentlyDragWidgetId = null;
+  this.dragEnd_ = function() {
+    this.backpackItem_.style.left = "0px";
+    this.backpackItem_.style.top = "0px";
+    goog.events.unlisten(this.gameEventHandler_, pike.events.Move.EVENT_TYPE, this.dragMove_, false, this);
+    goog.events.unlisten(this.gameEventHandler_, pike.events.Up.EVENT_TYPE, this.drop_, false, this);
     if(goog.DEBUG) {
       window.console.log("[pike.components.Backpack] dragend")
     }
   };
   this.removeFromBackpack = function() {
+    goog.events.unlisten(this.gameEventHandler_, pike.events.Down.EVENT_TYPE, this.dragStart_, false, this);
     goog.dom.removeNode(this.backpackItem_);
     this.backpackItem_ = null;
     this.isOnBackpack_ = false;
@@ -6571,7 +6573,6 @@ pike.components.Backpack = function() {
 };
 pike.components.Backpack.NAME = "pike.components.Backpack";
 pike.components.Backpack.ELEMENT_ID = "pike-backpack";
-pike.components.Backpack.DRAG_ELEMENT_ID = "dragArea";
 pike.components.Dialogues = function() {
   this.pike_components_Dialogues_ = {codeBeforeDialogueText:null, codeAfterDialogueText:null, codeBeforeDialogueElement:null, codeAfterDialogueElement:null, codeBeforeChoiceElement:null, codeAfterChoiceElement:null};
   this.setDialogues = function(data) {

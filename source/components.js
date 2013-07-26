@@ -446,7 +446,14 @@ pike.components.Backpack = function(){
 		this.isDropAcceptable_ = isAcceptable;
 	};
 	
-		
+	/**
+	 * Set a event handler
+	 * @param {pike.input.MouseInputHandler|pike.input.TouchInputHandler} eventHandler
+	 */
+	this.setGameEventHandler = function( eventHandler ){
+		this.gameEventHandler_ = eventHandler;
+	};
+			
 	/**
 	 * Get backpack DOM container
 	 * @return {Object} DOM element
@@ -470,19 +477,24 @@ pike.components.Backpack = function(){
 		
 		this.backpackItem_ = document.createElement('img');
 		this.backpackItem_.src = this.iconUrl_;
+		
+		this.backpackItem_.style.position="relative";
+	    this.backpackItem_.style.left="0px";
+	    this.backpackItem_.style.top="0px";	   
 			
 		this.backpackItem_.style.cursor = "pointer";
 		this.backpackItem_.style.padding = "2px 2px";
+		
+		this.backpackItem_.setAttribute("data-isDraggable", "true");
+		this.backpackItem_.setAttribute("data-widget", this.id);
 							
 		this.getBackpackElement().appendChild( this.backpackItem_ );			
 		this.layer.setDirty( this.getBounds() );
 		
 		this.isOnBackpack_ = true;		
 		if(goog.DEBUG) window.console.log("[pike.components.Backpack] putInBag #" + this.id);
-		
-		var itemEventHandler = pike.input.Utils.getDeviceInputHandler();
-		itemEventHandler.setEventTarget( this.backpackItem_ );		
-		goog.events.listen(itemEventHandler, pike.events.Down.EVENT_TYPE, this.dragStart_, false, this);							
+						
+	    goog.events.listen( this.gameEventHandler_, pike.events.Down.EVENT_TYPE, this.dragStart_, false, this);	   
 	};	
 		
 	/**
@@ -490,57 +502,61 @@ pike.components.Backpack = function(){
 	 * @param {pike.events.Down} e
 	 * @private
 	 */
-	this.dragStart_ = function(e){	
-					
-		var draggableArea = document.createElement('div');
-		draggableArea.setAttribute("id", pike.components.Backpack.DRAG_ELEMENT_ID);
-		draggableArea.style.position = "absolute";
-		draggableArea.style.top = "0px";
-		draggableArea.style.left = "0px";
-		//draggableArea.style.backgroundColor="blue";
-		draggableArea.style.width = "100%";
-		draggableArea.style.height = "100%";
-		draggableArea.style.zIndex = "99";		
-		draggableArea.style.cursor = "move";
-							
-		var areaEventHandler = pike.input.Utils.getDeviceInputHandler();
-		areaEventHandler.setEventTarget( draggableArea );				
-		goog.events.listen(areaEventHandler, pike.events.Up.EVENT_TYPE, this.drop_, false, this);
-		goog.events.listen(areaEventHandler, pike.events.Down.EVENT_TYPE, this.dragEnd_, false, this);
+	this.dragStart_ = function(e){					
+		if( e.posY < this.layer.viewport_.h){			
+			return;
+		}
 		
-		document.body.appendChild( draggableArea );
-													
-		this.isDropAcceptable_ = true;			
-		if(goog.DEBUG) window.console.log("[pike.components.Backpack] dragstart");
-		console.log("drag start")
+		var position = goog.style.getRelativePosition( this.backpackItem_, e.target);
+		var size = goog.style.getSize( this.backpackItem_ );
+		var bounds = new pike.graphics.Rectangle(position.x, position.y, size.width, size.height);
+			
+		if(!bounds.containsPoint( e.posX, e.posY )){			
+			return;
+		}
+		
+		this.isDropAcceptable_ = true;
+		
+		goog.events.listen( this.gameEventHandler_ , pike.events.Move.EVENT_TYPE, this.dragMove_, false, this);
+		goog.events.listen( this.gameEventHandler_ , pike.events.Up.EVENT_TYPE, this.drop_, false, this);
+		
+		if(goog.DEBUG) window.console.log("[pike.components.Backpack] dragstart");				
 	};
-		
+	
+	this.dragMove_ = function(e){						
+		this.backpackItem_.style.left = (parseInt( this.backpackItem_.style.left ) + e.deltaX) + "px" ;
+		this.backpackItem_.style.top = (parseInt( this.backpackItem_.style.top ) + e.deltaY) + "px" ;	 		
+	};
+	
 	/**
 	 * Drop over handler	
 	 * @param {pike.events.Up} e
 	 * @private
 	 */
-	this.drop_ = function(e){
-		console.log("drop")
-		this.dragEnd_(e);
+	this.drop_ = function(e){				
+		goog.events.unlisten( this.gameEventHandler_ , pike.events.Move.EVENT_TYPE, this.dragMove_, false, this);
+		goog.events.unlisten( this.gameEventHandler_ , pike.events.Up.EVENT_TYPE, this.drop_, false, this);
 		
+		this.backpackItem_.style.left="0px";
+	    this.backpackItem_.style.top="0px";
+		
+		var viewport = this.layer.viewport_;
+								
 		var oldX = this.x;
-		var oldY = this.y;
-		
-		var coords = pike.input.Utils.getInputCoordinates(e.domEvent, document.getElementById( pike.core.Stage.ELEMENT_ID ));		
-		var x = coords.posX ;
-		var y = coords.posY ;
+		var oldY = this.y;		
+		var x = e.posX + viewport.x;
+		var y = e.posY + viewport.y;
 				
-		if( x < 0 	
-		 || x > this.layer.viewport_.w
-		 || y < 0
-		 || y > this.layer.viewport_.h ){
+		if( e.posX < 0 	
+		 || e.posX > viewport.w
+		 || e.posY < 0
+		 || e.posY > viewport.h ){
 			if(goog.DEBUG) window.console.log("[pike.components.Backpack] drop out of game area.");
 			return;
 		}
 				
-		this.x = x + this.layer.viewport_.x;						
-		this.y = y + this.layer.viewport_.y;
+		this.x = x;						
+		this.y = y;
 					
 		this.dispatchEvent( new pike.events.ChangePosition(this.x, this.y, oldX, oldY, this));
 		if( !this.isDropAcceptable_ ){
@@ -557,20 +573,10 @@ pike.components.Backpack = function(){
 	};	
 	
 	/**
-	 * Drag end handler
-	 * @param {Object} e - Closure DOM event
-	 * @private
-	 */
-	this.dragEnd_ = function(e){
-		console.log("drag end")
-		goog.dom.removeNode( document.getElementById( pike.components.Backpack.DRAG_ELEMENT_ID ));		
-		if(goog.DEBUG) window.console.log("[pike.components.Backpack] dragend");		
-	};
-	
-	/**
 	 * Remove DOM item from DOM backpack container
 	 */
 	this.removeFromBackpack = function(){		
+		goog.events.unlisten( this.gameEventHandler_, pike.events.Down.EVENT_TYPE, this.dragStart_, false, this);			
 		goog.dom.removeNode( this.backpackItem_ );
 		this.backpackItem_ = null;
 		this.isOnBackpack_ = false;			
@@ -591,13 +597,6 @@ pike.components.Backpack.NAME="pike.components.Backpack";
  * @type {string}
  */
 pike.components.Backpack.ELEMENT_ID = "pike-backpack";
-
-/**
- * DOM Element id for dragArea
- * @const
- * @type {string}
- */
-pike.components.Backpack.DRAG_ELEMENT_ID = "dragArea";
 
 //## Dialogues #################################
 /**

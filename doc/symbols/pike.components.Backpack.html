@@ -343,16 +343,6 @@ and with drag-and-drop get back on canvas</div>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
 								<div class="fixedFont">
-								pike.components.Backpack.<b><a href="../symbols/pike.components.Backpack.html#.DRAG_ELEMENT_ID">DRAG_ELEMENT_ID</a></b>
-								</div>
-								<div class="description">DOM Element id for dragArea</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&lt;static&gt; &nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
 								pike.components.Backpack.<b><a href="../symbols/pike.components.Backpack.html#.ELEMENT_ID">ELEMENT_ID</a></b>
 								</div>
 								<div class="description">DOM Element id for Backpack</div>
@@ -366,16 +356,6 @@ and with drag-and-drop get back on canvas</div>
 								pike.components.Backpack.<b><a href="../symbols/pike.components.Backpack.html#.NAME">NAME</a></b>
 								</div>
 								<div class="description">Component name</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&lt;private&gt; &nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont">
-								<b><a href="../symbols/pike.components.Backpack.html#pike_components_Backpack_">pike_components_Backpack_</a></b>
-								</div>
-								<div class="description"></div>
 							</td>
 						</tr>
 					
@@ -403,7 +383,7 @@ and with drag-and-drop get back on canvas</div>
 						<tr>
 							<td class="attributes">&lt;private&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/pike.components.Backpack.html#dragEnd_">dragEnd_</a></b>(e)
+								<div class="fixedFont"><b><a href="../symbols/pike.components.Backpack.html#dragEnd_">dragEnd_</a></b>()
 								</div>
 								<div class="description">Drag end handler</div>
 							</td>
@@ -484,6 +464,15 @@ and with drag-and-drop get back on canvas</div>
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/pike.components.Backpack.html#setGameEventHandler">setGameEventHandler</a></b>(eventHandler)
+								</div>
+								<div class="description">Set a event handler</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
 								<div class="fixedFont"><b><a href="../symbols/pike.components.Backpack.html#setIconUrl">setIconUrl</a></b>(url)
 								</div>
 								<div class="description">Set a icon for item in backpack</div>
@@ -549,28 +538,6 @@ hero.onCollision = function(e){
 					Field Detail
 				</div>
 				
-					<a name=".DRAG_ELEMENT_ID"> </a>
-					<div class="fixedFont">&lt;static&gt; 
-					
-					
-					<span class="light">pike.components.Backpack.</span><b>DRAG_ELEMENT_ID</b>
-					
-					</div>
-					<div class="description">
-						DOM Element id for dragArea
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
-					<hr />
-				
 					<a name=".ELEMENT_ID"> </a>
 					<div class="fixedFont">&lt;static&gt; 
 					
@@ -613,28 +580,6 @@ hero.onCollision = function(e){
 						
 						
 
-					<hr />
-				
-					<a name="pike_components_Backpack_"> </a>
-					<div class="fixedFont">&lt;private&gt; 
-					
-					
-					<b>pike_components_Backpack_</b>
-					
-					</div>
-					<div class="description">
-						
-						
-						
-					</div>
-					
-					
-
-						
-						
-						
-						
-
 					
 				
 			
@@ -649,7 +594,7 @@ hero.onCollision = function(e){
 					<div class="fixedFont">&lt;private&gt; 
 					
 					
-					<b>dragEnd_</b>(e)
+					<b>dragEnd_</b>()
 					
 					</div>
 					<div class="description">
@@ -660,17 +605,6 @@ hero.onCollision = function(e){
 					
 					
 					
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{Object}</span> <b>e</b>
-									
-								</dt>
-								<dd>- Closure DOM event</dd>
-							
-							</dl>
 						
 						
 						
@@ -935,6 +869,42 @@ hero.onCollision = function(e){
 
 					<hr />
 				
+					<a name="setGameEventHandler"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>setGameEventHandler</b>(eventHandler)
+					
+					</div>
+					<div class="description">
+						Set a event handler
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{<a href="../symbols/pike.input.MouseInputHandler.html">pike.input.MouseInputHandler</a>|<a href="../symbols/pike.input.TouchInputHandler.html">pike.input.TouchInputHandler</a>}</span> <b>eventHandler</b>
+									
+								</dt>
+								<dd></dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
 					<a name="setIconUrl"> </a>
 					<div class="fixedFont">
 					
@@ -983,7 +953,7 @@ hero.onCollision = function(e){
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Wed Jul 24 2013 16:46:37 GMT+0200 (CEST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Fri Jul 26 2013 15:55:34 GMT+0200 (CEST)
 		</div>
 	</body>
 </html>

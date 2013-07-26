@@ -13,11 +13,25 @@
 				padding:0;
 				border: 0;
 			}
+			
+			#curtain{									
+				position:absolute;
+				top:0;
+				left:0;
+				width:100%;
+				height:100%;
+			}
+			
+			#game{
+				background:#eeeeee;
+				margin:0 auto;	
+				width:800px;
+				//overflow: hidden;
+				position:relative;						
+			}
 	        		
 			#pike-stage{
-				background:#eeeeee;
-				margin:0 auto;
-				border:15px solid #333; 			
+							
 			}
 			
 			#pike-dialogues{
@@ -46,8 +60,8 @@
 				background:transparent url(../img/heroQuestions.png) no-repeat 0 0;						
 			}
 			
-			#bag{
-				
+			#pike-backpack{
+				background:#999;	
 			}
 			
 			.xstats {
@@ -103,7 +117,7 @@
 															
 				var mouse = pike.input.Utils.getDeviceInputHandler();
 				mouse.handler.listen(viewport, pike.events.ChangePosition.EVENT_TYPE, goog.bind(mouse.onViewportChangePosition, mouse));
-				mouse.setEventTarget( stage.getRootElement() );				
+				mouse.setEventTarget( document.getElementById("game"));				
 		
 				viewport.setSize(800,600);
 				gameWorld.setSize(1280, 1280);
@@ -136,9 +150,17 @@
 				hero.positionAnimator.setRepeatBehavior(pike.animation.Animator.LOOP)
 				hero.positionAnimator.setRepeatCount(1);
 				
-				hero.handler.listen( mouse, pike.events.Down.EVENT_TYPE, goog.bind( function(e){					
-					this.targetX = e.posX;
-					this.targetY = e.posY;	
+				hero.handler.listen( mouse, pike.events.Down.EVENT_TYPE, goog.bind( function(e){
+								
+					var viewport = this.layer.viewport_;
+					
+					if(e.posY > viewport.h){
+						//click out of game layer
+						return
+					}
+										
+					this.targetX = e.posX + viewport.x;
+					this.targetY = e.posY + viewport.y;	
 					
 					this.vx = this.targetX - this.x;
 					this.vy = this.targetY - this.y;
@@ -209,20 +231,23 @@
 				cheese.y = 300;
 				cheese.setSprite( imageManager.get("entities"), 96, 96, 32, 32, 3, 300);
 				cheese.setIconUrl("../img/cheese.png");
+				cheese.setGameEventHandler( mouse );
+				
 				cheese.handler.listen(cheese, pike.events.Render.EVENT_TYPE, goog.bind(cheese.onSpriteRender, cheese));
 				cheese.onCollision = function(e){
+					
+					//player drop entity on collison area
+					if(this.isOnBackpack()){
+						this.setDropAcceptable(false);
+						return;
+					}
 					
 					if(e.obj === hero){
 						this.putInBackpack();									
 						this.y = -this.h;										
 						return;
 					}
-					
-					//player drop entity on collison area
-					if(this.isOnBackpack()){
-						this.setDropAcceptable(false);	
-					}
-					
+														
 					this.x = e.oldX;
 					this.y = e.oldY;
 					this.targetX = e.oldX;
@@ -255,10 +280,14 @@
 	</script>
 	
     </head>
-    <body>                                         
-        <div id="pike-stage"></div>
-        <div id="pike-backpack"></div>
-        <div id="pike-dialogues"></div>                          
+    <body>             
+    	<div id="game">                            
+        	<div id="pike-stage"></div>
+        	<div id="pike-backpack"></div>
+        	<div id="pike-dialogues"></div>
+        	<div id="curtain"></div>
+        </div>
+                                  
                               
         <script src="../../libs/xstats/xstats.js"></script>
         <script>

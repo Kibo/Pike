@@ -51,7 +51,7 @@ goog.inherits(pike.input.InputHandlerBase, goog.events.EventTarget);
 pike.input.InputHandlerBase.prototype.onDownDomEvent = function( e ){
 	// We must save this coordinates to support the moveThreshold
 	var coords = this.lastMoveCoordinates_ = this.getInputCoordinates(e);	
-		
+	
 	if(goog.DEBUG) window.console.log("[pike.core.InputHanderBase] down " + coords.posX + ", " + coords.posY );
 	this.dispatchEvent( new pike.events.Down(coords.posX, coords.posY, e, this.element_) );	
 	this.stopEventIfRequired_(e);
@@ -74,7 +74,7 @@ pike.input.InputHandlerBase.prototype.onUpDomEvent = function(e){
  * Listens to the "move" DOM events: mousemove and touchmove.
  * @param {Object} e - DOM move event
  */
-pike.input.InputHandlerBase.prototype.onMoveDomEvent = function(e){
+pike.input.InputHandlerBase.prototype.onMoveDomEvent = function(e){	
 	var coords = this.getInputCoordinates(e);	   
     var deltaX = coords.posX - this.lastMoveCoordinates_.posX;
     var deltaY = coords.posY - this.lastMoveCoordinates_.posY;
@@ -111,11 +111,7 @@ pike.input.InputHandlerBase.prototype.stopEventIfRequired_ = function(e){
  * @returns {Object}
  */
 pike.input.InputHandlerBase.prototype.getInputCoordinates = function(e){		
-	var coords = pike.input.Utils.getInputCoordinates( e.getBrowserEvent(), this.element_ );
-	return {
-		posX: coords.posX + this.viewport_.x,
-		posY: coords.posY + + this.viewport_.y
-	};
+	return pike.input.Utils.getInputCoordinates( e.getBrowserEvent(), this.element_ );	
 };
 
 /**
@@ -155,16 +151,16 @@ pike.input.MouseInputHandler.prototype.setEventTarget = function( eventTarget ){
  */
 pike.input.MouseInputHandler.prototype.attachDomListeners_ = function(){
 	 var el = this.element_;	 
-	 this.handler.listen(el, goog.events.EventType.MOUSEDOWN, goog.bind( this.onDownDomEvent, this));
-	 this.handler.listen(el, goog.events.EventType.MOUSEUP, goog.bind( this.onUpDomEvent, this));
-	 this.handler.listen(el, goog.events.EventType.MOUSEMOVE, goog.bind( this.onMoveDomEvent, this));
-	 this.handler.listen(el, goog.events.EventType.MOUSEOUT, goog.bind( this.onMouseOut, this));	 	
+	 this.handler.listen(el, goog.events.EventType.MOUSEDOWN, this.onDownDomEvent, false, this);
+	 this.handler.listen(el, goog.events.EventType.MOUSEUP, this.onUpDomEvent, false, this);
+	 this.handler.listen(el, goog.events.EventType.MOUSEMOVE, this.onMoveDomEvent, false, this);
+	 this.handler.listen(el, goog.events.EventType.MOUSEOUT, this.onMouseOut, false, this);	 	
 };
 
 /**
  * @param {Object} e - DOM Event
  */
-pike.input.MouseInputHandler.prototype.onDownDomEvent = function(e){
+pike.input.MouseInputHandler.prototype.onDownDomEvent = function(e){	
 	this.mouseDown_ = true;
 	pike.input.InputHandlerBase.prototype.onDownDomEvent.call(this, e);
 };
@@ -172,7 +168,7 @@ pike.input.MouseInputHandler.prototype.onDownDomEvent = function(e){
 /**
  * @param {Object} e - DOM Event
  */
-pike.input.MouseInputHandler.prototype.onUpDomEvent = function(e){
+pike.input.MouseInputHandler.prototype.onUpDomEvent = function(e){	
 	this.mouseDown_ = false;
 	pike.input.InputHandlerBase.prototype.onUpDomEvent.call(this, e);
 };
@@ -180,7 +176,7 @@ pike.input.MouseInputHandler.prototype.onUpDomEvent = function(e){
 /**
  * @param {Object} e - DOM Event
  */
-pike.input.MouseInputHandler.prototype.onMoveDomEvent = function(e){
+pike.input.MouseInputHandler.prototype.onMoveDomEvent = function(e){	
 	if (this.mouseDown_) {
 		pike.input.InputHandlerBase.prototype.onMoveDomEvent.call(this, e);
 	}
@@ -274,10 +270,9 @@ pike.input.Utils.isTouchDevice = function(){
  * mouse or touch
  * @return {pike.input.MouseInputHandler | pike.input.TouchInputHandler} 
  */
-pike.input.Utils.getDeviceInputHandler = function(){
-	//TODO
-	//return pike.input.Utils.isTouchDevice() ? new pike.input.TouchInputHandler() : new pike.input.MouseInputHandler();
-	return new pike.input.TouchInputHandler();
+pike.input.Utils.getDeviceInputHandler = function(){	
+	return pike.input.Utils.isTouchDevice() ? new pike.input.TouchInputHandler() : new pike.input.MouseInputHandler();
+	//return new pike.input.TouchInputHandler();
 };
 
 /**
