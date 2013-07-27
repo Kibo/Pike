@@ -1,0 +1,63 @@
+<!doctype html>
+<html>
+<head>
+<title>Test Case</title>
+</head>
+<body>
+<script src="../../closure-library/closure/goog/base.js"></script>
+<script src="js/deps.js"></script>
+<script>
+	goog.require('goog.testing.ContinuationTestCase');	
+	goog.require('goog.testing.jsunit');	
+</script>
+<script>
+	goog.require('pike.layers.CollisionLayer');	
+	goog.require('pike.core.Entity');
+	goog.require('goog.events.EventTarget');
+	goog.require('goog.events');
+	goog.require('pike.events.Collision');	
+</script>
+<script>
+var testCase = new goog.testing.ContinuationTestCase('Collision Test Case');
+testCase.autoDiscoverTests();
+
+// Standalone Closure Test Runner.
+if (typeof G_testRunner != 'undefined') {
+  G_testRunner.initialize(testCase);
+}
+
+var layer
+function setUpPage(){}
+function setUp(){
+	layer = new pike.layers.CollisionLayer("entity", 10, [1,0,0,0,0,1,1,1,0,1,
+                                                          1,0,0,0,0,1,1,1,0,1,
+                                                          0,1,0,1,0,1,1,1,0,0 ]);
+	layer.setGameWorldSize(100,30); //10x3
+}
+
+function testOnEntityChangePosition() {
+	
+	var entity = new pike.core.Entity();
+	 entity.w = 20;
+	 entity.h = 20;
+	 
+	 entity.x = 0;
+	 entity.y = 10;
+		
+	var event = null;
+    goog.events.listen(entity, pike.events.Collision.EVENT_TYPE, function(e) {
+    	event = e;
+    });
+		  
+    waitForEvent(entity, pike.events.Collision.EVENT_TYPE, function() {
+    	assertTrue( event instanceof pike.events.Collision);    	
+    	assertTrue( event.target === entity);
+    });
+	
+	layer.onEntityChangePosition( new pike.events.Collision( entity.x, entity.y, 21, 22, new pike.core.Entity(), entity) )	
+};
+
+function tearDown(){}
+</script>
+</body>
+</html>

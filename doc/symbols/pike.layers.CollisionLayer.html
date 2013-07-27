@@ -5,7 +5,7 @@
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 		<meta name="generator" content="JsDoc Toolkit" />
 		
-		<title>JsDoc Reference - pike.events.ChangeSize</title>
+		<title>JsDoc Reference - pike.layers.CollisionLayer</title>
 
 		<style type="text/css">
 			/* default.css */
@@ -286,7 +286,7 @@ ul.inheritsList
 <!-- ============================== class title ============================ -->
 			<h1 class="classTitle">
 				
-				Class pike.events.ChangeSize
+				Class pike.layers.CollisionLayer
 			</h1>
 
 <!-- ============================== class summary ========================== -->			
@@ -299,13 +299,13 @@ ul.inheritsList
 				
 				
 				
-					<br /><i>Defined in: </i> <a href="../symbols/src/source_events.js.html">events.js</a>.
+					<br /><i>Defined in: </i> <a href="../symbols/src/source_layers.js.html">layers.js</a>.
 				
 			</p>
 
 <!-- ============================== constructor summary ==================== -->			
 			
-			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class pike.events.ChangeSize.">
+			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class pike.layers.CollisionLayer.">
 				<caption>Class Summary</caption>
 				<thead>
 					<tr>
@@ -318,9 +318,9 @@ ul.inheritsList
 						<td class="attributes">&nbsp;</td>
 						<td class="nameDescription" >
 							<div class="fixedFont">
-								<b><a href="../symbols/pike.events.ChangeSize.html#constructor">pike.events.ChangeSize</a></b>(width, height, oldW, oldH, target)
+								<b><a href="../symbols/pike.layers.CollisionLayer.html#constructor">pike.layers.CollisionLayer</a></b>(name, tileSize, data)
 							</div>
-							<div class="description"></div>
+							<div class="description">Create a new Collision layer</div>
 						</td>
 					</tr>
 				</tbody>
@@ -329,25 +329,55 @@ ul.inheritsList
 
 <!-- ============================== properties summary ===================== -->
 			
+
+<!-- ============================== methods summary ======================== -->
+			
 				
 				
-				<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class pike.events.ChangeSize.">
-					<caption>Field Summary</caption>
+				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class pike.layers.CollisionLayer.">
+					<caption>Method Summary</caption>
 					<thead>
 						<tr>
-							<th scope="col">Field Attributes</th>
-							<th scope="col">Field Name and Description</th>
+							<th scope="col">Method Attributes</th>
+							<th scope="col">Method Name and Description</th>
 						</tr>
 					</thead>
 					<tbody>
 					
 						<tr>
-							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont">
-								pike.events.ChangeSize.<b><a href="../symbols/pike.events.ChangeSize.html#.EVENT_TYPE">EVENT_TYPE</a></b>
+								<div class="fixedFont"><b><a href="../symbols/pike.layers.CollisionLayer.html#getValue">getValue</a></b>(row, column)
 								</div>
-								<div class="description">Event type</div>
+								<div class="description">Get value of data</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/pike.layers.CollisionLayer.html#isInCollision">isInCollision</a></b>(entity)
+								</div>
+								<div class="description">Determine collision with entity</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/pike.layers.CollisionLayer.html#onEntityChangePosition">onEntityChangePosition</a></b>(e)
+								</div>
+								<div class="description">On Entity change position handler
+Check collision only on edge of tile</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;private&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/pike.layers.CollisionLayer.html#px2Value_">px2Value_</a></b>(posX, posY)
+								</div>
+								<div class="description">Convert positions in px to value in data</div>
 							</td>
 						</tr>
 					
@@ -356,9 +386,6 @@ ul.inheritsList
 				
 				
 				
-			
-
-<!-- ============================== methods summary ======================== -->
 			
 <!-- ============================== events summary ======================== -->
 			
@@ -371,13 +398,22 @@ ul.inheritsList
 				</div>
 				
 				<div class="fixedFont">
-						<b>pike.events.ChangeSize</b>(width, height, oldW, oldH, target)
+						<b>pike.layers.CollisionLayer</b>(name, tileSize, data)
 				</div>
 				
 				<div class="description">
-					
+					Create a new Collision layer
 					
 				</div>
+				
+				
+				
+				<pre class="code">~~~
+var cLayer = new pike.layers.CollisionLayer("entity", 16, [0,0,0,0,0,1,1,1,0,0,0,]);
+cLayer.addEntity( hero );
+
+cLayer.handler.listen(hero, pike.events.ChangePosition.EVENT_TYPE, cLayer.onEntityChangePosition, false, cLayer);			
+~~~</pre>
 				
 				
 				
@@ -387,34 +423,22 @@ ul.inheritsList
 						<dt class="heading">Parameters:</dt>
 						
 							<dt>
-								<span class="light fixedFont">{number}</span>  <b>width</b>
+								<span class="light fixedFont">{string}</span>  <b>name</b>
 								
 							</dt>
-								<dd></dd>
+								<dd>- name of layer</dd>
 						
 							<dt>
-								<span class="light fixedFont">{number}</span>  <b>height</b>
+								<span class="light fixedFont">{numner}</span>  <b>tileSize</b>
 								
 							</dt>
-								<dd></dd>
+								<dd>- px</dd>
 						
 							<dt>
-								<span class="light fixedFont">{number}</span>  <b>oldW</b>
+								<span class="light fixedFont">{Array.<number>}</span>  <b>data</b>
 								
 							</dt>
-								<dd></dd>
-						
-							<dt>
-								<span class="light fixedFont">{number}</span>  <b>oldH</b>
-								
-							</dt>
-								<dd></dd>
-						
-							<dt>
-								<span class="light fixedFont">{goog.events.EventTarget}</span>  <b>target</b>
-								
-							</dt>
-								<dd></dd>
+								<dd>- [0,0,0,0,0,1,1,1,0,0,0,]</dd>
 						
 						</dl>
 					
@@ -430,25 +454,184 @@ ul.inheritsList
 
 <!-- ============================== field details ========================== -->		
 			
+
+<!-- ============================== method details ========================= -->		
+			
 				<div class="sectionTitle">
-					Field Detail
+					Method Detail
 				</div>
 				
-					<a name=".EVENT_TYPE"> </a>
-					<div class="fixedFont">&lt;static&gt; 
+					<a name="getValue"> </a>
+					<div class="fixedFont">
 					
-					
-					<span class="light">pike.events.ChangeSize.</span><b>EVENT_TYPE</b>
+					<span class="light">{number}</span>
+					<b>getValue</b>(row, column)
 					
 					</div>
 					<div class="description">
-						Event type
+						Get value of data
 						
 						
 					</div>
 					
 					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{number}</span> <b>row</b>
+									
+								</dt>
+								<dd></dd>
+							
+								<dt>
+									<span class="light fixedFont">{number}</span> <b>column</b>
+									
+								</dt>
+								<dd></dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{number}</span> </dd>
+							
+							</dl>
+						
+						
+						
 
+					<hr />
+				
+					<a name="isInCollision"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{boolean}</span>
+					<b>isInCollision</b>(entity)
+					
+					</div>
+					<div class="description">
+						Determine collision with entity
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{<a href="../symbols/pike.core.Entity.html">pike.core.Entity</a>}</span> <b>entity</b>
+									
+								</dt>
+								<dd></dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{boolean}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="onEntityChangePosition"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>onEntityChangePosition</b>(e)
+					
+					</div>
+					<div class="description">
+						On Entity change position handler
+Check collision only on edge of tile
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{<a href="../symbols/pike.events.ChangePosition.html">pike.events.ChangePosition</a>}</span> <b>e</b>
+									
+								</dt>
+								<dd></dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">See:</dt>
+							
+								<dd>CollisionLayer.isInCollision( entity )</dd>
+							
+							</dl>
+						
+
+					<hr />
+				
+					<a name="px2Value_"> </a>
+					<div class="fixedFont">&lt;private&gt; 
+					
+					
+					<b>px2Value_</b>(posX, posY)
+					
+					</div>
+					<div class="description">
+						Convert positions in px to value in data
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{number}</span> <b>posX</b>
+									
+								</dt>
+								<dd></dd>
+							
+								<dt>
+									<span class="light fixedFont">{number}</span> <b>posY</b>
+									
+								</dt>
+								<dd></dd>
+							
+							</dl>
+						
+						
+						
 						
 						
 						
@@ -456,9 +639,6 @@ ul.inheritsList
 
 					
 				
-			
-
-<!-- ============================== method details ========================= -->		
 			
 			
 <!-- ============================== event details ========================= -->		

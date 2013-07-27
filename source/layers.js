@@ -6,6 +6,7 @@
 goog.provide('pike.layers.Layer');
 goog.provide('pike.layers.ClusterLayer');
 goog.provide('pike.layers.ObstacleLayer');
+goog.provide('pike.layers.CollisionLayer');
 goog.provide('pike.layers.DirtyManager');
 
 goog.require('goog.events.EventHandler');
@@ -301,6 +302,12 @@ pike.layers.Layer.prototype.dispatchEvent = function( e ){
  * @param {numner} clusterSize - px
  * @constructor
  * @extends {pike.layers.Layer}
+ * @example
+ * ~~~
+ *	var entityLayer = new pike.layers.ClusterLayer("entity", 250);
+ *	entityLayer.setDirtyManager( new pike.layers.DirtyManager() );
+ *	entityLayer.addEntity( hero);										
+ * ~~~
  */
 pike.layers.ClusterLayer = function( name, clusterSize ){
 	pike.layers.Layer.call(this, name);
@@ -544,9 +551,20 @@ pike.layers.ClusterLayer.prototype.moveObjectBetweenClusters_ = function( entity
 //## ObstacleLayer #################################################
 /**
  * Create a new Obstacle layer
+ * Make pixel perfect collision. It uses context.getImageData for read pixel info.
+ * It loads a background image. This image is not visible and is render only once on a offScreen canvas. Non transparent pixels evaluates as collision.
  * @param {string} name
  * @constructor
  * @extends {pike.layers.Layer}
+ * @example
+ * ~~~
+ * var obstacleLayer = new pike.layers.ObstacleLayer("obstacle");	
+ * var obstacleImage = new pike.core.Entity( pike.components.Image );	
+ * obstacleImage.handler.listen( obstacleImage, pike.events.Render.EVENT_TYPE, obstacleImage.onImageRender, false, obstacleImage);
+ * obstacleLayer.addEntity( obstacleImage );
+ * 
+ * obstacleLayer.handler.listen(hero, pike.events.ChangePosition.EVENT_TYPE, obstacleLayer.onEntityChangePosition, false, obstacleLayer);										
+ * ~~~
  */
 pike.layers.ObstacleLayer = function( name ){
 	pike.layers.Layer.call(this, name);	
@@ -704,5 +722,102 @@ pike.layers.DirtyManager.prototype.setSize = function( width, height ){
 pike.layers.DirtyManager.prototype.setPosition = function( x, y ){
 	this.viewport_.x = x;
 	this.viewport_.y = y;
+};
+
+//## CollisionLayer #################################################
+/**
+ * Create a new Collision layer
+ * @param {string} name - name of layer
+ * @param {numner} tileSize - px
+ * @param {Array.<number>} data - [0,0,0,0,0,1,1,1,0,0,0,]
+ * @constructor
+ * @extends {pike.layers.Layer}
+ * @example
+ * ~~~
+ * var cLayer = new pike.layers.CollisionLayer("entity", 16, [0,0,0,0,0,1,1,1,0,0,0,]);
+ * cLayer.addEntity( hero );
+ * 
+ * cLayer.handler.listen(hero, pike.events.ChangePosition.EVENT_TYPE, cLayer.onEntityChangePosition, false, cLayer);			
+ * ~~~
+ */
+pike.layers.CollisionLayer = function( name, tileSize, data ){
+	pike.layers.Layer.call(this, name);
+	
+	this.tileSize_ = tileSize;
+	this.data_ = data;
+};
+
+goog.inherits(pike.layers.CollisionLayer, pike.layers.Layer);
+
+/**
+ * Get value of data
+ * @param {number} row
+ * @param {number} column
+ * @return {number}
+ */
+pike.layers.CollisionLayer.prototype.getValue = function( row, column ){
+	var index = (row * this.tileSize_) + column;
+		
+	if(index < 0 
+	|| index >= this.data_.length ){
+	//It evaluates out of bounce as 0
+		return 0;
+	}
+	
+	return this.data_[ index ];
+};
+
+/**
+ * Convert positions in px to value in data
+ * @param {number} posX
+ * @param {number} posY
+ * @private
+ */
+pike.layers.CollisionLayer.prototype.px2Value_ = function( posX, posY ){
+	var column = ~~(posX / this.tileSize_);
+	var row = ~~(posY / this.tileSize_);	
+	return this.getValue( row, column );	
+};
+
+/**
+ * Determine collision with entity
+ * @param {pike.core.Entity} entity
+ * @return {boolean}
+ */
+pike.layers.CollisionLayer.prototype.isInCollision = function( entity ){
+	
+	var entityHeightTakesRows = ~~(entity.h / this.tileSize_);
+	var entityWidthTakesColumns = ~~(entity.w / this.tileSize_);
+	
+	for(var i = 0; i < entityHeightTakesRows; i++ ){
+		for(var n = 0; n < entityWidthTakesColumns; n++){								
+			if( this.px2Value_(entity.x + (n * this.tileSize_), entity.y + (i * this.tileSize_)) != 0 ){			
+				return true;
+			}					
+		}				
+	}
+	
+	return false;
+};
+
+/**
+ * On Entity change position handler
+ * Check collision only on edge of tile 
+ * @param {pike.events.ChangePosition} e
+ * @see CollisionLayer.isInCollision( entity )
+ */
+pike.layers.CollisionLayer.prototype.onEntityChangePosition = function(e){
+	
+	if( e.x % this.tileSize_ != 0 
+	 || e.y % this.tileSize_ != 0 ){
+		// check collision only on edge of tile
+		return;
+	}
+	
+	var entity = e.target;
+	if( this.isInCollision( entity ) ){
+		if(goog.DEBUG) window.console.log("[pike.layers.CollisionLayer] collision with entity #" + e.target.id);
+		entity.dispatchEvent( new pike.events.Collision(e.x, e.y, e.oldX, e.oldY, new pike.core.Entity(), entity ));
+	}	
 };
 
