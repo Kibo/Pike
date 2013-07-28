@@ -743,11 +743,30 @@ pike.layers.DirtyManager.prototype.setPosition = function( x, y ){
 pike.layers.CollisionLayer = function( name, tileSize, data ){
 	pike.layers.Layer.call(this, name);
 	
-	this.tileSize_ = tileSize;
-	this.data_ = data;
+	this.tileSize_ = tileSize || 32;
+	this.data_ = data || [];
 };
 
 goog.inherits(pike.layers.CollisionLayer, pike.layers.Layer);
+
+/**
+ * Set a size of tile in collision map
+ * @param {number} tileSize
+ */
+pike.layers.CollisionLayer.prototype.setTileSize = function( tileSize){
+	this.tileSize_ = tileSize;
+};
+
+/**
+ * Set a source data
+ * @param {Array.<number>} data
+ */
+pike.layers.CollisionLayer.prototype.setData = function( data ){
+	if(!data){
+		throw new Error("[pike.core.CollisionLayer] data is null")
+	}
+	this.data_ = data;
+};
 
 /**
  * Get value of data
