@@ -1,0 +1,85 @@
+<!doctype html>
+<html>
+<head>
+<title>Test Case</title>
+</head>
+<body>
+<script src="../../closure-library/closure/goog/base.js"></script>
+<script src="js/deps.js"></script>
+<script>
+	goog.require('goog.testing.ContinuationTestCase');	
+	goog.require('goog.testing.jsunit');	
+</script>
+<script>		
+	goog.require('pike.layers.CollisionLayer');	
+	goog.require('pike.core.Entity');
+	goog.require('goog.events.EventTarget');
+	goog.require('goog.events');	
+	goog.require('pike.graphics.Rectangle');	
+</script>
+<script>
+var layer
+function setUpPage(){}
+function setUp(){
+	layer = new pike.layers.CollisionLayer("entity", 10, [1,0,0,0,0,1,1,1,0,1,
+                                                          1,0,0,0,0,1,1,1,0,1,
+                                                          0,1,0,1,0,1,1,1,0,0 ]);
+	layer.setGameWorldSize(100,30); //10x3
+}
+
+function testGetValue(){				
+	assertEquals( 1, layer.getValue(0,0) );	
+	assertEquals( 1, layer.getValue(0,9) );
+	
+	assertEquals( 1, layer.getValue(1,0) );
+	assertEquals( 1, layer.getValue(1,5) );
+	assertEquals( 1, layer.getValue(1,9) );
+	
+	assertEquals( 0, layer.getValue(2,0) );
+	assertEquals( 1, layer.getValue(2,1) );
+	assertEquals( 0, layer.getValue(2,9) );
+	
+	//out of bounds
+	assertEquals( 0, layer.getValue(-100, -100) );
+	assertEquals( 0, layer.getValue(100, 100) );
+};
+
+function testPx2Coords(){
+	assertObjectEquals( {row:0, column:0}, layer.px2Coords(0, 0));
+	assertObjectEquals( {row:0, column:1}, layer.px2Coords(10, 0));
+	assertObjectEquals( {row:0, column:9}, layer.px2Coords(90, 0));
+	
+	assertObjectEquals( {row:1, column:0}, layer.px2Coords(0, 10));
+	assertObjectEquals( {row:2, column:0}, layer.px2Coords(0, 20));
+	assertObjectEquals( {row:2, column:9}, layer.px2Coords(90, 20));
+	
+	assertObjectEquals( {row:0, column:0}, layer.px2Coords(5, 5));
+	
+	assertObjectEquals( {row:1, column:0}, layer.px2Coords(5, 15));
+	
+	assertObjectEquals( {row:0, column:0}, layer.px2Coords(9, 0));
+}
+
+function testIsInCollision(){
+	
+	assertEquals( true, layer.isInCollision( new pike.graphics.Rectangle(0,0,1,1) ));
+	assertEquals( false, layer.isInCollision( new pike.graphics.Rectangle(10,0,1,1) ));
+	
+	assertEquals( true, layer.isInCollision( new pike.graphics.Rectangle(0,0,10,10) ));	
+	assertEquals( false, layer.isInCollision( new pike.graphics.Rectangle(10,10,10,10) ));	
+	assertEquals( true, layer.isInCollision( new pike.graphics.Rectangle(10,11,10,10) ));
+	
+	assertEquals( false, layer.isInCollision( new pike.graphics.Rectangle(20,10,10,10) ));
+	assertEquals( false, layer.isInCollision( new pike.graphics.Rectangle(20,11,10,10) ));
+	assertEquals( true, layer.isInCollision( new pike.graphics.Rectangle(21,11,10,10) ));
+	
+	assertEquals( false, layer.isInCollision( new pike.graphics.Rectangle(20,0,20,20) ));
+	assertEquals( false, layer.isInCollision( new pike.graphics.Rectangle(21,0,20,20) ));
+	assertEquals( true, layer.isInCollision( new pike.graphics.Rectangle(20,1,20,20) ));
+	assertEquals( true, layer.isInCollision( new pike.graphics.Rectangle(21,1,20,20) ));
+};
+
+function tearDown(){}
+</script>
+</body>
+</html>

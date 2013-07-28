@@ -756,47 +756,54 @@ goog.inherits(pike.layers.CollisionLayer, pike.layers.Layer);
  * @return {number}
  */
 pike.layers.CollisionLayer.prototype.getValue = function( row, column ){
-	var index = (row * this.tileSize_) + column;
+	var index = (row * ~~(this.gameWorld_.w/this.tileSize_)) + column;
 		
 	if(index < 0 
 	|| index >= this.data_.length ){
 	//It evaluates out of bounce as 0
 		return 0;
-	}
-	
+	}	
 	return this.data_[ index ];
 };
 
 /**
- * Convert positions in px to value in data
+ * Convert positions in px to coordinations in row/column
+ * Rowns and columns start count from 0.
  * @param {number} posX
  * @param {number} posY
- * @private
+ * @return {Object}
  */
-pike.layers.CollisionLayer.prototype.px2Value_ = function( posX, posY ){
-	var column = ~~(posX / this.tileSize_);
-	var row = ~~(posY / this.tileSize_);	
-	return this.getValue( row, column );	
+pike.layers.CollisionLayer.prototype.px2Coords = function( posX, posY ){		
+	return {row: ~~(posY / this.tileSize_), column: ~~(posX / this.tileSize_)};	
 };
 
 /**
  * Determine collision with entity
- * @param {pike.core.Entity} entity
+ * @param {pike.graphics.Rectangle} rectangle
  * @return {boolean}
  */
-pike.layers.CollisionLayer.prototype.isInCollision = function( entity ){
+pike.layers.CollisionLayer.prototype.isInCollision = function( rectangle ){
 	
-	var entityHeightTakesRows = ~~(entity.h / this.tileSize_);
-	var entityWidthTakesColumns = ~~(entity.w / this.tileSize_);
+	var startCoords = this.px2Coords( rectangle.x, rectangle.y );
 	
-	for(var i = 0; i < entityHeightTakesRows; i++ ){
-		for(var n = 0; n < entityWidthTakesColumns; n++){								
-			if( this.px2Value_(entity.x + (n * this.tileSize_), entity.y + (i * this.tileSize_)) != 0 ){			
+	//width 10 = from 0 to 9; height 10 = from 0 to 9
+	var endCoords = this.px2Coords( rectangle.x + rectangle.w - 1, rectangle.y + rectangle.h - 1);
+	
+	var rectangleTakesRows = endCoords.row - startCoords.row;
+	var rectangleTakesColumns = endCoords.column - startCoords.column;
+		 
+	for(var i = 0; i <= rectangleTakesRows; i++ ){
+		for(var n = 0; n <= rectangleTakesColumns; n++){	
+			
+			//convert positions in px to row/column coords
+			var coords = this.px2Coords(rectangle.x + (n * this.tileSize_), rectangle.y + (i * this.tileSize_));
+			
+			if( this.getValue(coords.row,  coords.column) != 0 ){			
 				return true;
 			}					
 		}				
 	}
-	
+	 	
 	return false;
 };
 
@@ -806,18 +813,10 @@ pike.layers.CollisionLayer.prototype.isInCollision = function( entity ){
  * @param {pike.events.ChangePosition} e
  * @see CollisionLayer.isInCollision( entity )
  */
-pike.layers.CollisionLayer.prototype.onEntityChangePosition = function(e){
-	
-	if( e.x % this.tileSize_ != 0 
-	 || e.y % this.tileSize_ != 0 ){
-		// check collision only on edge of tile
-		return;
-	}
-	
+pike.layers.CollisionLayer.prototype.onEntityChangePosition = function(e){		
 	var entity = e.target;
-	if( this.isInCollision( entity ) ){
+	if( this.isInCollision( entity.getCBounds()) ){
 		if(goog.DEBUG) window.console.log("[pike.layers.CollisionLayer] collision with entity #" + e.target.id);
 		entity.dispatchEvent( new pike.events.Collision(e.x, e.y, e.oldX, e.oldY, new pike.core.Entity(), entity ));
 	}	
 };
-

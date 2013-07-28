@@ -51,7 +51,7 @@ function testOnEntityChangePosition() {
 		  
     waitForEvent(entity, pike.events.Collision.EVENT_TYPE, function() {
     	assertTrue( event instanceof pike.events.Collision);    	
-    	assertTrue( event.target === entity);
+    	assertTrue( event.target === entity);  
     });
 	
 	layer.onEntityChangePosition( new pike.events.Collision( entity.x, entity.y, 21, 22, new pike.core.Entity(), entity) )	

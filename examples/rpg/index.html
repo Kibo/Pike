@@ -73,6 +73,7 @@
 				   
     <script src="../../../closure-library/closure/goog/base.js"></script>
     <script src="../../test/js/deps.js"></script>
+    <script src="data/collision.js"></script>
     <script src="data/dialogues.js"></script>
     <script>
 		goog.require('pike.assets.ImageManager');
@@ -132,18 +133,15 @@
 				stage.getLayer('background').addEntity( bgEntity );
 									
 				//Obstacles
-				stage.addLayer( new pike.layers.ObstacleLayer("obstacles") );
-				var obsLayer = stage.getLayer('obstacles');
-				var obs = new pike.core.Entity( pike.components.Image );
-				obs.setImage( imageManager.get("fg") );
-				obs.handler.listen(obs, pike.events.Render.EVENT_TYPE, goog.bind(obs.onImageRender, obs));				
-				
-				obsLayer.addEntity( obs );
+				stage.addLayer( new pike.layers.CollisionLayer("obstacles", 16, COLLISION_DATA) );
+				var cLayer = stage.getLayer('obstacles');							
 				
 				//Entities
 				var hero = new pike.core.Entity( pike.components.Sprite, pike.components.Watch, pike.components.Collision );
+				hero.x = 150;
+				hero.y = 200;
 				hero.setSprite( imageManager.get("entities"), 0, 0, 32, 32, 3, 124);
-				hero.setCollisionBounds(0,22,0,22);
+				hero.setCollisionBounds(0, 16, 0, 16);
 				
 				hero.SPEED = 120; // 2px * 60fps = 120px/sec 
 				hero.positionAnimator = new pike.animation.Animator();
@@ -224,7 +222,7 @@
 																								
 				hero.handler.listen(hero, pike.events.Render.EVENT_TYPE, goog.bind(hero.onSpriteRender, hero));
 														
-				//obsLayer.handler.listen(hero, pike.events.ChangePosition.EVENT_TYPE, goog.bind(obsLayer.onEntityChangePosition, obsLayer));
+				cLayer.handler.listen(hero, pike.events.ChangePosition.EVENT_TYPE, cLayer.onEntityChangePosition, false, cLayer);
 																																																																									
 				var cheese =  new pike.core.Entity( pike.components.Sprite, pike.components.Collision, pike.components.Backpack);
 				cheese.x = 150;
