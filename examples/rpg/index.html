@@ -3,6 +3,7 @@
     <head>
     	<meta charset="utf-8">       
         <title>Pike - rpg example</title>
+        <link rel="stylesheet" href="../css/main.css">
          <style>
         
 	        html, body {
@@ -30,8 +31,21 @@
 				position:relative;						
 			}
 	        		
-			#pike-stage{
-							
+			#practice{
+				position:absolute;
+				top:0;
+				left:0;
+				width:100%;
+				height:100%;
+				background:#eee;			
+			}
+								
+			.space{
+				padding:1em;
+			}
+			
+			.space h3{
+				margin:0;
 			}
 			
 			#pike-dialogues{
@@ -64,6 +78,10 @@
 				background:#999;	
 			}
 			
+			.hide{
+				display:none;
+			}
+			
 			.xstats {
 				position: absolute;
 				top: 0;
@@ -74,7 +92,8 @@
     <script src="../../../closure-library/closure/goog/base.js"></script>
     <script src="../../test/js/deps.js"></script>
     <script src="data/collision.js"></script>
-    <script src="data/dialogues.js"></script>
+    <script src="data/dialogue.js"></script>
+    <script src="data/practice.js"></script>
     <script>
 		goog.require('pike.assets.ImageManager');
 		goog.require('pike.input.MouseInputHandler');
@@ -118,7 +137,7 @@
 															
 				var mouse = pike.input.Utils.getDeviceInputHandler();
 				mouse.handler.listen(viewport, pike.events.ChangePosition.EVENT_TYPE, goog.bind(mouse.onViewportChangePosition, mouse));
-				mouse.setEventTarget( document.getElementById("game"));				
+				mouse.setEventTarget( document.getElementById("curtain"));				
 		
 				viewport.setSize(800,600);
 				gameWorld.setSize(1280, 1280);
@@ -223,6 +242,13 @@
 				hero.handler.listen(hero, pike.events.Render.EVENT_TYPE, goog.bind(hero.onSpriteRender, hero));
 														
 				cLayer.handler.listen(hero, pike.events.ChangePosition.EVENT_TYPE, cLayer.onEntityChangePosition, false, cLayer);
+				
+				
+				
+				var practice =  new pike.core.Entity( pike.components.Practice );
+				practice.setPracticeData( PRACTICE_DATA['drummer']);
+				practice.showPractice();
+				
 																																																																									
 				var cheese =  new pike.core.Entity( pike.components.Sprite, pike.components.Collision, pike.components.Backpack);
 				cheese.x = 150;
@@ -256,11 +282,9 @@
 																						
 				var clustaLayer = new pike.layers.ClusterLayer("Clusta", 250);
 				clustaLayer.setDirtyManager( new pike.layers.DirtyManager() );				
-				clustaLayer.addEntity( hero );	
-			
+				clustaLayer.addEntity( hero );				
 				clustaLayer.addEntity( cheese );
-				
-		
+						
 				stage.addLayer( clustaLayer );
 								
 				//Foreground					
@@ -282,11 +306,18 @@
     	<div id="game">                            
         	<div id="pike-stage"></div>
         	<div id="pike-backpack"></div>
-        	<div id="pike-dialogues"></div>
         	<div id="curtain"></div>
+        	<div id="pike-dialogues"></div>
+        	
+        	<div id="practice">
+        		<div class="space">
+        		<h3>Assignment</h3>
+        		<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent nulla nulla, egestas non consequat ac, tempus eget mi. Integer in tortor velit. Curabitur id justo at ante eleifend lobortis. Donec dolor lacus, euismod a malesuada ut, convallis eu elit. </p>        		        	
+        		<div id="pike-practice"></div>        		        		
+        		</div> <!-- space -->
+        	</div>
         </div>
-                                  
-                              
+                                                                
         <script src="../../libs/xstats/xstats.js"></script>
         <script>
         	var stats = new xStats;

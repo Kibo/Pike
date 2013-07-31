@@ -13,6 +13,7 @@ goog.provide('pike.components.Dialogues');
 goog.provide('pike.components.Hen');
 goog.provide('pike.components.VisualizeGraph');
 goog.provide('pike.components.VisualizeRectangle');
+goog.provide('pike.components.Practice');
 
 goog.require('goog.events');
 goog.require('goog.array');
@@ -22,6 +23,7 @@ goog.require('pike.animation.Animator');
 goog.require('pike.events.StartDialogue');
 goog.require('pike.events.ShowDialogue');
 goog.require('pike.events.EndDialogue');
+goog.require('pike.events.EndPractice');
 goog.require('goog.style');
 
 //## Collision #################################
@@ -1448,4 +1450,230 @@ pike.components.VisualizeRectangle = function(){
  * @type {string}
  */
 pike.components.VisualizeRectangle.NAME="pike.components.VisualizeRectangle";
+
+//## pike.components.Practice #################################
+/**
+ * Practice
+ * Practicing English tenses
+ * @constructor
+ * @example
+ * ~~~
+ * var practice = new pike.core.Entity( pike.components.Practice );
+ * practice.setPracticeData(data);  
+ * 
+ * hero.handler.listen(practice, pike.events.EndPractice.EVENT.TYPE, function(e){//do something}, false, this);
+ * 
+ * practice.showPractice();
+ * 
+ * practice.isPracticeFinished();
+ * practice.hasPracticeError();
+ * ~~~
+ * @author Tomas Jurman (tomasjurman@gmail.com)
+ */
+pike.components.Practice = function(){	
+	this.hasPracticeError_ = false;
+	this.numberOfPractice_ = 5;
+	this.practiceData_ = [];
+	this.practiceDataIndex_ = 0;
+	
+	root = document.getElementById(pike.components.Practice.ELEMENT_ID);
+		
+	/**
+	 * Create practice form
+	 */
+	this.showPractice = function(){
+		if( !this.practiceData_[ this.practiceDataIndex_ ]){
+			throw new Error("[pike.components.Practice] practiceData: Array Out of Bounds");
+		}
+		
+		if(!root){
+			throw new Error("[pike.components.Practice] there is not root element #: " + pike.components.Practice.NAME);
+		}
+				
+		root.innerHTML= ''; //reset
+		
+		var sentence = this.practiceData_[ this.practiceDataIndex_ ];
+					
+		var assignment = goog.dom.createDom('ul', undefined,
+				goog.dom.createDom('li', undefined, goog.dom.htmlToDocumentFragment('Subject: <b>' + sentence.subject + '</b>')),
+				goog.dom.createDom('li', undefined, goog.dom.htmlToDocumentFragment('Verb: <b>' + sentence.verb + '</b>')),
+				goog.dom.createDom('li', undefined, goog.dom.htmlToDocumentFragment('Verb Tense: <b>' + sentence.tense + '</b>')),
+				goog.dom.createDom('li', undefined, goog.dom.htmlToDocumentFragment('Option: <b>' + sentence.option + '</b>')),
+				goog.dom.createDom('li', undefined, goog.dom.htmlToDocumentFragment('Object: <b>' + sentence.object + '</b>'))				
+		);
+				
+		var text = goog.dom.createDom('div', {'id': pike.components.Practice.ANSWER_ELEMENT_ID}, 
+				goog.dom.createDom('label', undefined,'Write the Sentence:'),
+				goog.dom.createDom('textarea'));
+		
+		var solutions = goog.dom.createDom('div', {'id':pike.components.Practice.SOLUTIONS_ELEMENT_ID}); 
+				
+		var buttonsWrapper = goog.dom.createDom('p'); 
+																			
+		var checkButton = goog.dom.createDom('input', {'type':'button', 'id':pike.components.Practice.BUTTON_CHECK_ELEMENT_ID, 'value':'Check'});
+		var checkInputHandler = pike.input.Utils.getDeviceInputHandler();
+		checkInputHandler.setEventTarget( checkButton );
+		goog.events.listenOnce( checkInputHandler , pike.events.Down.EVENT_TYPE, this.checkButtonHandler, false, this);
+		goog.dom.appendChild(buttonsWrapper, checkButton);
+				
+		var nextButton = goog.dom.createDom('input', {'type':'button', 'id':pike.components.Practice.BUTTON_NEXT_ELEMENT_ID, 'value':'Next', 'class':'hide'});
+		var nextInputHandler = pike.input.Utils.getDeviceInputHandler();
+		nextInputHandler.setEventTarget( nextButton );
+		goog.events.listenOnce(nextInputHandler, pike.events.Down.EVENT_TYPE, this.nextButtonHandler, false, this);
+		goog.dom.appendChild(buttonsWrapper, nextButton);
+					
+		var leaveButton = goog.dom.createDom('input', {'type':'button', 'id':'practice-leave-button', 'value':'Leave'});
+		var leaveInputHandler = pike.input.Utils.getDeviceInputHandler();
+		leaveInputHandler.setEventTarget( leaveButton );
+		goog.events.listenOnce( leaveInputHandler, pike.events.Down.EVENT_TYPE, this.leaveButtonHandler, false, this);
+		goog.dom.appendChild(buttonsWrapper, leaveButton);
+		
+		goog.dom.appendChild(root, assignment);
+		goog.dom.appendChild(root, text);
+		goog.dom.appendChild(root, solutions);
+		goog.dom.appendChild(root, buttonsWrapper);
+	};
+		
+	/**
+	 * Check button handler
+	 * @param {Object} e - DOM event
+	 */
+	this.checkButtonHandler = function(e){
+				
+		goog.dom.classes.add( document.getElementById( pike.components.Practice.BUTTON_CHECK_ELEMENT_ID ), 'hide');
+		if( this.hasNextPractice() ){
+			goog.dom.classes.remove( document.getElementById( pike.components.Practice.BUTTON_NEXT_ELEMENT_ID ), 'hide');
+		}
+					
+		var answer = goog.dom.getLastElementChild(document.getElementById(pike.components.Practice.ANSWER_ELEMENT_ID)).value.trim();
+		var solutionsWrapper = document.getElementById( pike.components.Practice.SOLUTIONS_ELEMENT_ID );
+		
+		for(var i = 0; i < this.practiceData_[ this.practiceDataIndex_ ].solutions.length; i++){
+			if( answer == this.practiceData_[ this.practiceDataIndex_ ].solutions[i] ){				
+				goog.dom.classes.add( document.getElementById( pike.components.Practice.ANSWER_ELEMENT_ID ), 'correct');
+				return;
+			}			
+		}
+		
+		goog.dom.classes.add( document.getElementById( pike.components.Practice.ANSWER_ELEMENT_ID ), 'error');
+
+		//show correct answer
+		for(var i = 0; i < this.practiceData_[ this.practiceDataIndex_ ].solutions.length; i++){
+			var solution = goog.dom.createDom('p', undefined, this.practiceData_[ this.practiceDataIndex_ ].solutions[i]);			
+			goog.dom.appendChild(solutionsWrapper, solution);				
+		}				
+	};
+	
+	/**
+	 * Next button handler
+	 * @param {Object} e - DOM event
+	 */
+	this.nextButtonHandler = function(e){
+		if(this.hasNextPractice()){
+			this.practiceDataIndex_ += 1;
+			this.showPractice();			
+		}
+	};
+	
+	/**
+	 * Leave button handler
+	 * @param {Object} e - DOM event
+	 */
+	this.leaveButtonHandler = function(e){
+		if(goog.DEBUG) window.console.log("[pike.components.Practice] endpractice");
+		this.dispatchEvent( new pike.events.EndPractice( this ) );	
+		return;
+	};
+					
+	/**
+	 * Has next practice
+	 * @return {boolean}
+	 */
+	this.hasNextPractice = function(){
+		return ((this.practiceDataIndex_ + 1) < this.practiceData_.length 
+				&& (this.practiceDataIndex_ + 1) < this.numberOfPractice_ );
+	};
+		
+	/**
+	 * Shuffle practice data
+	 * @param {Array.<Object>} data
+	 */
+	this.shufflePracticeData = function( data ){
+		goog.array.shuffle(data);
+	};
+		
+	/**
+	 * Set a practice data
+	 * @param {Array.<Object>} data
+	 */
+	this.setPracticeData = function( data ){		
+		this.practiceData_ = data;
+	};
+
+	/**
+	 * Number of exercises
+	 * @param {number} number
+	 */
+	this.setNumberOfPractice = function( number ){
+		this.numberOfPractice_ = number;
+	};
+
+	/**
+	 * Is finished
+	 * @return {boolean}
+	 */
+	this.isPracticeFinished = function(){
+		return (this.practiceDataIndex_ + 1) == this.numberOfPractice_;
+	};
+
+	/**
+	 * Has error
+	 * @return {boolean}
+	 */
+	this.hasPracticeError = function(){
+		return this.hasPracticeError_;
+	};
+};
+
+/**
+ * Component name
+ * @const
+ * @type {string}
+ */
+pike.components.Practice.NAME="pike.components.Practice";
+
+/**
+ * DOM Element id
+ * @const
+ * @type {string}
+ */
+pike.components.Practice.ELEMENT_ID = "pike-practice";
+
+/**
+ * DOM Element id
+ * @const
+ * @type {string}
+ */
+pike.components.Practice.ANSWER_ELEMENT_ID = "practice-answer";
+
+/**
+ * DOM Element id
+ * @const
+ * @type {string}
+ */
+pike.components.Practice.SOLUTIONS_ELEMENT_ID = "practice-solutions";
+
+/**
+ * DOM Element id
+ * @const
+ * @type {string}
+ */
+pike.components.Practice.BUTTON_CHECK_ELEMENT_ID = "practice-button-check";
+
+/**
+ * DOM Element id
+ * @const
+ * @type {string}
+ */
+pike.components.Practice.BUTTON_NEXT_ELEMENT_ID = "practice-button-next";
 

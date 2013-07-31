@@ -23,6 +23,7 @@ goog.provide('pike.events.Move');
 goog.provide('pike.events.StartDialogue');
 goog.provide('pike.events.ShowDialogue');
 goog.provide('pike.events.EndDialogue');
+goog.provide('pike.events.EndPractice');
 
 goog.require('goog.events.Event');
 goog.require('goog.events.EventTarget');
@@ -337,5 +338,21 @@ goog.inherits( pike.events.ShowDialogue, goog.events.Event );
  */
 pike.events.ShowDialogue.EVENT_TYPE = "showdialogue";
 
+//## EndPractice #################################################################################
+/**
+* @param {goog.events.EventTarget} target
+* @constructor
+* @extends {goog.events.Event}
+*/
+pike.events.EndPractice = function( target ){
+	goog.events.Event.call(this, pike.events.EndPractice.EVENT_TYPE, target);
+};
 
+goog.inherits( pike.events.EndPractice, goog.events.Event );
 
+/**
+ * Event type
+ * @const
+ * @type {string}
+ */
+pike.events.EndPractice.EVENT_TYPE = "endpractice";
