@@ -24,6 +24,7 @@ goog.provide('pike.events.StartDialogue');
 goog.provide('pike.events.ShowDialogue');
 goog.provide('pike.events.EndDialogue');
 goog.provide('pike.events.EndPractice');
+goog.provide('pike.events.ReachDestination');
 
 goog.require('goog.events.Event');
 goog.require('goog.events.EventTarget');
@@ -356,3 +357,26 @@ goog.inherits( pike.events.EndPractice, goog.events.Event );
  * @type {string}
  */
 pike.events.EndPractice.EVENT_TYPE = "endpractice";
+
+//## ReachDestination #################################################################################
+/**
+* @param {number} x
+* @param {number} y
+* @param {goog.events.EventTarget} target
+* @constructor
+* @extends {goog.events.Event}
+*/
+pike.events.ReachDestination = function( x, y, target){
+	goog.events.Event.call(this, pike.events.ReachDestination.EVENT_TYPE, target);	
+	this.x = x;
+	this.y = y;	
+};
+
+goog.inherits( pike.events.ReachDestination, goog.events.Event );
+
+/**
+ * Event type
+ * @const
+ * @type {string}
+ */
+pike.events.ReachDestination.EVENT_TYPE = "reachdestination";

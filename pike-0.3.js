@@ -3167,6 +3167,8 @@ goog.provide("pike.events.Move");
 goog.provide("pike.events.StartDialogue");
 goog.provide("pike.events.ShowDialogue");
 goog.provide("pike.events.EndDialogue");
+goog.provide("pike.events.EndPractice");
+goog.provide("pike.events.ReachDestination");
 goog.require("goog.events.Event");
 goog.require("goog.events.EventTarget");
 pike.events.Update = function(now, target) {
@@ -3265,6 +3267,18 @@ pike.events.ShowDialogue = function(dialogue, target) {
 };
 goog.inherits(pike.events.ShowDialogue, goog.events.Event);
 pike.events.ShowDialogue.EVENT_TYPE = "showdialogue";
+pike.events.EndPractice = function(target) {
+  goog.events.Event.call(this, pike.events.EndPractice.EVENT_TYPE, target)
+};
+goog.inherits(pike.events.EndPractice, goog.events.Event);
+pike.events.EndPractice.EVENT_TYPE = "endpractice";
+pike.events.ReachDestination = function(x, y, target) {
+  goog.events.Event.call(this, pike.events.ReachDestination.EVENT_TYPE, target);
+  this.x = x;
+  this.y = y
+};
+goog.inherits(pike.events.ReachDestination, goog.events.Event);
+pike.events.ReachDestination.EVENT_TYPE = "reachdestination";
 // Input 23
 goog.provide("goog.math");
 goog.require("goog.array");
@@ -6079,7 +6093,7 @@ pike.ai.path.Graph.prototype.findPath = function(startNode, endNode) {
   });
   return route
 };
-pike.ai.path.Graph.serialize = function() {
+pike.ai.path.Graph.prototype.serialize = function() {
   var data = {};
   data.nodes = [];
   this.nodes_.forEach(function(it) {
@@ -6089,6 +6103,9 @@ pike.ai.path.Graph.serialize = function() {
 };
 pike.ai.path.Graph.distance = function(node1, node2) {
   return Math.sqrt((node1.x - node2.x) * (node1.x - node2.x) + (node1.y - node2.y) * (node1.y - node2.y))
+};
+pike.ai.path.Graph.prototype.getNodes = function() {
+  return this.nodes_
 };
 pike.ai.path.Node = function(id, x, y) {
   this.id = id;
@@ -6309,6 +6326,484 @@ pike.core.Stage.prototype.setViewportPosition_ = function(x, y) {
   }
 };
 // Input 38
+goog.provide("goog.events.EventHandler");
+goog.require("goog.Disposable");
+goog.require("goog.array");
+goog.require("goog.events");
+goog.require("goog.events.EventWrapper");
+goog.events.EventHandler = function(opt_handler) {
+  goog.Disposable.call(this);
+  this.handler_ = opt_handler;
+  this.keys_ = []
+};
+goog.inherits(goog.events.EventHandler, goog.Disposable);
+goog.events.EventHandler.typeArray_ = [];
+goog.events.EventHandler.prototype.listen = function(src, type, opt_fn, opt_capture, opt_handler) {
+  if(!goog.isArray(type)) {
+    goog.events.EventHandler.typeArray_[0] = (type);
+    type = goog.events.EventHandler.typeArray_
+  }
+  for(var i = 0;i < type.length;i++) {
+    var key = (goog.events.listen(src, type[i], opt_fn || this, opt_capture || false, opt_handler || this.handler_ || this));
+    this.keys_.push(key)
+  }
+  return this
+};
+goog.events.EventHandler.prototype.listenOnce = function(src, type, opt_fn, opt_capture, opt_handler) {
+  if(goog.isArray(type)) {
+    for(var i = 0;i < type.length;i++) {
+      this.listenOnce(src, type[i], opt_fn, opt_capture, opt_handler)
+    }
+  }else {
+    var key = (goog.events.listenOnce(src, type, opt_fn || this, opt_capture, opt_handler || this.handler_ || this));
+    this.keys_.push(key)
+  }
+  return this
+};
+goog.events.EventHandler.prototype.listenWithWrapper = function(src, wrapper, listener, opt_capt, opt_handler) {
+  wrapper.listen(src, listener, opt_capt, opt_handler || this.handler_ || this, this);
+  return this
+};
+goog.events.EventHandler.prototype.getListenerCount = function() {
+  return this.keys_.length
+};
+goog.events.EventHandler.prototype.unlisten = function(src, type, opt_fn, opt_capture, opt_handler) {
+  if(goog.isArray(type)) {
+    for(var i = 0;i < type.length;i++) {
+      this.unlisten(src, type[i], opt_fn, opt_capture, opt_handler)
+    }
+  }else {
+    var listener = goog.events.getListener(src, type, opt_fn || this, opt_capture, opt_handler || this.handler_ || this);
+    if(listener) {
+      var key = listener.key;
+      goog.events.unlistenByKey(key);
+      goog.array.remove(this.keys_, key)
+    }
+  }
+  return this
+};
+goog.events.EventHandler.prototype.unlistenWithWrapper = function(src, wrapper, listener, opt_capt, opt_handler) {
+  wrapper.unlisten(src, listener, opt_capt, opt_handler || this.handler_ || this, this);
+  return this
+};
+goog.events.EventHandler.prototype.removeAll = function() {
+  goog.array.forEach(this.keys_, goog.events.unlistenByKey);
+  this.keys_.length = 0
+};
+goog.events.EventHandler.prototype.disposeInternal = function() {
+  goog.events.EventHandler.superClass_.disposeInternal.call(this);
+  this.removeAll()
+};
+goog.events.EventHandler.prototype.handleEvent = function(e) {
+  throw Error("EventHandler.handleEvent not implemented");
+};
+// Input 39
+/*
+ Dual licensed under the MIT or GPL licenses.
+*/
+goog.provide("pike.layers.Layer");
+goog.provide("pike.layers.ClusterLayer");
+goog.provide("pike.layers.ObstacleLayer");
+goog.provide("pike.layers.CollisionLayer");
+goog.provide("pike.layers.DirtyManager");
+goog.require("goog.events.EventHandler");
+goog.require("goog.events.EventTarget");
+goog.require("pike.graphics.Rectangle");
+goog.require("pike.events.NewEntity");
+goog.require("pike.events.RemoveEntity");
+goog.require("goog.events");
+pike.layers.Layer = function(name) {
+  goog.events.EventTarget.call(this);
+  this.name = name;
+  this.handler = new goog.events.EventHandler(this);
+  this.viewport_ = new pike.graphics.Rectangle(0, 0, 0, 0);
+  this.gameWorld_ = new pike.graphics.Rectangle(0, 0, 0, 0);
+  this.entities_ = [];
+  this.screen_ = {};
+  this.offScreen_ = {};
+  this.screen_.canvas = document.createElement("canvas");
+  this.screen_.canvas.style.position = "absolute";
+  this.screen_.canvas.style.top = "0";
+  this.screen_.canvas.style.left = "0";
+  this.screen_.context = this.screen_.canvas.getContext("2d");
+  this.screen_.isDirty = false;
+  this.offScreen_.canvas = document.createElement("canvas");
+  this.offScreen_.context = this.offScreen_.canvas.getContext("2d");
+  this.offScreen_.isDirty = false
+};
+goog.inherits(pike.layers.Layer, goog.events.EventTarget);
+pike.layers.Layer.prototype.onRender = function() {
+  if(this.hasDirtyManager()) {
+    this.renderDirty_()
+  }else {
+    if(this.offScreen_.isDirty) {
+      this.renderOffScreen_()
+    }
+  }
+  if(this.screen_.isDirty) {
+    this.renderScreen_()
+  }
+};
+pike.layers.Layer.prototype.renderDirty_ = function() {
+  if(this.dirtyManager.isClean()) {
+    return
+  }
+  this.offScreen_.context.clearRect(this.dirtyManager.getDirtyRectangle().x, this.dirtyManager.getDirtyRectangle().y, this.dirtyManager.getDirtyRectangle().w, this.dirtyManager.getDirtyRectangle().h);
+  this.dispatchEvent(new pike.events.Render((new Date).getTime(), this));
+  if(!this.screen_.isDirty) {
+    this.screen_.context.clearRect(this.dirtyManager.getDirtyRectangle().x - this.viewport_.x, this.dirtyManager.getDirtyRectangle().y - this.viewport_.y, this.dirtyManager.getDirtyRectangle().w, this.dirtyManager.getDirtyRectangle().h);
+    this.screen_.context.drawImage(this.offScreen_.canvas, this.dirtyManager.getDirtyRectangle().x, this.dirtyManager.getDirtyRectangle().y, this.dirtyManager.getDirtyRectangle().w, this.dirtyManager.getDirtyRectangle().h, this.dirtyManager.getDirtyRectangle().x - this.viewport_.x, this.dirtyManager.getDirtyRectangle().y - this.viewport_.y, this.dirtyManager.getDirtyRectangle().w, this.dirtyManager.getDirtyRectangle().h)
+  }
+  this.dirtyManager.clear()
+};
+pike.layers.Layer.prototype.renderOffScreen_ = function() {
+  this.offScreen_.context.clearRect(0, 0, this.gameWorld_.w, this.gameWorld_.h);
+  this.dispatchEvent(new pike.events.Render((new Date).getTime(), this));
+  this.offScreen_.isDirty = false;
+  this.screen_.isDirty = true;
+  if(goog.DEBUG) {
+    window.console.log("[pike.core.Layer] " + this.name + " redraw offScreen")
+  }
+};
+pike.layers.Layer.prototype.renderScreen_ = function() {
+  this.screen_.context.clearRect(0, 0, this.viewport_.w, this.viewport_.h);
+  this.screen_.context.drawImage(this.offScreen_.canvas, this.viewport_.x, this.viewport_.y, this.viewport_.w, this.viewport_.h, 0, 0, this.viewport_.w, this.viewport_.h);
+  this.screen_.isDirty = false;
+  if(goog.DEBUG) {
+    window.console.log("[pike.core.Layer] " + this.name + " redraw screen")
+  }
+};
+pike.layers.Layer.prototype.setViewportSize = function(width, height) {
+  this.viewport_.w = width;
+  this.viewport_.h = height;
+  this.screen_.canvas.width = this.viewport_.w;
+  this.screen_.canvas.height = this.viewport_.h;
+  this.screen_.isDirty = true;
+  if(this.hasDirtyManager()) {
+    this.dirtyManager.setSize(this.viewport_.w, this.viewport_.h)
+  }
+};
+pike.layers.Layer.prototype.setGameWorldSize = function(width, height) {
+  this.gameWorld_.w = width;
+  this.gameWorld_.h = height;
+  this.offScreen_.canvas.width = this.gameWorld_.w;
+  this.offScreen_.canvas.height = this.gameWorld_.h;
+  this.offScreen_.isDirty = true
+};
+pike.layers.Layer.prototype.setViewportPosition = function(x, y) {
+  this.viewport_.x = x;
+  this.viewport_.y = y;
+  this.getScreen().isDirty = true;
+  if(this.hasDirtyManager()) {
+    this.dirtyManager.setPosition(this.viewport_.x, this.viewport_.y)
+  }
+};
+pike.layers.Layer.prototype.setDirtyManager = function(dirtyManager) {
+  this.dirtyManager = dirtyManager
+};
+pike.layers.Layer.prototype.hasDirtyManager = function() {
+  return this.dirtyManager
+};
+pike.layers.Layer.prototype.setDirty = function(rect) {
+  if(this.hasDirtyManager()) {
+    this.dirtyManager.markDirty(rect)
+  }else {
+    this.offScreen_.isDirty = true
+  }
+};
+pike.layers.Layer.prototype.getScreen = function() {
+  return this.screen_
+};
+pike.layers.Layer.prototype.getOffScreen = function() {
+  return this.offScreen_
+};
+pike.layers.Layer.prototype.addEntity = function(entity) {
+  this.entities_.push(entity);
+  entity.layer = this;
+  this.dispatchEvent(new pike.events.NewEntity(entity, this));
+  if(goog.DEBUG) {
+    window.console.log("[pike.core.Layer] Layer: " + this.name + " has newentity #" + entity.id)
+  }
+};
+pike.layers.Layer.prototype.removeEntity = function(entity) {
+  goog.array.remove(this.entities_, entity);
+  delete entity.layer;
+  this.dispatchEvent(new pike.events.RemoveEntity(entity, this));
+  if(goog.DEBUG) {
+    window.console.log("[pike.core.Layer] removeentity")
+  }
+};
+pike.layers.Layer.prototype.getEntity = function(id) {
+  for(var idx = 0;idx < this.entities_.length;idx++) {
+    if(this.entities_[idx].id == id) {
+      return this.entities_[idx]
+    }
+  }
+};
+pike.layers.Layer.prototype.getAllEntities = function() {
+  return this.entities_
+};
+pike.layers.Layer.prototype.dispatchEvent = function(e) {
+  for(var idx = 0;idx < this.entities_.length;idx++) {
+    this.entities_[idx].dispatchEvent(e)
+  }
+  goog.events.EventTarget.prototype.dispatchEvent.call(this, e)
+};
+pike.layers.ClusterLayer = function(name, clusterSize) {
+  pike.layers.Layer.call(this, name);
+  this.clusters_ = new pike.graphics.Cluster(clusterSize, 0, 0);
+  this.visibleClusterBounds_ = {};
+  this.cache_ = [];
+  this.cacheDirty_ = true;
+  this.cacheUnsorted_ = false
+};
+goog.inherits(pike.layers.ClusterLayer, pike.layers.Layer);
+pike.layers.ClusterLayer.prototype.getCluster = function() {
+  return this.clusters_
+};
+pike.layers.ClusterLayer.prototype.dispatchEvent = function(e) {
+  if(this.cacheDirty_) {
+    this.resetCache_()
+  }else {
+    if(this.cacheUnsorted_) {
+      this.sortCache_()
+    }
+  }
+  for(var i = 0;i < this.cache_.length;i++) {
+    var entity = this.cache_[i];
+    if(entity.getBounds().intersects(this.viewport_)) {
+      entity.dispatchEvent(e)
+    }
+  }
+  goog.events.EventTarget.prototype.dispatchEvent.call(this, e)
+};
+pike.layers.ClusterLayer.prototype.addEntity = function(entity) {
+  pike.layers.Layer.prototype.addEntity.call(this, entity);
+  this.handler.listen(entity, pike.events.ChangePosition.EVENT_TYPE, this.onEntityMove, false, this);
+  if(this.clusters_.getClusters().length == 0) {
+    return
+  }
+  var clusters = this.clusters_.addToClusters(entity);
+  if(clusters.intersects(this.visibleClusterBounds_)) {
+    this.cache_.push(entity);
+    this.cacheUnsorted_ = true
+  }
+};
+pike.layers.ClusterLayer.prototype.removeEntity = function(entity) {
+  this.clusters_.removeFromClusters(entity);
+  this.handler.unlisten(entity, pike.events.ChangePosition.EVENT_TYPE, this.onEntityMove, false, this);
+  pike.layers.Layer.prototype.removeEntity.call(this, entity)
+};
+pike.layers.ClusterLayer.prototype.resetCache_ = function() {
+  var cache = this.cache_ = [];
+  for(var i = this.visibleClusterBounds_.y;i < this.visibleClusterBounds_.y + this.visibleClusterBounds_.h;i++) {
+    for(var j = this.visibleClusterBounds_.x;j < this.visibleClusterBounds_.x + this.visibleClusterBounds_.w;j++) {
+      var cluster = this.clusters_.getClusters()[i][j];
+      for(var k = 0;k < cluster.length;k++) {
+        if(cache.indexOf(cluster[k]) == -1) {
+          cache.push(cluster[k])
+        }
+      }
+    }
+  }
+  if(goog.DEBUG) {
+    window.console.log("[pike.layers.ClusterLayer] resetcache")
+  }
+  this.sortCache_();
+  this.cacheDirty_ = false;
+  this.cacheUnsorted_ = false
+};
+pike.layers.ClusterLayer.prototype.sortCache_ = function() {
+  this.cache_.sort(function(a, b) {
+    var aBounds = a.getBounds();
+    var bBounds = b.getBounds();
+    return aBounds.y + aBounds.h - (bBounds.y + bBounds.h)
+  });
+  this.cacheUnsorted_ = false;
+  if(goog.DEBUG) {
+    window.console.log("[pike.layers.ClusterLayer] sortcache")
+  }
+};
+pike.layers.ClusterLayer.prototype.resetClusters_ = function() {
+  this.clusters_.build();
+  if(goog.DEBUG) {
+    window.console.log("[pike.layers.ClusterLayer] resetcluster")
+  }
+  for(var i = 0;i < this.entities_.length;i++) {
+    var entity = this.entities_[i];
+    this.clusters_.addToClusters(entity)
+  }
+};
+pike.layers.ClusterLayer.prototype.updateVisibleClusters_ = function() {
+  var newRect = this.viewport_.getOverlappingGridCells(this.clusters_.getClusterSize(), this.clusters_.getClusterSize(), this.clusters_.getClusters()[0].length, this.clusters_.getClusters().length);
+  if(!newRect.equals(this.visibleClusterBounds_)) {
+    this.visibleClusterBounds_ = newRect;
+    this.cacheDirty_ = true
+  }
+};
+pike.layers.ClusterLayer.prototype.setViewportSize = function(width, height) {
+  pike.layers.Layer.prototype.setViewportSize.call(this, width, height);
+  this.setGameWorldSize.call(this, Math.max(this.gameWorld_.w, width), Math.max(this.gameWorld_.h, height));
+  this.updateVisibleClusters_()
+};
+pike.layers.ClusterLayer.prototype.setViewportPosition = function(x, y) {
+  pike.layers.Layer.prototype.setViewportPosition.call(this, x, y);
+  this.updateVisibleClusters_()
+};
+pike.layers.ClusterLayer.prototype.setGameWorldSize = function(width, height) {
+  pike.layers.Layer.prototype.setGameWorldSize.call(this, width, height);
+  this.clusters_.setSize(width, height);
+  this.resetClusters_()
+};
+pike.layers.ClusterLayer.prototype.onEntityMove = function(e) {
+  var entity = e.target;
+  var newClusters = entity.getBounds().getOverlappingGridCells(this.clusters_.getClusterSize(), this.clusters_.getClusterSize(), this.clusters_.getClusters()[0].length, this.clusters_.getClusters().length);
+  var oldClusters = this.clusters_.getIdToClusterBounds(entity.id);
+  if(!oldClusters.equals(newClusters)) {
+    this.moveObjectBetweenClusters_(entity, oldClusters, newClusters)
+  }
+  if(newClusters.intersects(this.visibleClusterBounds_) && e.y != e.oldY) {
+    this.cacheUnsorted_ = true
+  }
+};
+pike.layers.ClusterLayer.prototype.moveObjectBetweenClusters_ = function(entity, oldClusters, newClusters) {
+  this.clusters_.removeFromClusters(entity, oldClusters);
+  this.clusters_.addToClusters(entity, newClusters);
+  this.clusters_.setIdToClusterBounds(entity.id, newClusters);
+  if(newClusters.intersects(this.visibleClusterBounds_)) {
+    if(!goog.array.contains(this.cache_, entity)) {
+      this.cache_.push(entity)
+    }
+  }else {
+    goog.array.remove(this.cache_, entity)
+  }
+};
+pike.layers.ObstacleLayer = function(name) {
+  pike.layers.Layer.call(this, name)
+};
+goog.inherits(pike.layers.ObstacleLayer, pike.layers.Layer);
+pike.layers.ObstacleLayer.prototype.setViewportSize = function(width, height) {
+  pike.layers.Layer.prototype.setViewportSize.call(this, width, height);
+  this.screen_.isDirty = false
+};
+pike.layers.ObstacleLayer.prototype.setViewportPosition = function(x, y) {
+  pike.layers.Layer.prototype.setViewportPosition.call(this, x, y);
+  this.screen_.isDirty = false
+};
+pike.layers.ObstacleLayer.prototype.renderOffScreen_ = function() {
+  pike.layers.Layer.prototype.renderOffScreen_.call(this);
+  this.screen_.isDirty = false;
+  if(goog.DEBUG) {
+    window.console.log("[pike.core.ObstacleLayer] " + this.name + " redraw offScreen")
+  }
+};
+pike.layers.ObstacleLayer.prototype.onEntityChangePosition = function(e) {
+  var entity = e.target;
+  var collisionBounds = entity.getCBounds();
+  if(this.offScreen_.context.getImageData(collisionBounds.x, collisionBounds.y, 1, 1).data[3] != 0 || this.offScreen_.context.getImageData(collisionBounds.x + collisionBounds.w, collisionBounds.y, 1, 1).data[3] != 0 || this.offScreen_.context.getImageData(collisionBounds.x + collisionBounds.w, collisionBounds.y + collisionBounds.h, 1, 1).data[3] != 0 || this.offScreen_.context.getImageData(collisionBounds.x, collisionBounds.y + collisionBounds.h, 1, 1).data[3] != 0) {
+    if(goog.DEBUG) {
+      window.console.log("[pike.core.ObstacleLayer] obstacle collision entity #" + e.target.id)
+    }
+    entity.dispatchEvent(new pike.events.Collision(e.x, e.y, e.oldX, e.oldY, new pike.core.Entity, entity))
+  }
+};
+pike.layers.DirtyManager = function(allDirtyThreshold) {
+  this.viewport_ = new pike.graphics.Rectangle(0, 0, 0, 0);
+  this.handler = new goog.events.EventHandler(this);
+  this.dirtyRect_ = null;
+  this.allDirtyThreshold_ = allDirtyThreshold == undefined ? 0.5 : allDirtyThreshold;
+  this.allDirty_ = true;
+  this.markAllDirty()
+};
+pike.layers.DirtyManager.prototype.getDirtyRectangle = function() {
+  return this.dirtyRect_
+};
+pike.layers.DirtyManager.prototype.markAllDirty = function() {
+  this.allDirty_ = true;
+  this.dirtyRect_ = this.viewport_.copy()
+};
+pike.layers.DirtyManager.prototype.markDirty = function(rect) {
+  if(!(rect.w || rect.h) || this.allDirty_) {
+    return
+  }
+  if(!rect.intersects(this.viewport_)) {
+    return
+  }
+  if(this.dirtyRect_) {
+    this.dirtyRect_ = this.dirtyRect_.convexHull(rect)
+  }else {
+    this.dirtyRect_ = rect
+  }
+  if(this.dirtyRect_.w * this.dirtyRect_.h > this.allDirtyThreshold_ * this.viewport_.w * this.viewport_.h) {
+    this.markAllDirty()
+  }
+};
+pike.layers.DirtyManager.prototype.isClean = function() {
+  return!this.dirtyRect_
+};
+pike.layers.DirtyManager.prototype.clear = function() {
+  this.dirtyRect_ = null;
+  this.allDirty_ = false
+};
+pike.layers.DirtyManager.prototype.setSize = function(width, height) {
+  this.viewport_.w = width;
+  this.viewport_.h = height;
+  this.markAllDirty()
+};
+pike.layers.DirtyManager.prototype.setPosition = function(x, y) {
+  this.viewport_.x = x;
+  this.viewport_.y = y
+};
+pike.layers.CollisionLayer = function(name, tileSize, data) {
+  pike.layers.Layer.call(this, name);
+  this.tileSize_ = tileSize || 32;
+  this.data_ = data || []
+};
+goog.inherits(pike.layers.CollisionLayer, pike.layers.Layer);
+pike.layers.CollisionLayer.prototype.setTileSize = function(tileSize) {
+  this.tileSize_ = tileSize
+};
+pike.layers.CollisionLayer.prototype.setData = function(data) {
+  if(!data) {
+    throw new Error("[pike.core.CollisionLayer] data is null");
+  }
+  this.data_ = data
+};
+pike.layers.CollisionLayer.prototype.getValue = function(row, column) {
+  var index = row * ~~(this.gameWorld_.w / this.tileSize_) + column;
+  if(index < 0 || index >= this.data_.length) {
+    return 0
+  }
+  return this.data_[index]
+};
+pike.layers.CollisionLayer.prototype.px2Coords = function(posX, posY) {
+  return{row:~~(posY / this.tileSize_), column:~~(posX / this.tileSize_)}
+};
+pike.layers.CollisionLayer.prototype.isInCollision = function(rectangle) {
+  var startCoords = this.px2Coords(rectangle.x, rectangle.y);
+  var endCoords = this.px2Coords(rectangle.x + rectangle.w - 1, rectangle.y + rectangle.h - 1);
+  var rectangleTakesRows = endCoords.row - startCoords.row;
+  var rectangleTakesColumns = endCoords.column - startCoords.column;
+  for(var i = 0;i <= rectangleTakesRows;i++) {
+    for(var n = 0;n <= rectangleTakesColumns;n++) {
+      var coords = this.px2Coords(rectangle.x + n * this.tileSize_, rectangle.y + i * this.tileSize_);
+      if(this.getValue(coords.row, coords.column) != 0) {
+        return true
+      }
+    }
+  }
+  return false
+};
+pike.layers.CollisionLayer.prototype.onEntityChangePosition = function(e) {
+  var entity = e.target;
+  if(this.isInCollision(entity.getCBounds())) {
+    if(goog.DEBUG) {
+      window.console.log("[pike.layers.CollisionLayer] collision with entity #" + e.target.id)
+    }
+    entity.dispatchEvent(new pike.events.Collision(e.x, e.y, e.oldX, e.oldY, new pike.core.Entity, entity))
+  }
+};
+// Input 40
 /*
  Dual licensed under the MIT or GPL licenses.
 */
@@ -6321,6 +6816,8 @@ goog.provide("pike.components.Dialogues");
 goog.provide("pike.components.Hen");
 goog.provide("pike.components.VisualizeGraph");
 goog.provide("pike.components.VisualizeRectangle");
+goog.provide("pike.components.Practice");
+goog.provide("pike.components.AStar");
 goog.require("goog.events");
 goog.require("goog.array");
 goog.require("goog.dom");
@@ -6329,7 +6826,10 @@ goog.require("pike.animation.Animator");
 goog.require("pike.events.StartDialogue");
 goog.require("pike.events.ShowDialogue");
 goog.require("pike.events.EndDialogue");
+goog.require("pike.events.EndPractice");
+goog.require("pike.events.ReachDestination");
 goog.require("goog.style");
+goog.require("pike.ai.path.Graph");
 pike.components.Collision = function() {
   this.collisionBounds_ = new pike.graphics.Rectangle(0, 0, 0, 0);
   this.setCollisionBounds = function(x, y, w, h) {
@@ -6523,7 +7023,10 @@ pike.components.Backpack = function() {
     this.backpackItem_.style.top = parseInt(this.backpackItem_.style.top) + e.deltaY + "px"
   };
   this.drop_ = function(e) {
-    this.dragEnd_();
+    goog.events.unlisten(this.gameEventHandler_, pike.events.Move.EVENT_TYPE, this.dragMove_, false, this);
+    goog.events.unlisten(this.gameEventHandler_, pike.events.Up.EVENT_TYPE, this.drop_, false, this);
+    this.backpackItem_.style.left = "0px";
+    this.backpackItem_.style.top = "0px";
     var viewport = this.layer.viewport_;
     var oldX = this.x;
     var oldY = this.y;
@@ -6551,15 +7054,6 @@ pike.components.Backpack = function() {
       window.console.log("[pike.components.Backpack] drop #" + this.id)
     }
     this.removeFromBackpack()
-  };
-  this.dragEnd_ = function() {
-    this.backpackItem_.style.left = "0px";
-    this.backpackItem_.style.top = "0px";
-    goog.events.unlisten(this.gameEventHandler_, pike.events.Move.EVENT_TYPE, this.dragMove_, false, this);
-    goog.events.unlisten(this.gameEventHandler_, pike.events.Up.EVENT_TYPE, this.drop_, false, this);
-    if(goog.DEBUG) {
-      window.console.log("[pike.components.Backpack] dragend")
-    }
   };
   this.removeFromBackpack = function() {
     goog.events.unlisten(this.gameEventHandler_, pike.events.Down.EVENT_TYPE, this.dragStart_, false, this);
@@ -6974,434 +7468,217 @@ pike.components.VisualizeRectangle = function() {
   }
 };
 pike.components.VisualizeRectangle.NAME = "pike.components.VisualizeRectangle";
-// Input 39
-goog.provide("goog.events.EventHandler");
-goog.require("goog.Disposable");
-goog.require("goog.array");
-goog.require("goog.events");
-goog.require("goog.events.EventWrapper");
-goog.events.EventHandler = function(opt_handler) {
-  goog.Disposable.call(this);
-  this.handler_ = opt_handler;
-  this.keys_ = []
-};
-goog.inherits(goog.events.EventHandler, goog.Disposable);
-goog.events.EventHandler.typeArray_ = [];
-goog.events.EventHandler.prototype.listen = function(src, type, opt_fn, opt_capture, opt_handler) {
-  if(!goog.isArray(type)) {
-    goog.events.EventHandler.typeArray_[0] = (type);
-    type = goog.events.EventHandler.typeArray_
-  }
-  for(var i = 0;i < type.length;i++) {
-    var key = (goog.events.listen(src, type[i], opt_fn || this, opt_capture || false, opt_handler || this.handler_ || this));
-    this.keys_.push(key)
-  }
-  return this
-};
-goog.events.EventHandler.prototype.listenOnce = function(src, type, opt_fn, opt_capture, opt_handler) {
-  if(goog.isArray(type)) {
-    for(var i = 0;i < type.length;i++) {
-      this.listenOnce(src, type[i], opt_fn, opt_capture, opt_handler)
+pike.components.Practice = function() {
+  this.hasPracticeError_ = false;
+  this.numberOfPractice_ = 5;
+  this.practiceData_ = [];
+  this.practiceDataIndex_ = 0;
+  var root = document.getElementById(pike.components.Practice.ELEMENT_ID);
+  var isPracticeCheck_ = false;
+  this.showPractice = function() {
+    if(!this.practiceData_[this.practiceDataIndex_]) {
+      throw new Error("[pike.components.Practice] practiceData: Array Out of Bounds");
     }
-  }else {
-    var key = (goog.events.listenOnce(src, type, opt_fn || this, opt_capture, opt_handler || this.handler_ || this));
-    this.keys_.push(key)
-  }
-  return this
-};
-goog.events.EventHandler.prototype.listenWithWrapper = function(src, wrapper, listener, opt_capt, opt_handler) {
-  wrapper.listen(src, listener, opt_capt, opt_handler || this.handler_ || this, this);
-  return this
-};
-goog.events.EventHandler.prototype.getListenerCount = function() {
-  return this.keys_.length
-};
-goog.events.EventHandler.prototype.unlisten = function(src, type, opt_fn, opt_capture, opt_handler) {
-  if(goog.isArray(type)) {
-    for(var i = 0;i < type.length;i++) {
-      this.unlisten(src, type[i], opt_fn, opt_capture, opt_handler)
+    if(!root) {
+      throw new Error("[pike.components.Practice] there is not root element #: " + pike.components.Practice.NAME);
     }
-  }else {
-    var listener = goog.events.getListener(src, type, opt_fn || this, opt_capture, opt_handler || this.handler_ || this);
-    if(listener) {
-      var key = listener.key;
-      goog.events.unlistenByKey(key);
-      goog.array.remove(this.keys_, key)
+    root.innerHTML = "";
+    var sentence = this.practiceData_[this.practiceDataIndex_];
+    var practiceWrapper = goog.dom.createDom("div");
+    var assignment = goog.dom.createDom("ul", undefined, goog.dom.createDom("li", undefined, goog.dom.htmlToDocumentFragment("Subject: <b>" + sentence.subject + "</b>")), goog.dom.createDom("li", undefined, goog.dom.htmlToDocumentFragment("Verb: <b>" + sentence.verb + "</b>")), goog.dom.createDom("li", undefined, goog.dom.htmlToDocumentFragment("Verb Tense: <b>" + sentence.tense + "</b>")), goog.dom.createDom("li", undefined, goog.dom.htmlToDocumentFragment("Option: <b>" + sentence.option + "</b>")), 
+    goog.dom.createDom("li", undefined, goog.dom.htmlToDocumentFragment("Object: <b>" + sentence.object + "</b>")));
+    var answer = goog.dom.createDom("div", {"id":pike.components.Practice.ANSWER_ELEMENT_ID}, goog.dom.createDom("label", undefined, "Write the Sentence:"), goog.dom.createDom("textarea"));
+    var solutions = goog.dom.createDom("div", {"id":pike.components.Practice.SOLUTIONS_ELEMENT_ID});
+    var buttonsWrapper = goog.dom.createDom("p", {"class":"buttons"});
+    var checkButton = goog.dom.createDom("input", {"type":"button", "id":pike.components.Practice.BUTTON_CHECK_ELEMENT_ID, "value":"Check", "class":"btn"});
+    var checkInputHandler = pike.input.Utils.getDeviceInputHandler();
+    checkInputHandler.setEventTarget(checkButton);
+    goog.events.listenOnce(checkInputHandler, pike.events.Down.EVENT_TYPE, this.checkButtonHandler, false, this);
+    goog.dom.appendChild(buttonsWrapper, checkButton);
+    var nextButton = goog.dom.createDom("input", {"type":"button", "id":pike.components.Practice.BUTTON_NEXT_ELEMENT_ID, "value":"Next", "class":"hide btn"});
+    var nextInputHandler = pike.input.Utils.getDeviceInputHandler();
+    nextInputHandler.setEventTarget(nextButton);
+    goog.events.listenOnce(nextInputHandler, pike.events.Down.EVENT_TYPE, this.nextButtonHandler, false, this);
+    goog.dom.appendChild(buttonsWrapper, nextButton);
+    var leaveButton = goog.dom.createDom("input", {"type":"button", "id":pike.components.Practice.BUTTON_LEAVE_ELEMENT_ID, "value":"Leave", "class":"btn"});
+    var leaveInputHandler = pike.input.Utils.getDeviceInputHandler();
+    leaveInputHandler.setEventTarget(leaveButton);
+    goog.events.listenOnce(leaveInputHandler, pike.events.Down.EVENT_TYPE, this.leaveButtonHandler, false, this);
+    goog.dom.appendChild(buttonsWrapper, leaveButton);
+    if(this.practiceInstructionText) {
+      goog.dom.appendChild(practiceWrapper, goog.dom.createDom("div", {"id":pike.components.Practice.INSTRUCTION_ELEMENT_ID}, goog.dom.htmlToDocumentFragment(this.practiceInstructionText)))
     }
-  }
-  return this
-};
-goog.events.EventHandler.prototype.unlistenWithWrapper = function(src, wrapper, listener, opt_capt, opt_handler) {
-  wrapper.unlisten(src, listener, opt_capt, opt_handler || this.handler_ || this, this);
-  return this
-};
-goog.events.EventHandler.prototype.removeAll = function() {
-  goog.array.forEach(this.keys_, goog.events.unlistenByKey);
-  this.keys_.length = 0
-};
-goog.events.EventHandler.prototype.disposeInternal = function() {
-  goog.events.EventHandler.superClass_.disposeInternal.call(this);
-  this.removeAll()
-};
-goog.events.EventHandler.prototype.handleEvent = function(e) {
-  throw Error("EventHandler.handleEvent not implemented");
-};
-// Input 40
-/*
- Dual licensed under the MIT or GPL licenses.
-*/
-goog.provide("pike.layers.Layer");
-goog.provide("pike.layers.ClusterLayer");
-goog.provide("pike.layers.ObstacleLayer");
-goog.provide("pike.layers.DirtyManager");
-goog.require("goog.events.EventHandler");
-goog.require("goog.events.EventTarget");
-goog.require("pike.graphics.Rectangle");
-goog.require("pike.events.NewEntity");
-goog.require("pike.events.RemoveEntity");
-goog.require("goog.events");
-pike.layers.Layer = function(name) {
-  goog.events.EventTarget.call(this);
-  this.name = name;
-  this.handler = new goog.events.EventHandler(this);
-  this.viewport_ = new pike.graphics.Rectangle(0, 0, 0, 0);
-  this.gameWorld_ = new pike.graphics.Rectangle(0, 0, 0, 0);
-  this.entities_ = [];
-  this.screen_ = {};
-  this.offScreen_ = {};
-  this.screen_.canvas = document.createElement("canvas");
-  this.screen_.canvas.style.position = "absolute";
-  this.screen_.canvas.style.top = "0";
-  this.screen_.canvas.style.left = "0";
-  this.screen_.context = this.screen_.canvas.getContext("2d");
-  this.screen_.isDirty = false;
-  this.offScreen_.canvas = document.createElement("canvas");
-  this.offScreen_.context = this.offScreen_.canvas.getContext("2d");
-  this.offScreen_.isDirty = false
-};
-goog.inherits(pike.layers.Layer, goog.events.EventTarget);
-pike.layers.Layer.prototype.onRender = function() {
-  if(this.hasDirtyManager()) {
-    this.renderDirty_()
-  }else {
-    if(this.offScreen_.isDirty) {
-      this.renderOffScreen_()
+    goog.dom.appendChild(practiceWrapper, assignment);
+    goog.dom.appendChild(practiceWrapper, answer);
+    goog.dom.appendChild(practiceWrapper, solutions);
+    goog.dom.appendChild(practiceWrapper, buttonsWrapper);
+    goog.dom.appendChild(root, practiceWrapper);
+    goog.dom.getLastElementChild(document.getElementById(pike.components.Practice.ANSWER_ELEMENT_ID)).focus();
+    isPracticeCheck_ = false
+  };
+  this.checkButtonHandler = function(e) {
+    isPracticeCheck_ = true;
+    goog.dom.classes.add(document.getElementById(pike.components.Practice.BUTTON_CHECK_ELEMENT_ID), "hide");
+    if(this.hasNextPractice()) {
+      goog.dom.classes.remove(document.getElementById(pike.components.Practice.BUTTON_NEXT_ELEMENT_ID), "hide")
     }
-  }
-  if(this.screen_.isDirty) {
-    this.renderScreen_()
-  }
-};
-pike.layers.Layer.prototype.renderDirty_ = function() {
-  if(this.dirtyManager.isClean()) {
-    return
-  }
-  this.offScreen_.context.clearRect(this.dirtyManager.getDirtyRectangle().x, this.dirtyManager.getDirtyRectangle().y, this.dirtyManager.getDirtyRectangle().w, this.dirtyManager.getDirtyRectangle().h);
-  this.dispatchEvent(new pike.events.Render((new Date).getTime(), this));
-  if(!this.screen_.isDirty) {
-    this.screen_.context.clearRect(this.dirtyManager.getDirtyRectangle().x - this.viewport_.x, this.dirtyManager.getDirtyRectangle().y - this.viewport_.y, this.dirtyManager.getDirtyRectangle().w, this.dirtyManager.getDirtyRectangle().h);
-    this.screen_.context.drawImage(this.offScreen_.canvas, this.dirtyManager.getDirtyRectangle().x, this.dirtyManager.getDirtyRectangle().y, this.dirtyManager.getDirtyRectangle().w, this.dirtyManager.getDirtyRectangle().h, this.dirtyManager.getDirtyRectangle().x - this.viewport_.x, this.dirtyManager.getDirtyRectangle().y - this.viewport_.y, this.dirtyManager.getDirtyRectangle().w, this.dirtyManager.getDirtyRectangle().h)
-  }
-  this.dirtyManager.clear()
-};
-pike.layers.Layer.prototype.renderOffScreen_ = function() {
-  this.offScreen_.context.clearRect(0, 0, this.gameWorld_.w, this.gameWorld_.h);
-  this.dispatchEvent(new pike.events.Render((new Date).getTime(), this));
-  this.offScreen_.isDirty = false;
-  this.screen_.isDirty = true;
-  if(goog.DEBUG) {
-    window.console.log("[pike.core.Layer] " + this.name + " redraw offScreen")
-  }
-};
-pike.layers.Layer.prototype.renderScreen_ = function() {
-  this.screen_.context.clearRect(0, 0, this.viewport_.w, this.viewport_.h);
-  this.screen_.context.drawImage(this.offScreen_.canvas, this.viewport_.x, this.viewport_.y, this.viewport_.w, this.viewport_.h, 0, 0, this.viewport_.w, this.viewport_.h);
-  this.screen_.isDirty = false;
-  if(goog.DEBUG) {
-    window.console.log("[pike.core.Layer] " + this.name + " redraw screen")
-  }
-};
-pike.layers.Layer.prototype.setViewportSize = function(width, height) {
-  this.viewport_.w = width;
-  this.viewport_.h = height;
-  this.screen_.canvas.width = this.viewport_.w;
-  this.screen_.canvas.height = this.viewport_.h;
-  this.screen_.isDirty = true;
-  if(this.hasDirtyManager()) {
-    this.dirtyManager.setSize(this.viewport_.w, this.viewport_.h)
-  }
-};
-pike.layers.Layer.prototype.setGameWorldSize = function(width, height) {
-  this.gameWorld_.w = width;
-  this.gameWorld_.h = height;
-  this.offScreen_.canvas.width = this.gameWorld_.w;
-  this.offScreen_.canvas.height = this.gameWorld_.h;
-  this.offScreen_.isDirty = true
-};
-pike.layers.Layer.prototype.setViewportPosition = function(x, y) {
-  this.viewport_.x = x;
-  this.viewport_.y = y;
-  this.getScreen().isDirty = true;
-  if(this.hasDirtyManager()) {
-    this.dirtyManager.setPosition(this.viewport_.x, this.viewport_.y)
-  }
-};
-pike.layers.Layer.prototype.setDirtyManager = function(dirtyManager) {
-  this.dirtyManager = dirtyManager
-};
-pike.layers.Layer.prototype.hasDirtyManager = function() {
-  return this.dirtyManager
-};
-pike.layers.Layer.prototype.setDirty = function(rect) {
-  if(this.hasDirtyManager()) {
-    this.dirtyManager.markDirty(rect)
-  }else {
-    this.offScreen_.isDirty = true
-  }
-};
-pike.layers.Layer.prototype.getScreen = function() {
-  return this.screen_
-};
-pike.layers.Layer.prototype.getOffScreen = function() {
-  return this.offScreen_
-};
-pike.layers.Layer.prototype.addEntity = function(entity) {
-  this.entities_.push(entity);
-  entity.layer = this;
-  this.dispatchEvent(new pike.events.NewEntity(entity, this));
-  if(goog.DEBUG) {
-    window.console.log("[pike.core.Layer] Layer: " + this.name + " has newentity #" + entity.id)
-  }
-};
-pike.layers.Layer.prototype.removeEntity = function(entity) {
-  goog.array.remove(this.entities_, entity);
-  delete entity.layer;
-  this.dispatchEvent(new pike.events.RemoveEntity(entity, this));
-  if(goog.DEBUG) {
-    window.console.log("[pike.core.Layer] removeentity")
-  }
-};
-pike.layers.Layer.prototype.getEntity = function(id) {
-  for(var idx = 0;idx < this.entities_.length;idx++) {
-    if(this.entities_[idx].id == id) {
-      return this.entities_[idx]
-    }
-  }
-};
-pike.layers.Layer.prototype.getAllEntities = function() {
-  return this.entities_
-};
-pike.layers.Layer.prototype.dispatchEvent = function(e) {
-  for(var idx = 0;idx < this.entities_.length;idx++) {
-    this.entities_[idx].dispatchEvent(e)
-  }
-  goog.events.EventTarget.prototype.dispatchEvent.call(this, e)
-};
-pike.layers.ClusterLayer = function(name, clusterSize) {
-  pike.layers.Layer.call(this, name);
-  this.clusters_ = new pike.graphics.Cluster(clusterSize, 0, 0);
-  this.visibleClusterBounds_ = {};
-  this.cache_ = [];
-  this.cacheDirty_ = true;
-  this.cacheUnsorted_ = false
-};
-goog.inherits(pike.layers.ClusterLayer, pike.layers.Layer);
-pike.layers.ClusterLayer.prototype.getCluster = function() {
-  return this.clusters_
-};
-pike.layers.ClusterLayer.prototype.dispatchEvent = function(e) {
-  if(this.cacheDirty_) {
-    this.resetCache_()
-  }else {
-    if(this.cacheUnsorted_) {
-      this.sortCache_()
-    }
-  }
-  for(var i = 0;i < this.cache_.length;i++) {
-    var entity = this.cache_[i];
-    if(entity.getBounds().intersects(this.viewport_)) {
-      entity.dispatchEvent(e)
-    }
-  }
-  goog.events.EventTarget.prototype.dispatchEvent.call(this, e)
-};
-pike.layers.ClusterLayer.prototype.addEntity = function(entity) {
-  pike.layers.Layer.prototype.addEntity.call(this, entity);
-  this.handler.listen(entity, pike.events.ChangePosition.EVENT_TYPE, this.onEntityMove, false, this);
-  if(this.clusters_.getClusters().length == 0) {
-    return
-  }
-  var clusters = this.clusters_.addToClusters(entity);
-  if(clusters.intersects(this.visibleClusterBounds_)) {
-    this.cache_.push(entity);
-    this.cacheUnsorted_ = true
-  }
-};
-pike.layers.ClusterLayer.prototype.removeEntity = function(entity) {
-  this.clusters_.removeFromClusters(entity);
-  this.handler.unlisten(entity, pike.events.ChangePosition.EVENT_TYPE, this.onEntityMove, false, this);
-  pike.layers.Layer.prototype.removeEntity.call(this, entity)
-};
-pike.layers.ClusterLayer.prototype.resetCache_ = function() {
-  var cache = this.cache_ = [];
-  for(var i = this.visibleClusterBounds_.y;i < this.visibleClusterBounds_.y + this.visibleClusterBounds_.h;i++) {
-    for(var j = this.visibleClusterBounds_.x;j < this.visibleClusterBounds_.x + this.visibleClusterBounds_.w;j++) {
-      var cluster = this.clusters_.getClusters()[i][j];
-      for(var k = 0;k < cluster.length;k++) {
-        if(cache.indexOf(cluster[k]) == -1) {
-          cache.push(cluster[k])
-        }
+    var answer = goog.dom.getLastElementChild(document.getElementById(pike.components.Practice.ANSWER_ELEMENT_ID)).value.trim();
+    var solutionsWrapper = document.getElementById(pike.components.Practice.SOLUTIONS_ELEMENT_ID);
+    for(var i = 0;i < this.practiceData_[this.practiceDataIndex_].solutions.length;i++) {
+      if(answer == this.practiceData_[this.practiceDataIndex_].solutions[i]) {
+        goog.dom.classes.add(document.getElementById(pike.components.Practice.ANSWER_ELEMENT_ID), "correct");
+        return
       }
     }
-  }
-  if(goog.DEBUG) {
-    window.console.log("[pike.layers.ClusterLayer] resetcache")
-  }
-  this.sortCache_();
-  this.cacheDirty_ = false;
-  this.cacheUnsorted_ = false
-};
-pike.layers.ClusterLayer.prototype.sortCache_ = function() {
-  this.cache_.sort(function(a, b) {
-    var aBounds = a.getBounds();
-    var bBounds = b.getBounds();
-    return aBounds.y + aBounds.h - (bBounds.y + bBounds.h)
-  });
-  this.cacheUnsorted_ = false;
-  if(goog.DEBUG) {
-    window.console.log("[pike.layers.ClusterLayer] sortcache")
-  }
-};
-pike.layers.ClusterLayer.prototype.resetClusters_ = function() {
-  this.clusters_.build();
-  if(goog.DEBUG) {
-    window.console.log("[pike.layers.ClusterLayer] resetcluster")
-  }
-  for(var i = 0;i < this.entities_.length;i++) {
-    var entity = this.entities_[i];
-    this.clusters_.addToClusters(entity)
-  }
-};
-pike.layers.ClusterLayer.prototype.updateVisibleClusters_ = function() {
-  var newRect = this.viewport_.getOverlappingGridCells(this.clusters_.getClusterSize(), this.clusters_.getClusterSize(), this.clusters_.getClusters()[0].length, this.clusters_.getClusters().length);
-  if(!newRect.equals(this.visibleClusterBounds_)) {
-    this.visibleClusterBounds_ = newRect;
-    this.cacheDirty_ = true
-  }
-};
-pike.layers.ClusterLayer.prototype.setViewportSize = function(width, height) {
-  pike.layers.Layer.prototype.setViewportSize.call(this, width, height);
-  this.setGameWorldSize.call(this, Math.max(this.gameWorld_.w, width), Math.max(this.gameWorld_.h, height));
-  this.updateVisibleClusters_()
-};
-pike.layers.ClusterLayer.prototype.setViewportPosition = function(x, y) {
-  pike.layers.Layer.prototype.setViewportPosition.call(this, x, y);
-  this.updateVisibleClusters_()
-};
-pike.layers.ClusterLayer.prototype.setGameWorldSize = function(width, height) {
-  pike.layers.Layer.prototype.setGameWorldSize.call(this, width, height);
-  this.clusters_.setSize(width, height);
-  this.resetClusters_()
-};
-pike.layers.ClusterLayer.prototype.onEntityMove = function(e) {
-  var entity = e.target;
-  var newClusters = entity.getBounds().getOverlappingGridCells(this.clusters_.getClusterSize(), this.clusters_.getClusterSize(), this.clusters_.getClusters()[0].length, this.clusters_.getClusters().length);
-  var oldClusters = this.clusters_.getIdToClusterBounds(entity.id);
-  if(!oldClusters.equals(newClusters)) {
-    this.moveObjectBetweenClusters_(entity, oldClusters, newClusters)
-  }
-  if(newClusters.intersects(this.visibleClusterBounds_) && e.y != e.oldY) {
-    this.cacheUnsorted_ = true
-  }
-};
-pike.layers.ClusterLayer.prototype.moveObjectBetweenClusters_ = function(entity, oldClusters, newClusters) {
-  this.clusters_.removeFromClusters(entity, oldClusters);
-  this.clusters_.addToClusters(entity, newClusters);
-  this.clusters_.setIdToClusterBounds(entity.id, newClusters);
-  if(newClusters.intersects(this.visibleClusterBounds_)) {
-    if(!goog.array.contains(this.cache_, entity)) {
-      this.cache_.push(entity)
+    goog.dom.classes.add(document.getElementById(pike.components.Practice.ANSWER_ELEMENT_ID), "error");
+    this.hasPracticeError_ = true;
+    goog.dom.appendChild(solutionsWrapper, goog.dom.createDom("h3", undefined, "Solutions"));
+    var solutions = goog.dom.createDom("ul");
+    for(var i = 0;i < this.practiceData_[this.practiceDataIndex_].solutions.length;i++) {
+      var solution = goog.dom.createDom("li", undefined, this.practiceData_[this.practiceDataIndex_].solutions[i]);
+      goog.dom.appendChild(solutions, solution)
     }
-  }else {
-    goog.array.remove(this.cache_, entity)
-  }
-};
-pike.layers.ObstacleLayer = function(name) {
-  pike.layers.Layer.call(this, name)
-};
-goog.inherits(pike.layers.ObstacleLayer, pike.layers.Layer);
-pike.layers.ObstacleLayer.prototype.setViewportSize = function(width, height) {
-  pike.layers.Layer.prototype.setViewportSize.call(this, width, height);
-  this.screen_.isDirty = false
-};
-pike.layers.ObstacleLayer.prototype.setViewportPosition = function(x, y) {
-  pike.layers.Layer.prototype.setViewportPosition.call(this, x, y);
-  this.screen_.isDirty = false
-};
-pike.layers.ObstacleLayer.prototype.renderOffScreen_ = function() {
-  pike.layers.Layer.prototype.renderOffScreen_.call(this);
-  this.screen_.isDirty = false;
-  if(goog.DEBUG) {
-    window.console.log("[pike.core.ObstacleLayer] " + this.name + " redraw offScreen")
-  }
-};
-pike.layers.ObstacleLayer.prototype.onEntityChangePosition = function(e) {
-  var entity = e.target;
-  var collisionBounds = entity.getCBounds();
-  if(this.offScreen_.context.getImageData(collisionBounds.x, collisionBounds.y, 1, 1).data[3] != 0 || this.offScreen_.context.getImageData(collisionBounds.x + collisionBounds.w, collisionBounds.y, 1, 1).data[3] != 0 || this.offScreen_.context.getImageData(collisionBounds.x + collisionBounds.w, collisionBounds.y + collisionBounds.h, 1, 1).data[3] != 0 || this.offScreen_.context.getImageData(collisionBounds.x, collisionBounds.y + collisionBounds.h, 1, 1).data[3] != 0) {
+    goog.dom.appendChild(solutionsWrapper, solutions)
+  };
+  this.nextButtonHandler = function(e) {
+    if(this.hasNextPractice()) {
+      this.practiceDataIndex_ += 1;
+      this.showPractice()
+    }
+  };
+  this.leaveButtonHandler = function(e) {
     if(goog.DEBUG) {
-      window.console.log("[pike.core.ObstacleLayer] obstacle collision entity #" + e.target.id)
+      window.console.log("[pike.components.Practice] endpractice")
     }
-    entity.dispatchEvent(new pike.events.Collision(e.x, e.y, e.oldX, e.oldY, new pike.core.Entity, entity))
-  }
-};
-pike.layers.DirtyManager = function(allDirtyThreshold) {
-  this.viewport_ = new pike.graphics.Rectangle(0, 0, 0, 0);
-  this.handler = new goog.events.EventHandler(this);
-  this.dirtyRect_ = null;
-  this.allDirtyThreshold_ = allDirtyThreshold == undefined ? 0.5 : allDirtyThreshold;
-  this.allDirty_ = true;
-  this.markAllDirty()
-};
-pike.layers.DirtyManager.prototype.getDirtyRectangle = function() {
-  return this.dirtyRect_
-};
-pike.layers.DirtyManager.prototype.markAllDirty = function() {
-  this.allDirty_ = true;
-  this.dirtyRect_ = this.viewport_.copy()
-};
-pike.layers.DirtyManager.prototype.markDirty = function(rect) {
-  if(!(rect.w || rect.h) || this.allDirty_) {
+    this.dispatchEvent(new pike.events.EndPractice(this));
     return
+  };
+  this.hasNextPractice = function() {
+    return this.practiceDataIndex_ + 1 < this.practiceData_.length && this.practiceDataIndex_ + 1 < this.numberOfPractice_
+  };
+  this.shufflePracticeData = function() {
+    goog.array.shuffle(this.practiceDataIndex_)
+  };
+  this.setPracticeData = function(data) {
+    this.practiceData_ = data
+  };
+  this.setNumberOfPractice = function(number) {
+    this.numberOfPractice_ = number
+  };
+  this.setPracticeInstructionText = function(text) {
+    this.practiceInstructionText = text
+  };
+  this.isPracticeFinished = function() {
+    return isPracticeCheck_ && this.practiceDataIndex_ + 1 == this.numberOfPractice_
+  };
+  this.hasPracticeError = function() {
+    return this.hasPracticeError_
   }
-  if(!rect.intersects(this.viewport_)) {
-    return
+};
+pike.components.Practice.NAME = "pike.components.Practice";
+pike.components.Practice.ELEMENT_ID = "pike-practice";
+pike.components.Practice.ANSWER_ELEMENT_ID = "practice-answer";
+pike.components.Practice.SOLUTIONS_ELEMENT_ID = "practice-solutions";
+pike.components.Practice.INSTRUCTION_ELEMENT_ID = "practice-instruction";
+pike.components.Practice.BUTTON_CHECK_ELEMENT_ID = "practice-button-check";
+pike.components.Practice.BUTTON_NEXT_ELEMENT_ID = "practice-button-next";
+pike.components.Practice.BUTTON_LEAVE_ELEMENT_ID = "practice-leave-button";
+pike.components.AStar = function() {
+  this.isWalking_ = false;
+  this.graph_ = null;
+  this.tempo_ = 50;
+  this.pike_components_AStar_ = {actualNode:null, path:null, animator:new pike.animation.Animator, lastUpdate:null};
+  this.setTempo = function(tempo) {
+    this.tempo_ = tempo
+  };
+  this.setGraph = function(graph) {
+    this.graph_ = graph
+  };
+  this.getGraph = function() {
+    return this.graph_
+  };
+  this.isWalking = function() {
+    return this.isWalking_
+  };
+  this.stopWalking = function() {
+    this.isWalking_ = false
+  };
+  this.startWalking = function() {
+    var targetNode = this.pike_components_AStar_.path[0];
+    this.startX_ = this.x;
+    this.startY_ = this.y;
+    this.vx = targetNode.x - this.x;
+    this.vy = targetNode.y - this.y;
+    var magnitude = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+    this.pike_components_AStar_.animator.stop();
+    this.pike_components_AStar_.animator.setRepeatBehavior(pike.animation.Animator.LOOP);
+    this.pike_components_AStar_.animator.setRepeatCount(1);
+    this.pike_components_AStar_.animator.setDuration(magnitude / this.tempo_ * 1E3);
+    this.pike_components_AStar_.animator.start();
+    this.pike_components_AStar_.lastUpdate = (new Date).getTime();
+    this.isWalking_ = true
+  };
+  this.setDestinationNode = function(destinationNode) {
+    if(!this.graph_) {
+      throw new Error("[pike.components.AStar] Graph is not set.");
+    }
+    this.pike_components_AStar_.path = this.graph_.findPath(this.getActualNode_(), destinationNode);
+    this.setNextDestination_()
+  };
+  this.setNextDestination_ = function() {
+    this.pike_components_AStar_.actualNode = this.pike_components_AStar_.path[0];
+    this.pike_components_AStar_.path.splice(0, 1);
+    if(this.pike_components_AStar_.path.length == 0) {
+      this.isWalking_ = false;
+      this.dispatchEvent(new pike.events.ReachDestination(this.x, this.y, this));
+      if(goog.DEBUG) {
+        window.console.log("[pike.components.AStar] destination is reached")
+      }
+      return
+    }
+    this.startWalking()
+  };
+  this.onAStartUpdate = function(e) {
+    if(!this.isWalking_) {
+      return
+    }
+    if(typeof this.vx == "undefined" || typeof this.vy == "undefined") {
+      return
+    }
+    var now = e.now;
+    var fraction = this.pike_components_AStar_.animator.update(now - this.pike_components_AStar_.lastUpdate);
+    this.pike_components_AStar_.lastUpdate = now;
+    if(typeof fraction == "undefined") {
+      delete this.vx;
+      delete this.vy;
+      this.setNextDestination_();
+      return
+    }
+    var oldX = this.x;
+    var oldY = this.y;
+    this.x = this.startX_ + this.vx * fraction;
+    this.y = this.startY_ + this.vy * fraction;
+    this.x = 0.5 + this.x << 0;
+    this.y = 0.5 + this.y << 0;
+    this.dispatchEvent(new pike.events.ChangePosition(this.x, this.y, oldX, oldY, this));
+    if(this.hasComponent(pike.components.Sprite.NAME)) {
+      this.onSpriteUpdate(e)
+    }
+  };
+  this.getActualNode_ = function() {
+    if(!this.pike_components_AStar_.actualNode) {
+      for(var i = 0;i < this.graph_.getNodes().length;i++) {
+        if(this.graph_.getNodes()[i].x == this.x && this.graph_.getNodes()[i].y == this.y) {
+          this.pike_components_AStar_.actualNode = this.graph_.getNodes()[i];
+          return this.pike_components_AStar_.actualNode
+        }
+      }
+      throw new Error("[pike.components.AStar] Entity is not on graph position.");
+    }
+    return this.pike_components_AStar_.actualNode
   }
-  if(this.dirtyRect_) {
-    this.dirtyRect_ = this.dirtyRect_.convexHull(rect)
-  }else {
-    this.dirtyRect_ = rect
-  }
-  if(this.dirtyRect_.w * this.dirtyRect_.h > this.allDirtyThreshold_ * this.viewport_.w * this.viewport_.h) {
-    this.markAllDirty()
-  }
 };
-pike.layers.DirtyManager.prototype.isClean = function() {
-  return!this.dirtyRect_
-};
-pike.layers.DirtyManager.prototype.clear = function() {
-  this.dirtyRect_ = null;
-  this.allDirty_ = false
-};
-pike.layers.DirtyManager.prototype.setSize = function(width, height) {
-  this.viewport_.w = width;
-  this.viewport_.h = height;
-  this.markAllDirty()
-};
-pike.layers.DirtyManager.prototype.setPosition = function(x, y) {
-  this.viewport_.x = x;
-  this.viewport_.y = y
-};
+pike.components.AStar.NAME = "pike.components.AStar";
 // Input 41
 /*
  Dual licensed under the MIT or GPL licenses.

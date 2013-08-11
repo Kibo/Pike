@@ -31,26 +31,28 @@
 				position:relative;						
 			}
 	        		
-			#practice{
+			#pike-practice{
 				position:absolute;
-				top:0;
+				top:-800px;
 				left:0;
 				width:100%;
 				height:100%;
 				background:#eee;			
 			}
 								
-			.space{
+			#pike-practice > div{
 				padding:1em;
 			}
 			
-			.space h3{
+			#pike-practice h3{
 				margin:0;
 			}
 			
 			#pike-dialogues{
-				width:800px;
-				margin:5em auto;	
+				width:800px;	
+				position:absolute;
+				top:600px;
+				left:0;			
 			}
 			
 			#pike-dialogues div{						
@@ -162,7 +164,7 @@
 				hero.setSprite( imageManager.get("entities"), 0, 0, 32, 32, 3, 124);
 				hero.setCollisionBounds(0, 16, 0, 16);
 				
-				hero.SPEED = 120; // 2px * 60fps = 120px/sec 
+				hero.TEMPO = 120; // 2px * 60fps = 120px/sec 
 				hero.positionAnimator = new pike.animation.Animator();
 				hero.positionAnimator.setRepeatBehavior(pike.animation.Animator.LOOP)
 				hero.positionAnimator.setRepeatCount(1);
@@ -183,7 +185,7 @@
 					this.vy = this.targetY - this.y;
 					var magnitude = Math.sqrt((this.vx*this.vx)+(this.vy*this.vy));
 														
-					var duration = (magnitude/ hero.SPEED) * 1000;
+					var duration = (magnitude/ hero.TEMPO) * 1000;
 					if( duration < 2) return;
 					
 					this.positionAnimator.stop();
@@ -194,7 +196,11 @@
 					this.startX = this.x;
 					this.startY = this.y;	
 										
-					this.dispatchEvent( new pike.events.EndDialogue( this ) );	
+					if(this.isTalkingWith){
+						this.isTalkingWith.dispatchEvent( new pike.events.EndDialogue( this ) );
+						delete this.isTalkingWith;
+					}	
+												
 				}, hero) );
 																	
 				hero.handler.listen(timer, pike.events.Update.EVENT_TYPE, goog.bind(function(e){
@@ -227,8 +233,10 @@
 					}														
 				}, hero));
 																
-				hero.handler.listen(hero, pike.events.ChangePosition.EVENT_TYPE, goog.bind(function(e){
+				hero.handler.listen(hero, pike.events.ChangePosition.EVENT_TYPE, goog.bind(function(e){					
 					this.layer.setDirty( new pike.graphics.Rectangle(e.oldX, e.oldY, this.w, this.h));
+					this.layer.setDirty( new pike.graphics.Rectangle(this.x, this.y, this.w, this.h));
+					
 					this.setSpriteRow(this.vx, this.vy);	
 				}, hero));
 				
@@ -242,18 +250,116 @@
 				hero.handler.listen(hero, pike.events.Render.EVENT_TYPE, goog.bind(hero.onSpriteRender, hero));
 														
 				cLayer.handler.listen(hero, pike.events.ChangePosition.EVENT_TYPE, cLayer.onEntityChangePosition, false, cLayer);
+					
+				//## GUARD ###
+				var guard =  new pike.core.Entity( pike.components.Sprite, pike.components.Collision, pike.components.Dialogues, pike.components.Practice );
+				guard.x = 550;
+				guard.y = 115;
+				guard.setSprite( imageManager.get("entities"), 96, 0, 32, 32, 3, 300);
+				guard.setCollisionBounds(0, 16, 0, 16);
+				guard.setDialogues( DIALOGUE_DATA["guard"] );	
+				guard.setPracticeData( PRACTICE_DATA['drummer']);
+				guard.setNumberOfPractice(2);
+								
+				guard.handler.listen(guard, pike.events.Collision.EVENT_TYPE, function(e){	
+					this.x = e.oldX;
+					this.y = e.oldY;
+					
+					if(e.obj === hero ){
+						hero.isTalkingWith = this;
+						//self.showDialoguePanel();			
+						this.showDialogue( this.getDialogue() );	
+						timer.stop();
+					}
+					
+				}, false, guard);
 				
+				guard.handler.listen(guard, pike.events.EndDialogue.EVENT_TYPE, function(e){					
+					timer.start();
+				}, false, guard);	
 				
+				guard.handler.listen(guard, pike.events.EndPractice.EVENT_TYPE, function(e){
+					document.getElementById('pike-practice').style.top='-800px';
+					this.showDialogue( this.getDialogue() );					
+				}, false, guard);
 				
-				var practice =  new pike.core.Entity( pike.components.Practice );
-				practice.setPracticeData( PRACTICE_DATA['drummer']);
-				practice.showPractice();
+				guard.openGate = function(){													
+					gate.handler.unlisten(gate, pike.events.Render.EVENT_TYPE, gate.onSpriteRender, false, gate);
+					this.layer.setDirty( new pike.graphics.Rectangle(gate.x, gate.y, gate.w, gate.h));
+					clustaLayer.removeEntity( gate );
+				};
 				
-																																																																									
+				guard.handler.listen(guard, pike.events.Render.EVENT_TYPE, guard.onSpriteRender, false, guard);
+								
+				//## BOY ###
+				var boy =  new pike.core.Entity( pike.components.Sprite, pike.components.Collision, pike.components.AStar, pike.components.VisualizeGraph);
+				boy.x = 248;
+				boy.y = 276;
+				boy.setSprite( imageManager.get("entities"), 96, 0, 32, 32, 3, 300);
+				boy.setCollisionBounds(0, 16, 0, 16);				
+				boy.handler.listen(boy, pike.events.Render.EVENT_TYPE, boy.onSpriteRender, false, boy);
+								
+				var coords = [[248,276],[205,529],[592,430],[420,610], [95,610],[479,430],[420,216],[555,216]];
+				var matrix =
+						[[1, 1, 0, 0, 0, 0, 0, 0],
+						 [1, 1, 0, 1, 0, 0, 0, 0],
+						 [0, 0, 1, 1, 0, 1, 0, 0],
+						 [0, 1, 1, 1, 1, 1, 1, 0],
+						 [0, 0, 0, 1, 1, 0, 0, 0],
+				  	     [0, 0, 1, 1, 0, 1, 1, 0],
+						 [0, 0, 0, 1, 0, 1, 1, 1],
+						 [0, 0, 0, 0, 0, 0, 1, 1]];
+						
+				var nodes = [];
+				for (var i = 0; i < coords.length; i++) {
+					nodes.push(new pike.ai.path.Node(i, coords[i][0], coords[i][1]));
+				}
+				var graph = new pike.ai.path.Graph(nodes, matrix);
+								
+				//boy.handler.listen(boy, pike.events.Render.EVENT_TYPE, boy.onPathRender, false, boy);
+				boy.handler.listen(timer, pike.events.Update.EVENT_TYPE, boy.onAStartUpdate, false, boy);				
+				
+				boy.setGraph( graph );				
+				boy.setDestinationNode( nodes[1] );
+								
+				boy.handler.listen( boy, pike.events.ReachDestination.EVENT_TYPE, function(e){
+					var node = nodes[ Math.floor(Math.random() * this.getGraph().getNodes().length)];					
+					console.log("next destination: " + node.id);					
+					setTimeout( function(){
+						boy.setDestinationNode( node );				
+					} , 2000);
+				});
+				
+				boy.handler.listen(boy, pike.events.ChangePosition.EVENT_TYPE, function(e){	
+					
+					this.layer.setDirty( new pike.graphics.Rectangle(e.oldX, e.oldY, this.w, this.h));	
+					this.layer.setDirty( new pike.graphics.Rectangle(this.x, this.y, this.w, this.h));					
+					this.setSpriteRow(this.vx, this.vy);
+					
+				}, false, boy);
+				
+				boy.handler.listen(boy, pike.events.Collision.EVENT_TYPE, function(e){	
+					this.x = e.oldX;
+					this.y = e.oldY;	
+					
+					this.stopWalking();
+					
+				}, false, boy);
+				
+				//## GATE ###
+				var gate =  new pike.core.Entity( pike.components.Sprite );
+				gate.x = 592;
+				gate.y = 78;
+				gate.w = 64;
+				gate.h = 48;
+				gate.setSprite( imageManager.get("entities"), 0, 128, 64, 48, 0, 0);				
+				gate.handler.listen(gate, pike.events.Render.EVENT_TYPE, gate.onSpriteRender, false, gate);
+				
+				//## CHEESE ###
 				var cheese =  new pike.core.Entity( pike.components.Sprite, pike.components.Collision, pike.components.Backpack);
 				cheese.x = 150;
-				cheese.y = 300;
-				cheese.setSprite( imageManager.get("entities"), 96, 96, 32, 32, 3, 300);
+				cheese.y = 500;
+				cheese.setSprite( imageManager.get("entities"), 160, 160, 32, 32, 3, 300);
 				cheese.setIconUrl("../img/cheese.png");
 				cheese.setGameEventHandler( mouse );
 				
@@ -284,6 +390,9 @@
 				clustaLayer.setDirtyManager( new pike.layers.DirtyManager() );				
 				clustaLayer.addEntity( hero );				
 				clustaLayer.addEntity( cheese );
+				clustaLayer.addEntity( guard );
+				clustaLayer.addEntity( boy );
+				clustaLayer.addEntity( gate );
 						
 				stage.addLayer( clustaLayer );
 								
@@ -307,15 +416,8 @@
         	<div id="pike-stage"></div>
         	<div id="pike-backpack"></div>
         	<div id="curtain"></div>
-        	<div id="pike-dialogues"></div>
-        	
-        	<div id="practice">
-        		<div class="space">
-        		<h3>Assignment</h3>
-        		<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent nulla nulla, egestas non consequat ac, tempus eget mi. Integer in tortor velit. Curabitur id justo at ante eleifend lobortis. Donec dolor lacus, euismod a malesuada ut, convallis eu elit. </p>        		        	
-        		<div id="pike-practice"></div>        		        		
-        		</div> <!-- space -->
-        	</div>
+        	<div id="pike-dialogues"></div>        	        	    		       
+        	<div id="pike-practice"></div>        		        		        	
         </div>
                                                                 
         <script src="../../libs/xstats/xstats.js"></script>

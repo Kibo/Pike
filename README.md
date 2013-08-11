@@ -20,6 +20,7 @@ There are no restrictions, here are the basic classes.
 - Canvas renderer
 - Collision detection
 - Animation
+- A*
 - Audio
 - Math
 

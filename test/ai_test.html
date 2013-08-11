@@ -31,7 +31,9 @@ var testGetNodes= function() {
 var testFindPath= function() {
 	createGraph();	
 	assertObjectEquals( [nodes[0], nodes[1], nodes[3], nodes[6], nodes[7]], graph.findPath( nodes[0], nodes[7]))	
+	assertObjectEquals( [nodes[0]], graph.findPath( nodes[0], nodes[0]))	
 };
+
 
 var testDecisionTree = function() {
 	

@@ -282,7 +282,7 @@ pike.ai.path.Graph.prototype.findPath = function(startNode, endNode){
  * Serialize the graph
  * @return {Object} json
  */
-pike.ai.path.Graph.serialize = function() {
+pike.ai.path.Graph.prototype.serialize = function() {
     var data = {};
     data.nodes = [];
     this.nodes_.forEach(function(it) {
@@ -292,6 +292,7 @@ pike.ai.path.Graph.serialize = function() {
 };
 
 /**
+ * @static
  * @param {pike.ai.path.Node} node1
  * @param {pike.ai.path.Node} node2
  * @returns {number}
@@ -301,6 +302,15 @@ pike.ai.path.Graph.distance = function(node1, node2) {
         (node1.x - node2.x)*(node1.x - node2.x) +
         (node1.y - node2.y)*(node1.y - node2.y));
 };
+
+/**
+ * Get nodes
+ * @return {Array.<pike.ai.path.Node>}
+ */
+pike.ai.path.Graph.prototype.getNodes = function() {
+	return this.nodes_;
+};
+
 //## Node #####################################
 /**
 * Create a new Node

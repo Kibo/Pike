@@ -14,6 +14,7 @@ goog.provide('pike.components.Hen');
 goog.provide('pike.components.VisualizeGraph');
 goog.provide('pike.components.VisualizeRectangle');
 goog.provide('pike.components.Practice');
+goog.provide('pike.components.AStar');
 
 goog.require('goog.events');
 goog.require('goog.array');
@@ -24,7 +25,9 @@ goog.require('pike.events.StartDialogue');
 goog.require('pike.events.ShowDialogue');
 goog.require('pike.events.EndDialogue');
 goog.require('pike.events.EndPractice');
+goog.require('pike.events.ReachDestination');
 goog.require('goog.style');
+goog.require('pike.ai.path.Graph');
 
 //## Collision #################################
 /**
@@ -176,7 +179,7 @@ pike.components.Sprite = function(){
 		var deltaTime = now - this.spriteSource.lastUpdate;
 		this.spriteSource.lastUpdate = now;		
 		var fraction = this.spriteSource.animator.update(deltaTime);			
-		this.spriteSource.currentFrame = Math.floor(fraction * this.spriteSource.numberOfFrames);		
+		this.spriteSource.currentFrame = Math.floor(fraction * this.spriteSource.numberOfFrames);			
 	};
 	
 	/**
@@ -1476,7 +1479,8 @@ pike.components.Practice = function(){
 	this.practiceData_ = [];
 	this.practiceDataIndex_ = 0;
 	
-	root = document.getElementById(pike.components.Practice.ELEMENT_ID);
+	var root = document.getElementById(pike.components.Practice.ELEMENT_ID);
+	var isPracticeCheck_ = false;
 		
 	/**
 	 * Create practice form
@@ -1493,6 +1497,8 @@ pike.components.Practice = function(){
 		root.innerHTML= ''; //reset
 		
 		var sentence = this.practiceData_[ this.practiceDataIndex_ ];
+		
+		var practiceWrapper = goog.dom.createDom('div');
 					
 		var assignment = goog.dom.createDom('ul', undefined,
 				goog.dom.createDom('li', undefined, goog.dom.htmlToDocumentFragment('Subject: <b>' + sentence.subject + '</b>')),
@@ -1501,37 +1507,46 @@ pike.components.Practice = function(){
 				goog.dom.createDom('li', undefined, goog.dom.htmlToDocumentFragment('Option: <b>' + sentence.option + '</b>')),
 				goog.dom.createDom('li', undefined, goog.dom.htmlToDocumentFragment('Object: <b>' + sentence.object + '</b>'))				
 		);
-				
-		var text = goog.dom.createDom('div', {'id': pike.components.Practice.ANSWER_ELEMENT_ID}, 
-				goog.dom.createDom('label', undefined,'Write the Sentence:'),
+						
+		var answer = goog.dom.createDom('div', {'id': pike.components.Practice.ANSWER_ELEMENT_ID}, 
+				goog.dom.createDom('label', undefined,'Write the Sentence:'), 
 				goog.dom.createDom('textarea'));
 		
 		var solutions = goog.dom.createDom('div', {'id':pike.components.Practice.SOLUTIONS_ELEMENT_ID}); 
 				
-		var buttonsWrapper = goog.dom.createDom('p'); 
+		var buttonsWrapper = goog.dom.createDom('p', {'class':'buttons'}); 
 																			
-		var checkButton = goog.dom.createDom('input', {'type':'button', 'id':pike.components.Practice.BUTTON_CHECK_ELEMENT_ID, 'value':'Check'});
+		var checkButton = goog.dom.createDom('input', {'type':'button', 'id':pike.components.Practice.BUTTON_CHECK_ELEMENT_ID, 'value':'Check', 'class':'btn'});
 		var checkInputHandler = pike.input.Utils.getDeviceInputHandler();
 		checkInputHandler.setEventTarget( checkButton );
 		goog.events.listenOnce( checkInputHandler , pike.events.Down.EVENT_TYPE, this.checkButtonHandler, false, this);
 		goog.dom.appendChild(buttonsWrapper, checkButton);
 				
-		var nextButton = goog.dom.createDom('input', {'type':'button', 'id':pike.components.Practice.BUTTON_NEXT_ELEMENT_ID, 'value':'Next', 'class':'hide'});
+		var nextButton = goog.dom.createDom('input', {'type':'button', 'id':pike.components.Practice.BUTTON_NEXT_ELEMENT_ID, 'value':'Next', 'class':'hide btn'});
 		var nextInputHandler = pike.input.Utils.getDeviceInputHandler();
 		nextInputHandler.setEventTarget( nextButton );
 		goog.events.listenOnce(nextInputHandler, pike.events.Down.EVENT_TYPE, this.nextButtonHandler, false, this);
 		goog.dom.appendChild(buttonsWrapper, nextButton);
 					
-		var leaveButton = goog.dom.createDom('input', {'type':'button', 'id':'practice-leave-button', 'value':'Leave'});
+		var leaveButton = goog.dom.createDom('input', {'type':'button', 'id':pike.components.Practice.BUTTON_LEAVE_ELEMENT_ID, 'value':'Leave', 'class':'btn'});
 		var leaveInputHandler = pike.input.Utils.getDeviceInputHandler();
 		leaveInputHandler.setEventTarget( leaveButton );
 		goog.events.listenOnce( leaveInputHandler, pike.events.Down.EVENT_TYPE, this.leaveButtonHandler, false, this);
 		goog.dom.appendChild(buttonsWrapper, leaveButton);
+					
+		if(this.practiceInstructionText){						
+			goog.dom.appendChild(practiceWrapper, goog.dom.createDom('div', {'id':pike.components.Practice.INSTRUCTION_ELEMENT_ID}, goog.dom.htmlToDocumentFragment( this.practiceInstructionText )));
+		}	 
+		goog.dom.appendChild(practiceWrapper, assignment);
+		goog.dom.appendChild(practiceWrapper, answer);
+		goog.dom.appendChild(practiceWrapper, solutions);
+		goog.dom.appendChild(practiceWrapper, buttonsWrapper);
+		goog.dom.appendChild(root, practiceWrapper);
 		
-		goog.dom.appendChild(root, assignment);
-		goog.dom.appendChild(root, text);
-		goog.dom.appendChild(root, solutions);
-		goog.dom.appendChild(root, buttonsWrapper);
+				
+		goog.dom.getLastElementChild( document.getElementById( pike.components.Practice.ANSWER_ELEMENT_ID ) ).focus(); 
+		
+		isPracticeCheck_ = false;
 	};
 		
 	/**
@@ -1539,6 +1554,7 @@ pike.components.Practice = function(){
 	 * @param {Object} e - DOM event
 	 */
 	this.checkButtonHandler = function(e){
+		isPracticeCheck_ = true;
 				
 		goog.dom.classes.add( document.getElementById( pike.components.Practice.BUTTON_CHECK_ELEMENT_ID ), 'hide');
 		if( this.hasNextPractice() ){
@@ -1556,12 +1572,15 @@ pike.components.Practice = function(){
 		}
 		
 		goog.dom.classes.add( document.getElementById( pike.components.Practice.ANSWER_ELEMENT_ID ), 'error');
+		this.hasPracticeError_ = true;
 
-		//show correct answer
+		goog.dom.appendChild(solutionsWrapper, goog.dom.createDom('h3', undefined, 'Solutions'));
+		var solutions = goog.dom.createDom('ul');			
 		for(var i = 0; i < this.practiceData_[ this.practiceDataIndex_ ].solutions.length; i++){
-			var solution = goog.dom.createDom('p', undefined, this.practiceData_[ this.practiceDataIndex_ ].solutions[i]);			
-			goog.dom.appendChild(solutionsWrapper, solution);				
-		}				
+			var solution = goog.dom.createDom('li', undefined, this.practiceData_[ this.practiceDataIndex_ ].solutions[i]);			
+			goog.dom.appendChild(solutions, solution);				
+		}
+		goog.dom.appendChild(solutionsWrapper, solutions);
 	};
 	
 	/**
@@ -1596,10 +1615,9 @@ pike.components.Practice = function(){
 		
 	/**
 	 * Shuffle practice data
-	 * @param {Array.<Object>} data
 	 */
-	this.shufflePracticeData = function( data ){
-		goog.array.shuffle(data);
+	this.shufflePracticeData = function(){
+		goog.array.shuffle( this.practiceDataIndex_ );
 	};
 		
 	/**
@@ -1617,13 +1635,25 @@ pike.components.Practice = function(){
 	this.setNumberOfPractice = function( number ){
 		this.numberOfPractice_ = number;
 	};
+	
+	/**
+	 * Set instruction text
+	 * @param {String} text
+	 * @example
+	 * ~~~
+	 * practice.setPracticeInstructionText('Only <b>you</b> can prevent forest fires.')
+	 * ~~~
+	 */
+	this.setPracticeInstructionText = function( text ){
+		this.practiceInstructionText = text;
+	};
 
 	/**
 	 * Is finished
 	 * @return {boolean}
 	 */
 	this.isPracticeFinished = function(){
-		return (this.practiceDataIndex_ + 1) == this.numberOfPractice_;
+		return isPracticeCheck_ && (this.practiceDataIndex_ + 1) == this.numberOfPractice_;
 	};
 
 	/**
@@ -1668,6 +1698,13 @@ pike.components.Practice.SOLUTIONS_ELEMENT_ID = "practice-solutions";
  * @const
  * @type {string}
  */
+pike.components.Practice.INSTRUCTION_ELEMENT_ID = "practice-instruction";
+
+/**
+ * DOM Element id
+ * @const
+ * @type {string}
+ */
 pike.components.Practice.BUTTON_CHECK_ELEMENT_ID = "practice-button-check";
 
 /**
@@ -1677,3 +1714,227 @@ pike.components.Practice.BUTTON_CHECK_ELEMENT_ID = "practice-button-check";
  */
 pike.components.Practice.BUTTON_NEXT_ELEMENT_ID = "practice-button-next";
 
+/**
+ * DOM Element id
+ * @const
+ * @type {string}
+ */
+pike.components.Practice.BUTTON_LEAVE_ELEMENT_ID = "practice-leave-button";
+
+//## pike.components.AStar #################################
+/**
+ * pike.components.AStar
+ * A* algorithm for an entity
+ * @constructor
+ * @fires {pike.events.ReachDestination}
+ * @example
+ * ~~~
+ * var enemy = new pike.core.Entity( pike.components.AStar );
+ * enemy.setGraph( graph );
+ * enemy.setDestinationNode( nodes[1] );
+ * ~~~
+ * @see pike.components.VisualizeGraph
+ * @author Tomas Jurman (tomasjurman@gmail.com)
+ */
+pike.components.AStar = function(){
+	
+	/**
+	 * @private
+	 */
+	this.isWalking_ = false;
+	
+	/**
+	 * @private
+	 */
+	this.graph_ = null;
+	
+	/**
+	 * @private
+	 */
+	this.tempo_ = 50;
+	
+	/**
+	 * @private
+	 */
+	this.pike_components_AStar_ = {
+			actualNode:null,
+			path:null,
+			animator:new pike.animation.Animator(),
+			lastUpdate:null			
+	};
+	
+	/**
+	 * Set movement tempo
+	 * @param {number} tempo - px per second
+	 */
+	this.setTempo = function( tempo ){
+		this.tempo_ = tempo;
+	};
+	
+	/**
+	 * Set a graph
+	 * @param {pike.ai.path.Graph} graph
+	 */
+	this.setGraph = function(graph){
+		this.graph_ = graph;		
+	};
+	
+	/**
+	 * Get a graph
+	 * @return {pike.ai.path.Graph}
+	 */
+	this.getGraph = function(){
+		return this.graph_;		
+	};
+	
+	/**
+	 * Is walking
+	 * @return {boolean}
+	 */
+	this.isWalking = function(){
+		return this.isWalking_;
+	};
+	
+	/**
+	 * Stop walkning
+	 */
+	this.stopWalking = function(){
+		this.isWalking_ = false;			
+	};
+	
+	/**
+	 * Start walkning
+	 */
+	this.startWalking = function(){		
+		var targetNode = this.pike_components_AStar_.path[0];
+		
+		this.startX_ = this.x;
+		this.startY_ = this.y;
+		
+		this.vx = targetNode.x - this.x;
+		this.vy = targetNode.y - this.y;
+		var magnitude = Math.sqrt((this.vx*this.vx)+(this.vy*this.vy));
+		
+		this.pike_components_AStar_.animator.stop();
+		this.pike_components_AStar_.animator.setRepeatBehavior(pike.animation.Animator.LOOP);
+		this.pike_components_AStar_.animator.setRepeatCount(1);
+		this.pike_components_AStar_.animator.setDuration( (magnitude/this.tempo_) * 1000 ); 
+		this.pike_components_AStar_.animator.start();
+		
+		this.pike_components_AStar_.lastUpdate = new Date().getTime();
+		
+		this.isWalking_ = true;
+	};
+	
+	/**
+	 * Set destination node
+	 * @param {pike.ai.path.Node} destinationNode
+	 */
+	this.setDestinationNode = function( destinationNode ){			
+		if(!this.graph_){
+			throw new Error("[pike.components.AStar] Graph is not set.");
+		}
+		
+		
+					
+		//Find the best path
+		this.pike_components_AStar_.path = this.graph_.findPath( this.getActualNode_(), destinationNode );		
+							
+		this.setNextDestination_();
+	};
+	
+	/**
+	 * Set next destination
+	 * @fires {pike.events.ReachDestination} - when the last node is reached
+	 * @private
+	 */
+	this.setNextDestination_ = function(){
+								
+		//First node is actual node
+		this.pike_components_AStar_.actualNode = this.pike_components_AStar_.path[0];
+		
+		//Removes actual node from path
+		this.pike_components_AStar_.path.splice(0,1);
+									
+		//Reach the destination
+		if(this.pike_components_AStar_.path.length == 0){				
+			this.isWalking_ = false;	
+			this.dispatchEvent( new pike.events.ReachDestination(this.x, this.y, this));
+			if(goog.DEBUG) window.console.log("[pike.components.AStar] destination is reached");
+			return; //===========>
+		}
+							
+		this.startWalking();
+	};
+	
+	/**
+	 * On update handler
+	 * @param {pike.events.Update} e
+	 * @fires {pike.events.ReachPathDestination} - when the last node is reached
+	 */
+	this.onAStartUpdate = function( e ){		
+		if(!this.isWalking_){
+			return;
+		}
+				
+		if(typeof this.vx == 'undefined' || typeof this.vy == 'undefined' ){
+			return;
+		}			
+		
+		var now = e.now;						
+		var fraction = this.pike_components_AStar_.animator.update( now - this.pike_components_AStar_.lastUpdate );
+		this.pike_components_AStar_.lastUpdate = now;
+					
+		if( typeof fraction == 'undefined'){			
+			delete this.vx;
+			delete this.vy;
+			this.setNextDestination_();
+			return
+		};
+					
+		var oldX = this.x;
+		var oldY = this.y;
+		
+		this.x = this.startX_ + (this.vx * fraction);
+		this.y = this.startY_ + (this.vy * fraction); 
+		
+		this.x = (0.5 + this.x) << 0; //round
+    	this.y = (0.5 + this.y) << 0; //round
+    	
+    	this.dispatchEvent( new pike.events.ChangePosition(this.x, this.y, oldX, oldY, this) );
+    	
+    	if( this.hasComponent( pike.components.Sprite.NAME ) ){
+    		this.onSpriteUpdate( e );    		
+    	}
+	};
+	
+		
+	/**
+	 * Get actual node or first node in graph
+	 * Actual node is node where an entity stays
+	 * @return {pike.ai.path.Node}
+	 * @private
+	 */
+	this.getActualNode_ = function(){
+		if( !this.pike_components_AStar_.actualNode ){		
+			for(var i = 0; i < this.graph_.getNodes().length; i++){
+				
+				if(	this.graph_.getNodes()[i].x == this.x 
+					&& this.graph_.getNodes()[i].y == this.y){
+					this.pike_components_AStar_.actualNode = this.graph_.getNodes()[i]; 
+					return this.pike_components_AStar_.actualNode; //========>
+				}
+			}				
+			throw new Error("[pike.components.AStar] Entity is not on graph position.");
+		}
+			
+		return this.pike_components_AStar_.actualNode;
+	};
+};
+
+/**
+ * Component name
+ * @const
+ * @type {string}
+ */
+pike.components.AStar.NAME="pike.components.AStar";
