@@ -5,7 +5,7 @@
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 		<meta name="generator" content="JsDoc Toolkit" />
 		
-		<title>JsDoc Reference - pike.components.Backpack</title>
+		<title>JsDoc Reference - pike.components.AStar</title>
 
 		<style type="text/css">
 			/* default.css */
@@ -294,7 +294,7 @@ ul.inheritsList
 <!-- ============================== class title ============================ -->
 			<h1 class="classTitle">
 				
-				Class pike.components.Backpack
+				Class pike.components.AStar
 			</h1>
 
 <!-- ============================== class summary ========================== -->			
@@ -311,7 +311,7 @@ ul.inheritsList
 
 <!-- ============================== constructor summary ==================== -->			
 			
-			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class pike.components.Backpack.">
+			<table class="summaryTable" cellspacing="0" summary="A summary of the constructor documented in the class pike.components.AStar.">
 				<caption>Class Summary</caption>
 				<thead>
 					<tr>
@@ -324,11 +324,10 @@ ul.inheritsList
 						<td class="attributes">&nbsp;</td>
 						<td class="nameDescription" >
 							<div class="fixedFont">
-								<b><a href="../symbols/pike.components.Backpack.html#constructor">pike.components.Backpack</a></b>()
+								<b><a href="../symbols/pike.components.AStar.html#constructor">pike.components.AStar</a></b>()
 							</div>
-							<div class="description">Backpack
-Lets put an entity to a DOM container(Backpack) as a DOM element 
-and with drag-and-drop get back on canvas</div>
+							<div class="description">pike.components.AStar
+A* algorithm for an entity</div>
 						</td>
 					</tr>
 				</tbody>
@@ -339,7 +338,7 @@ and with drag-and-drop get back on canvas</div>
 			
 				
 				
-				<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class pike.components.Backpack.">
+				<table class="summaryTable" cellspacing="0" summary="A summary of the fields documented in the class pike.components.AStar.">
 					<caption>Field Summary</caption>
 					<thead>
 						<tr>
@@ -350,12 +349,22 @@ and with drag-and-drop get back on canvas</div>
 					<tbody>
 					
 						<tr>
-							<td class="attributes">&lt;static&gt; &nbsp;</td>
+							<td class="attributes">&lt;private&gt; &nbsp;</td>
 							<td class="nameDescription">
 								<div class="fixedFont">
-								pike.components.Backpack.<b><a href="../symbols/pike.components.Backpack.html#.ELEMENT_ID">ELEMENT_ID</a></b>
+								<b><a href="../symbols/pike.components.AStar.html#graph_">graph_</a></b>
 								</div>
-								<div class="description">DOM Element id for Backpack</div>
+								<div class="description"></div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;private&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								<b><a href="../symbols/pike.components.AStar.html#isWalking_">isWalking_</a></b>
+								</div>
+								<div class="description"></div>
 							</td>
 						</tr>
 					
@@ -363,9 +372,29 @@ and with drag-and-drop get back on canvas</div>
 							<td class="attributes">&lt;static&gt; &nbsp;</td>
 							<td class="nameDescription">
 								<div class="fixedFont">
-								pike.components.Backpack.<b><a href="../symbols/pike.components.Backpack.html#.NAME">NAME</a></b>
+								pike.components.AStar.<b><a href="../symbols/pike.components.AStar.html#.NAME">NAME</a></b>
 								</div>
 								<div class="description">Component name</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;private&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								<b><a href="../symbols/pike.components.AStar.html#pike_components_AStar_">pike_components_AStar_</a></b>
+								</div>
+								<div class="description"></div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&lt;private&gt; &nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont">
+								<b><a href="../symbols/pike.components.AStar.html#tempo_">tempo_</a></b>
+								</div>
+								<div class="description"></div>
 							</td>
 						</tr>
 					
@@ -380,7 +409,7 @@ and with drag-and-drop get back on canvas</div>
 			
 				
 				
-				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class pike.components.Backpack.">
+				<table class="summaryTable" cellspacing="0" summary="A summary of the methods documented in the class pike.components.AStar.">
 					<caption>Method Summary</caption>
 					<thead>
 						<tr>
@@ -393,90 +422,91 @@ and with drag-and-drop get back on canvas</div>
 						<tr>
 							<td class="attributes">&lt;private&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/pike.components.Backpack.html#dragStart_">dragStart_</a></b>(e)
+								<div class="fixedFont"><b><a href="../symbols/pike.components.AStar.html#getActualNode_">getActualNode_</a></b>()
 								</div>
-								<div class="description">Drag start handler</div>
+								<div class="description">Get actual node or first node in graph
+Actual node is node where an entity stays</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/pike.components.AStar.html#getGraph">getGraph</a></b>()
+								</div>
+								<div class="description">Get a graph</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/pike.components.AStar.html#isWalking">isWalking</a></b>()
+								</div>
+								<div class="description">Is walking</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/pike.components.AStar.html#onAStartUpdate">onAStartUpdate</a></b>(e)
+								</div>
+								<div class="description">On update handler</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/pike.components.AStar.html#setDestinationNode">setDestinationNode</a></b>(destinationNode)
+								</div>
+								<div class="description">Set destination node</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/pike.components.AStar.html#setGraph">setGraph</a></b>(graph)
+								</div>
+								<div class="description">Set a graph</div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&lt;private&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/pike.components.Backpack.html#drop_">drop_</a></b>(e)
+								<div class="fixedFont"><b><a href="../symbols/pike.components.AStar.html#setNextDestination_">setNextDestination_</a></b>()
 								</div>
-								<div class="description">Drop over handler</div>
+								<div class="description">Set next destination</div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/pike.components.Backpack.html#getBackpackElement">getBackpackElement</a></b>()
+								<div class="fixedFont"><b><a href="../symbols/pike.components.AStar.html#setTempo">setTempo</a></b>(tempo)
 								</div>
-								<div class="description">Get backpack DOM container</div>
+								<div class="description">Set movement tempo</div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/pike.components.Backpack.html#isDropAcceptable">isDropAcceptable</a></b>()
+								<div class="fixedFont"><b><a href="../symbols/pike.components.AStar.html#startWalking">startWalking</a></b>()
 								</div>
-								<div class="description">Determines that entity is drop acceptable</div>
+								<div class="description">Start walkning</div>
 							</td>
 						</tr>
 					
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/pike.components.Backpack.html#isOnBackpack">isOnBackpack</a></b>()
+								<div class="fixedFont"><b><a href="../symbols/pike.components.AStar.html#stopWalking">stopWalking</a></b>()
 								</div>
-								<div class="description">Determines that entity is on the backpack</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/pike.components.Backpack.html#putInBackpack">putInBackpack</a></b>()
-								</div>
-								<div class="description">Create DOM representation of entity and attach it on backpack DOM container</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/pike.components.Backpack.html#removeFromBackpack">removeFromBackpack</a></b>()
-								</div>
-								<div class="description">Remove DOM item from DOM backpack container</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/pike.components.Backpack.html#setDropAcceptable">setDropAcceptable</a></b>(isAcceptable)
-								</div>
-								<div class="description">Set drop acceptable</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/pike.components.Backpack.html#setGameEventHandler">setGameEventHandler</a></b>(eventHandler)
-								</div>
-								<div class="description">Set a event handler</div>
-							</td>
-						</tr>
-					
-						<tr>
-							<td class="attributes">&nbsp;</td>
-							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/pike.components.Backpack.html#setIconUrl">setIconUrl</a></b>(url)
-								</div>
-								<div class="description">Set a icon for item in backpack</div>
+								<div class="description">Stop walkning</div>
 							</td>
 						</tr>
 					
@@ -497,26 +527,21 @@ and with drag-and-drop get back on canvas</div>
 				</div>
 				
 				<div class="fixedFont">
-						<b>pike.components.Backpack</b>()
+						<b>pike.components.AStar</b>()
 				</div>
 				
 				<div class="description">
-					Backpack
-Lets put an entity to a DOM container(Backpack) as a DOM element 
-and with drag-and-drop get back on canvas
+					pike.components.AStar
+A* algorithm for an entity
 					<br /><i>Author: </i>Tomas Jurman (tomasjurman@gmail.com).
 				</div>
 				
 				
 				
 				<pre class="code">~~~
-var sword = new pike.core.Entity( pike.components.Backpack )
-var hero  = new pike.core.Entity( pike.components.Collision )
-hero.onCollision = function(e){
-  if(e.obj.hasComponent( pike.components.Backpack.NAME ) ){
-  	e.obj.putInBackpack();	
-  }	 
-}
+var enemy = new pike.core.Entity( pike.components.AStar );
+enemy.setGraph( graph );
+enemy.setDestinationNode( nodes[1] );
 ~~~</pre>
 				
 				
@@ -529,6 +554,13 @@ hero.onCollision = function(e){
 					
 					
 					
+						<dl class="detailList">
+						<dt class="heading">See:</dt>
+						
+							<dd><a href="../symbols/pike.components.VisualizeGraph.html">pike.components.VisualizeGraph</a></dd>
+						
+						</dl>
+					
 
 			</div>
 			
@@ -539,15 +571,37 @@ hero.onCollision = function(e){
 					Field Detail
 				</div>
 				
-					<a name=".ELEMENT_ID"> </a>
-					<div class="fixedFont">&lt;static&gt; 
+					<a name="graph_"> </a>
+					<div class="fixedFont">&lt;private&gt; 
 					
 					
-					<span class="light">pike.components.Backpack.</span><b>ELEMENT_ID</b>
+					<b>graph_</b>
 					
 					</div>
 					<div class="description">
-						DOM Element id for Backpack
+						
+						
+						
+					</div>
+					
+					
+
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="isWalking_"> </a>
+					<div class="fixedFont">&lt;private&gt; 
+					
+					
+					<b>isWalking_</b>
+					
+					</div>
+					<div class="description">
+						
 						
 						
 					</div>
@@ -565,11 +619,55 @@ hero.onCollision = function(e){
 					<div class="fixedFont">&lt;static&gt; 
 					
 					
-					<span class="light">pike.components.Backpack.</span><b>NAME</b>
+					<span class="light">pike.components.AStar.</span><b>NAME</b>
 					
 					</div>
 					<div class="description">
 						Component name
+						
+						
+					</div>
+					
+					
+
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="pike_components_AStar_"> </a>
+					<div class="fixedFont">&lt;private&gt; 
+					
+					
+					<b>pike_components_AStar_</b>
+					
+					</div>
+					<div class="description">
+						
+						
+						
+					</div>
+					
+					
+
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="tempo_"> </a>
+					<div class="fixedFont">&lt;private&gt; 
+					
+					
+					<b>tempo_</b>
+					
+					</div>
+					<div class="description">
+						
 						
 						
 					</div>
@@ -591,87 +689,16 @@ hero.onCollision = function(e){
 					Method Detail
 				</div>
 				
-					<a name="dragStart_"> </a>
+					<a name="getActualNode_"> </a>
 					<div class="fixedFont">&lt;private&gt; 
 					
-					
-					<b>dragStart_</b>(e)
-					
-					</div>
-					<div class="description">
-						Drag start handler
-						
-						
-					</div>
-					
-					
-					
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{<a href="../symbols/pike.events.Down.html">pike.events.Down</a>}</span> <b>e</b>
-									
-								</dt>
-								<dd></dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="drop_"> </a>
-					<div class="fixedFont">&lt;private&gt; 
-					
-					
-					<b>drop_</b>(e)
+					<span class="light">{<a href="../symbols/pike.ai.path.Node.html">pike.ai.path.Node</a>}</span>
+					<b>getActualNode_</b>()
 					
 					</div>
 					<div class="description">
-						Drop over handler
-						
-						
-					</div>
-					
-					
-					
-						
-							<dl class="detailList">
-							<dt class="heading">Parameters:</dt>
-							
-								<dt>
-									<span class="light fixedFont">{<a href="../symbols/pike.events.Up.html">pike.events.Up</a>}</span> <b>e</b>
-									
-								</dt>
-								<dd></dd>
-							
-							</dl>
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="getBackpackElement"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{Object}</span>
-					<b>getBackpackElement</b>()
-					
-					</div>
-					<div class="description">
-						Get backpack DOM container
+						Get actual node or first node in graph
+Actual node is node where an entity stays
 						
 						
 					</div>
@@ -686,7 +713,7 @@ hero.onCollision = function(e){
 							<dl class="detailList">
 							<dt class="heading">Returns:</dt>
 							
-								<dd><span class="light fixedFont">{Object}</span> DOM element</dd>
+								<dd><span class="light fixedFont">{<a href="../symbols/pike.ai.path.Node.html">pike.ai.path.Node</a>}</span> </dd>
 							
 							</dl>
 						
@@ -695,15 +722,47 @@ hero.onCollision = function(e){
 
 					<hr />
 				
-					<a name="isDropAcceptable"> </a>
+					<a name="getGraph"> </a>
 					<div class="fixedFont">
 					
-					<span class="light">{boolean}</span>
-					<b>isDropAcceptable</b>()
+					<span class="light">{<a href="../symbols/pike.ai.path.Graph.html">pike.ai.path.Graph</a>}</span>
+					<b>getGraph</b>()
 					
 					</div>
 					<div class="description">
-						Determines that entity is drop acceptable
+						Get a graph
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+							<dl class="detailList">
+							<dt class="heading">Returns:</dt>
+							
+								<dd><span class="light fixedFont">{<a href="../symbols/pike.ai.path.Graph.html">pike.ai.path.Graph</a>}</span> </dd>
+							
+							</dl>
+						
+						
+						
+
+					<hr />
+				
+					<a name="isWalking"> </a>
+					<div class="fixedFont">
+					
+					<span class="light">{boolean}</span>
+					<b>isWalking</b>()
+					
+					</div>
+					<div class="description">
+						Is walking
 						
 						
 					</div>
@@ -727,97 +786,15 @@ hero.onCollision = function(e){
 
 					<hr />
 				
-					<a name="isOnBackpack"> </a>
-					<div class="fixedFont">
-					
-					<span class="light">{boolean}</span>
-					<b>isOnBackpack</b>()
-					
-					</div>
-					<div class="description">
-						Determines that entity is on the backpack
-						
-						
-					</div>
-					
-					
-					
-						
-						
-						
-						
-						
-							<dl class="detailList">
-							<dt class="heading">Returns:</dt>
-							
-								<dd><span class="light fixedFont">{boolean}</span> </dd>
-							
-							</dl>
-						
-						
-						
-
-					<hr />
-				
-					<a name="putInBackpack"> </a>
+					<a name="onAStartUpdate"> </a>
 					<div class="fixedFont">
 					
 					
-					<b>putInBackpack</b>()
+					<b>onAStartUpdate</b>(e)
 					
 					</div>
 					<div class="description">
-						Create DOM representation of entity and attach it on backpack DOM container
-						
-						
-					</div>
-					
-					
-					
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="removeFromBackpack"> </a>
-					<div class="fixedFont">
-					
-					
-					<b>removeFromBackpack</b>()
-					
-					</div>
-					<div class="description">
-						Remove DOM item from DOM backpack container
-						
-						
-					</div>
-					
-					
-					
-						
-						
-						
-						
-						
-						
-						
-
-					<hr />
-				
-					<a name="setDropAcceptable"> </a>
-					<div class="fixedFont">
-					
-					
-					<b>setDropAcceptable</b>(isAcceptable)
-					
-					</div>
-					<div class="description">
-						Set drop acceptable
+						On update handler
 						
 						
 					</div>
@@ -829,7 +806,7 @@ hero.onCollision = function(e){
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{boolean}</span> <b>isAcceptable</b>
+									<span class="light fixedFont">{<a href="../symbols/pike.events.Update.html">pike.events.Update</a>}</span> <b>e</b>
 									
 								</dt>
 								<dd></dd>
@@ -845,15 +822,15 @@ hero.onCollision = function(e){
 
 					<hr />
 				
-					<a name="setGameEventHandler"> </a>
+					<a name="setDestinationNode"> </a>
 					<div class="fixedFont">
 					
 					
-					<b>setGameEventHandler</b>(eventHandler)
+					<b>setDestinationNode</b>(destinationNode)
 					
 					</div>
 					<div class="description">
-						Set a event handler
+						Set destination node
 						
 						
 					</div>
@@ -865,7 +842,7 @@ hero.onCollision = function(e){
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{<a href="../symbols/pike.input.MouseInputHandler.html">pike.input.MouseInputHandler</a>|<a href="../symbols/pike.input.TouchInputHandler.html">pike.input.TouchInputHandler</a>}</span> <b>eventHandler</b>
+									<span class="light fixedFont">{<a href="../symbols/pike.ai.path.Node.html">pike.ai.path.Node</a>}</span> <b>destinationNode</b>
 									
 								</dt>
 								<dd></dd>
@@ -881,15 +858,15 @@ hero.onCollision = function(e){
 
 					<hr />
 				
-					<a name="setIconUrl"> </a>
+					<a name="setGraph"> </a>
 					<div class="fixedFont">
 					
 					
-					<b>setIconUrl</b>(url)
+					<b>setGraph</b>(graph)
 					
 					</div>
 					<div class="description">
-						Set a icon for item in backpack
+						Set a graph
 						
 						
 					</div>
@@ -901,12 +878,123 @@ hero.onCollision = function(e){
 							<dt class="heading">Parameters:</dt>
 							
 								<dt>
-									<span class="light fixedFont">{string}</span> <b>url</b>
+									<span class="light fixedFont">{<a href="../symbols/pike.ai.path.Graph.html">pike.ai.path.Graph</a>}</span> <b>graph</b>
 									
 								</dt>
-								<dd>- icon</dd>
+								<dd></dd>
 							
 							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="setNextDestination_"> </a>
+					<div class="fixedFont">&lt;private&gt; 
+					
+					
+					<b>setNextDestination_</b>()
+					
+					</div>
+					<div class="description">
+						Set next destination
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="setTempo"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>setTempo</b>(tempo)
+					
+					</div>
+					<div class="description">
+						Set movement tempo
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{number}</span> <b>tempo</b>
+									
+								</dt>
+								<dd>- px per second</dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="startWalking"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>startWalking</b>()
+					
+					</div>
+					<div class="description">
+						Start walkning
+						
+						
+					</div>
+					
+					
+					
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="stopWalking"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>stopWalking</b>()
+					
+					</div>
+					<div class="description">
+						Stop walkning
+						
+						
+					</div>
+					
+					
+					
 						
 						
 						

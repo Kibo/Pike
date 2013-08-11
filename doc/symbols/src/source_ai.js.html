@@ -289,7 +289,7 @@
 <span class='line'>282</span>  * Serialize the graph
 <span class='line'>283</span>  * @return {Object} json
 <span class='line'>284</span>  */</span><span class="WHIT">
-<span class='line'>285</span> </span><span class="NAME">pike.ai.path.Graph.serialize</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>285</span> </span><span class="NAME">pike.ai.path.Graph.prototype.serialize</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
 <span class='line'>286</span> </span><span class="WHIT">    </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">data</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>287</span> </span><span class="WHIT">    </span><span class="NAME">data.nodes</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>288</span> </span><span class="WHIT">    </span><span class="NAME">this.nodes_.forEach</span><span class="PUNC">(</span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">it</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
@@ -299,43 +299,53 @@
 <span class='line'>292</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>293</span> 
 <span class='line'>294</span> </span><span class="COMM">/**
-<span class='line'>295</span>  * @param {pike.ai.path.Node} node1
-<span class='line'>296</span>  * @param {pike.ai.path.Node} node2
-<span class='line'>297</span>  * @returns {number}
-<span class='line'>298</span>  */</span><span class="WHIT">
-<span class='line'>299</span> </span><span class="NAME">pike.ai.path.Graph.distance</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">node1</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">node2</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>300</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">Math.sqrt</span><span class="PUNC">(</span><span class="WHIT">
-<span class='line'>301</span> </span><span class="WHIT">        </span><span class="PUNC">(</span><span class="NAME">node1.x</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">node2.x</span><span class="PUNC">)</span><span class="PUNC">*</span><span class="PUNC">(</span><span class="NAME">node1.x</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">node2.x</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT">
-<span class='line'>302</span> </span><span class="WHIT">        </span><span class="PUNC">(</span><span class="NAME">node1.y</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">node2.y</span><span class="PUNC">)</span><span class="PUNC">*</span><span class="PUNC">(</span><span class="NAME">node1.y</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">node2.y</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>303</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>304</span> </span><span class="COMM">//## Node #####################################</span><span class="WHIT">
-<span class='line'>305</span> </span><span class="COMM">/**
-<span class='line'>306</span> * Create a new Node
-<span class='line'>307</span> * @param {*} id
-<span class='line'>308</span> * @param {number} x - position
-<span class='line'>309</span> * @param {number} y - position
-<span class='line'>310</span> * @constructor
-<span class='line'>311</span> */</span><span class="WHIT">
-<span class='line'>312</span> </span><span class="NAME">pike.ai.path.Node</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">id</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">x</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">y</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>313</span> </span><span class="WHIT">	</span><span class="NAME">this.id</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">id</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>314</span> </span><span class="WHIT">	</span><span class="NAME">this.x</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">x</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>315</span> </span><span class="WHIT">	</span><span class="NAME">this.y</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">y</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>316</span> </span><span class="WHIT">	</span><span class="NAME">this.connections_</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>317</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>318</span> 
-<span class='line'>319</span> </span><span class="COMM">/**
-<span class='line'>320</span>  * Add a connection
-<span class='line'>321</span>  * @param {pike.ai.path.Node} node
-<span class='line'>322</span>  * @param {number} weight
-<span class='line'>323</span>  */</span><span class="WHIT">
-<span class='line'>324</span> </span><span class="NAME">pike.ai.path.Node.prototype.addConnection</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">node</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">weight</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>325</span> </span><span class="WHIT">	</span><span class="NAME">this.connections_.push</span><span class="PUNC">(</span><span class="PUNC">{</span><span class="WHIT"> </span><span class="NAME">node</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">node</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">weight</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">weight</span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>326</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>327</span> 
-<span class='line'>328</span> </span><span class="COMM">/**
-<span class='line'>329</span>  * Get a connections of the Node
-<span class='line'>330</span>  * @returns {Array.&lt;pike.ai.path.Node>}
-<span class='line'>331</span>  */</span><span class="WHIT">
-<span class='line'>332</span> </span><span class="NAME">pike.ai.path.Node.prototype.getConnections</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>333</span> </span><span class="WHIT">	</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.connections_</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>334</span> </span><span class="PUNC">}</span><span class="PUNC">;</span></pre></body></html>
+<span class='line'>295</span>  * @static
+<span class='line'>296</span>  * @param {pike.ai.path.Node} node1
+<span class='line'>297</span>  * @param {pike.ai.path.Node} node2
+<span class='line'>298</span>  * @returns {number}
+<span class='line'>299</span>  */</span><span class="WHIT">
+<span class='line'>300</span> </span><span class="NAME">pike.ai.path.Graph.distance</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">node1</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">node2</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>301</span> </span><span class="WHIT">    </span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">Math.sqrt</span><span class="PUNC">(</span><span class="WHIT">
+<span class='line'>302</span> </span><span class="WHIT">        </span><span class="PUNC">(</span><span class="NAME">node1.x</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">node2.x</span><span class="PUNC">)</span><span class="PUNC">*</span><span class="PUNC">(</span><span class="NAME">node1.x</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">node2.x</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT">
+<span class='line'>303</span> </span><span class="WHIT">        </span><span class="PUNC">(</span><span class="NAME">node1.y</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">node2.y</span><span class="PUNC">)</span><span class="PUNC">*</span><span class="PUNC">(</span><span class="NAME">node1.y</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">node2.y</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>304</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>305</span> 
+<span class='line'>306</span> </span><span class="COMM">/**
+<span class='line'>307</span>  * Get nodes
+<span class='line'>308</span>  * @return {Array.&lt;pike.ai.path.Node>}
+<span class='line'>309</span>  */</span><span class="WHIT">
+<span class='line'>310</span> </span><span class="NAME">pike.ai.path.Graph.prototype.getNodes</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>311</span> </span><span class="WHIT">	</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.nodes_</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>312</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>313</span> 
+<span class='line'>314</span> </span><span class="COMM">//## Node #####################################</span><span class="WHIT">
+<span class='line'>315</span> </span><span class="COMM">/**
+<span class='line'>316</span> * Create a new Node
+<span class='line'>317</span> * @param {*} id
+<span class='line'>318</span> * @param {number} x - position
+<span class='line'>319</span> * @param {number} y - position
+<span class='line'>320</span> * @constructor
+<span class='line'>321</span> */</span><span class="WHIT">
+<span class='line'>322</span> </span><span class="NAME">pike.ai.path.Node</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">id</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">x</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">y</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>323</span> </span><span class="WHIT">	</span><span class="NAME">this.id</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">id</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>324</span> </span><span class="WHIT">	</span><span class="NAME">this.x</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">x</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>325</span> </span><span class="WHIT">	</span><span class="NAME">this.y</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">y</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>326</span> </span><span class="WHIT">	</span><span class="NAME">this.connections_</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">[</span><span class="PUNC">]</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>327</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>328</span> 
+<span class='line'>329</span> </span><span class="COMM">/**
+<span class='line'>330</span>  * Add a connection
+<span class='line'>331</span>  * @param {pike.ai.path.Node} node
+<span class='line'>332</span>  * @param {number} weight
+<span class='line'>333</span>  */</span><span class="WHIT">
+<span class='line'>334</span> </span><span class="NAME">pike.ai.path.Node.prototype.addConnection</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">node</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">weight</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>335</span> </span><span class="WHIT">	</span><span class="NAME">this.connections_.push</span><span class="PUNC">(</span><span class="PUNC">{</span><span class="WHIT"> </span><span class="NAME">node</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">node</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">weight</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">weight</span><span class="WHIT"> </span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>336</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>337</span> 
+<span class='line'>338</span> </span><span class="COMM">/**
+<span class='line'>339</span>  * Get a connections of the Node
+<span class='line'>340</span>  * @returns {Array.&lt;pike.ai.path.Node>}
+<span class='line'>341</span>  */</span><span class="WHIT">
+<span class='line'>342</span> </span><span class="NAME">pike.ai.path.Node.prototype.getConnections</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>343</span> </span><span class="WHIT">	</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">this.connections_</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>344</span> </span><span class="PUNC">}</span><span class="PUNC">;</span></pre></body></html>
