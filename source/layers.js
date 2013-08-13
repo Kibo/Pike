@@ -67,7 +67,7 @@ pike.layers.Layer.prototype.onRender = function(){
 	}else if( this.offScreen_.isDirty ){
 		this.renderOffScreen_();
 	}
-	
+		
 	if(this.screen_.isDirty){
 		this.renderScreen_();
 	}	
@@ -82,11 +82,13 @@ pike.layers.Layer.prototype.renderDirty_ = function(){
 		return;
 	}
 	
+	var dirtyRect = this.dirtyManager.getDirtyRectangle(); 
+	
 	this.offScreen_.context.clearRect(
-			this.dirtyManager.getDirtyRectangle().x,
-			this.dirtyManager.getDirtyRectangle().y,
-			this.dirtyManager.getDirtyRectangle().w,
-			this.dirtyManager.getDirtyRectangle().h
+			dirtyRect.x,
+			dirtyRect.y,
+			dirtyRect.w,
+			dirtyRect.h
 	);
 		
 	//this method is override. See: pike.layers.Layer.prototype.dispatchEvent
@@ -94,23 +96,23 @@ pike.layers.Layer.prototype.renderDirty_ = function(){
 									
 	if(!this.screen_.isDirty){
 		this.screen_.context.clearRect(
-			(this.dirtyManager.getDirtyRectangle().x - this.viewport_.x),
-			(this.dirtyManager.getDirtyRectangle().y - this.viewport_.y),
-			this.dirtyManager.getDirtyRectangle().w,
-			this.dirtyManager.getDirtyRectangle().h						
+			(dirtyRect.x - this.viewport_.x),
+			(dirtyRect.y - this.viewport_.y),
+			dirtyRect.w,
+			dirtyRect.h						
 		);
 		
 		this.screen_.context.drawImage(
 				this.offScreen_.canvas,
-				this.dirtyManager.getDirtyRectangle().x,
-				this.dirtyManager.getDirtyRectangle().y,
-				this.dirtyManager.getDirtyRectangle().w,
-				this.dirtyManager.getDirtyRectangle().h,
+				dirtyRect.x,
+				dirtyRect.y,
+				dirtyRect.w,
+				dirtyRect.h,
 				
-				(this.dirtyManager.getDirtyRectangle().x - this.viewport_.x),
-				(this.dirtyManager.getDirtyRectangle().y - this.viewport_.y),
-				this.dirtyManager.getDirtyRectangle().w,
-				this.dirtyManager.getDirtyRectangle().h						
+				(dirtyRect.x - this.viewport_.x),
+				(dirtyRect.y - this.viewport_.y),
+				dirtyRect.w,
+				dirtyRect.h						
 		);										
 	}
 						
@@ -355,7 +357,7 @@ pike.layers.ClusterLayer.prototype.dispatchEvent = function( e ){
 	
 	for (var i = 0; i < this.cache_.length; i++) {
 		var entity = this.cache_[i];
-		if (entity.getBounds().intersects(this.viewport_)) {
+		if (entity.getBounds().intersects(this.viewport_)) {		
 			entity.dispatchEvent(e);			
 		}
 	}
@@ -638,7 +640,7 @@ pike.layers.DirtyManager = function( allDirtyThreshold ){
 	// Current dirty rectangle that covers all smaller dirty areas
 	this.dirtyRect_ = null;
 	
-	this.allDirtyThreshold_ = allDirtyThreshold == undefined ? .5 : allDirtyThreshold;
+	this.allDirtyThreshold_ = allDirtyThreshold == undefined ? 0.5 : allDirtyThreshold;
 	
 	// true when we have reached the threshold
 	this.allDirty_ = true;
@@ -660,6 +662,7 @@ pike.layers.DirtyManager.prototype.getDirtyRectangle = function(){
 pike.layers.DirtyManager.prototype.markAllDirty = function(){
 	this.allDirty_ = true;
 	this.dirtyRect_ = this.viewport_.copy();
+	if(goog.DEBUG) window.console.log("[pike.layers.DirtyManager] markAllDirty");
 };
 
 /**
@@ -670,20 +673,27 @@ pike.layers.DirtyManager.prototype.markDirty = function( rect ){
 	if ( !(rect.w || rect.h) || this.allDirty_) {
 		return;
 	}
-		
+			
+	rect = this.viewport_.intersection(rect);
+	if (!rect) {
+		return
+	}	
+	
+	/*
 	if( !rect.intersects( this.viewport_ ) ){		
 		return;
 	}
-															
+	*/
+														
 	if (this.dirtyRect_) {
 		this.dirtyRect_ = this.dirtyRect_.convexHull(rect);		
 	} else {					
 		this.dirtyRect_ = rect;		
 	}
-		
+			
 	// Check for threshold. If it is reached, mark the whole screen dirty
-	if (this.dirtyRect_.w * this.dirtyRect_.h > this.allDirtyThreshold_ * this.viewport_.w * this.viewport_.h){	
-			this.markAllDirty();
+	if (this.dirtyRect_.w * this.dirtyRect_.h > this.allDirtyThreshold_ * this.viewport_.w * this.viewport_.h){
+		this.markAllDirty();
 	}	
 };
 
