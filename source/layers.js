@@ -56,28 +56,40 @@ pike.layers.Layer = function( name ){
 
 goog.inherits(pike.layers.Layer, goog.events.EventTarget);
 
+
+/**
+ * On update handler
+ * @param {pike.events.Update} e
+ */
+pike.layers.Layer.prototype.onUpdate = function( e ){
+	//this method is override. See: pike.layers.Layer.prototype.dispatchEvent
+	this.dispatchEvent( e );	
+};
+
 /**
  * On render handler
+ * @param {pike.events.Render} e
  */
-pike.layers.Layer.prototype.onRender = function(){
+pike.layers.Layer.prototype.onRender = function(e){
 	
 	if(this.hasDirtyManager()){
-		this.renderDirty_();
+		this.renderDirty_( e );
 		
 	}else if( this.offScreen_.isDirty ){
-		this.renderOffScreen_();
+		this.renderOffScreen_( e );
 	}
 		
 	if(this.screen_.isDirty){
-		this.renderScreen_();
+		this.renderScreen_( e );
 	}	
 };
 
 /**
  * Renders dirty area
+ * @param {pike.events.Render} e
  * @private
  */
-pike.layers.Layer.prototype.renderDirty_ = function(){
+pike.layers.Layer.prototype.renderDirty_ = function( e ){
 	if( this.dirtyManager.isClean() ){
 		return;
 	}
@@ -92,7 +104,7 @@ pike.layers.Layer.prototype.renderDirty_ = function(){
 	);
 		
 	//this method is override. See: pike.layers.Layer.prototype.dispatchEvent
-	this.dispatchEvent( new pike.events.Render( new Date().getTime(), this));
+	this.dispatchEvent( e );
 									
 	if(!this.screen_.isDirty){
 		this.screen_.context.clearRect(
@@ -121,12 +133,13 @@ pike.layers.Layer.prototype.renderDirty_ = function(){
 
 /**
  * Renders offscreen
+ * @param {pike.events.Render} e
  * @private
  */
-pike.layers.Layer.prototype.renderOffScreen_ = function(){
+pike.layers.Layer.prototype.renderOffScreen_ = function( e ){
 	this.offScreen_.context.clearRect( 0, 0, this.gameWorld_.w, this.gameWorld_.h );
 	
-	this.dispatchEvent( new pike.events.Render( new Date().getTime(), this) );
+	this.dispatchEvent( e );
 			
 	this.offScreen_.isDirty = false;
 	this.screen_.isDirty = true;
@@ -135,9 +148,10 @@ pike.layers.Layer.prototype.renderOffScreen_ = function(){
 
 /**
  * Renders screen
+ * @param {pike.events.Render} e
  * @private
  */
-pike.layers.Layer.prototype.renderScreen_ = function(){
+pike.layers.Layer.prototype.renderScreen_ = function( e ){
 	this.screen_.context.clearRect( 0, 0, this.viewport_.w, this.viewport_.h );
 	this.screen_.context.drawImage(
 			this.offScreen_.canvas,
@@ -624,10 +638,9 @@ pike.layers.ObstacleLayer.prototype.onEntityChangePosition = function(e){
 //## DirtyManager #################################
 /**
  * Create a new DirtyManager
- * @param {number} allDirtyThreshold - the value is the number between 0 and 1.
  * @constructor
  */
-pike.layers.DirtyManager = function( allDirtyThreshold ){
+pike.layers.DirtyManager = function(){
 		
 	this.viewport_ = new pike.graphics.Rectangle(0, 0, 0, 0);
 	
@@ -639,9 +652,7 @@ pike.layers.DirtyManager = function( allDirtyThreshold ){
 	
 	// Current dirty rectangle that covers all smaller dirty areas
 	this.dirtyRect_ = null;
-	
-	this.allDirtyThreshold_ = allDirtyThreshold == undefined ? 0.5 : allDirtyThreshold;
-	
+		
 	// true when we have reached the threshold
 	this.allDirty_ = true;
 	
@@ -670,30 +681,18 @@ pike.layers.DirtyManager.prototype.markAllDirty = function(){
  * @param {?pike.graphics.Rectangle} rect
  */
 pike.layers.DirtyManager.prototype.markDirty = function( rect ){	
-	if ( !(rect.w || rect.h) || this.allDirty_) {
+	if ( !(rect.w || rect.h) ) {
 		return;
 	}
-			
-	rect = this.viewport_.intersection(rect);
-	if (!rect) {
-		return
-	}	
 	
-	/*
 	if( !rect.intersects( this.viewport_ ) ){		
 		return;
 	}
-	*/
 														
 	if (this.dirtyRect_) {
 		this.dirtyRect_ = this.dirtyRect_.convexHull(rect);		
 	} else {					
 		this.dirtyRect_ = rect;		
-	}
-			
-	// Check for threshold. If it is reached, mark the whole screen dirty
-	if (this.dirtyRect_.w * this.dirtyRect_.h > this.allDirtyThreshold_ * this.viewport_.w * this.viewport_.h){
-		this.markAllDirty();
 	}	
 };
 

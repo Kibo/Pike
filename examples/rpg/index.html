@@ -132,7 +132,8 @@
 				var viewport = new pike.core.Viewport();				
 				var stage = new pike.core.Stage();						
 																				
-				stage.handler.listen(timer, pike.events.Render.EVENT_TYPE, goog.bind(stage.onRender, stage));
+				stage.handler.listen(timer, pike.events.Update.EVENT_TYPE, stage.onUpdate, false, stage);
+				stage.handler.listen(timer, pike.events.Render.EVENT_TYPE, stage.onRender, false, stage);
 				stage.handler.listen(gameWorld, pike.events.ChangeSize.EVENT_TYPE, goog.bind(stage.onGameWorldChangeSize, stage));
 				stage.handler.listen(viewport, pike.events.ChangeSize.EVENT_TYPE, goog.bind(stage.onViewportChangeSize, stage));
 				stage.handler.listen(viewport, pike.events.ChangePosition.EVENT_TYPE, goog.bind(stage.onViewportChangePosition, stage));
@@ -203,7 +204,7 @@
 												
 				}, hero) );
 																	
-				hero.handler.listen(timer, pike.events.Update.EVENT_TYPE, goog.bind(function(e){
+				hero.handler.listen(hero, pike.events.Update.EVENT_TYPE, function(e){
 				
 					if(this.targetX && this.targetX != this.x 
 					|| this.targetY && this.targetY != this.y  ){
@@ -231,7 +232,7 @@
 				    	this.onSpriteUpdate(e);				    	
 				    	this.watchMe(viewport, gameWorld);						
 					}														
-				}, hero));
+				}, false, hero);
 																
 				hero.handler.listen(hero, pike.events.ChangePosition.EVENT_TYPE, goog.bind(function(e){					
 					this.layer.setDirty( new pike.graphics.Rectangle(e.oldX, e.oldY, this.w, this.h));
@@ -317,7 +318,7 @@
 				var graph = new pike.ai.path.Graph(nodes, matrix);
 								
 				//boy.handler.listen(boy, pike.events.Render.EVENT_TYPE, boy.onPathRender, false, boy);
-				boy.handler.listen(timer, pike.events.Update.EVENT_TYPE, boy.onAStartUpdate, false, boy);				
+				boy.handler.listen( boy, pike.events.Update.EVENT_TYPE, boy.onAStartUpdate, false, boy);					
 				
 				boy.setGraph( graph );				
 				boy.setDestinationNode( nodes[1] );

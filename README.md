@@ -1,4 +1,4 @@
-# Pike v0.3
+# Pike v0.4
 HTML5 gamedeveloper library.
 All classes in this library are based on the [Google Closure Library](https://developers.google.com/closure/library/).
 
@@ -16,12 +16,11 @@ There are no restrictions, here are the basic classes.
 
 ###Covers
 - Resource loader
-- Input handler
+- Touch/ Mouse input handler
 - Canvas renderer
 - Collision detection
-- Animation
-- A*
-- Audio
+- Sprite animation
+- A* path finding
 - Math
 
 ###Feature

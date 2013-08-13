@@ -28,6 +28,7 @@ goog.require('pike.events.EndPractice');
 goog.require('pike.events.ReachDestination');
 goog.require('goog.style');
 goog.require('pike.ai.path.Graph');
+goog.require('pike.input.Utils');
 
 //## Collision #################################
 /**

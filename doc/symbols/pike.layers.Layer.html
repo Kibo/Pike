@@ -446,9 +446,18 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/pike.layers.Layer.html#onRender">onRender</a></b>()
+								<div class="fixedFont"><b><a href="../symbols/pike.layers.Layer.html#onRender">onRender</a></b>(e)
 								</div>
 								<div class="description">On render handler</div>
+							</td>
+						</tr>
+					
+						<tr>
+							<td class="attributes">&nbsp;</td>
+							<td class="nameDescription">
+								<div class="fixedFont"><b><a href="../symbols/pike.layers.Layer.html#onUpdate">onUpdate</a></b>(e)
+								</div>
+								<div class="description">On update handler</div>
 							</td>
 						</tr>
 					
@@ -464,7 +473,7 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&lt;private&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/pike.layers.Layer.html#renderDirty_">renderDirty_</a></b>()
+								<div class="fixedFont"><b><a href="../symbols/pike.layers.Layer.html#renderDirty_">renderDirty_</a></b>(e)
 								</div>
 								<div class="description">Renders dirty area</div>
 							</td>
@@ -473,7 +482,7 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&lt;private&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/pike.layers.Layer.html#renderOffScreen_">renderOffScreen_</a></b>()
+								<div class="fixedFont"><b><a href="../symbols/pike.layers.Layer.html#renderOffScreen_">renderOffScreen_</a></b>(e)
 								</div>
 								<div class="description">Renders offscreen</div>
 							</td>
@@ -482,7 +491,7 @@ ul.inheritsList
 						<tr>
 							<td class="attributes">&lt;private&gt; &nbsp;</td>
 							<td class="nameDescription">
-								<div class="fixedFont"><b><a href="../symbols/pike.layers.Layer.html#renderScreen_">renderScreen_</a></b>()
+								<div class="fixedFont"><b><a href="../symbols/pike.layers.Layer.html#renderScreen_">renderScreen_</a></b>(e)
 								</div>
 								<div class="description">Renders screen</div>
 							</td>
@@ -866,7 +875,7 @@ ul.inheritsList
 					<div class="fixedFont">
 					
 					
-					<b>onRender</b>()
+					<b>onRender</b>(e)
 					
 					</div>
 					<div class="description">
@@ -877,6 +886,53 @@ ul.inheritsList
 					
 					
 					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{<a href="../symbols/pike.events.Render.html">pike.events.Render</a>}</span> <b>e</b>
+									
+								</dt>
+								<dd></dd>
+							
+							</dl>
+						
+						
+						
+						
+						
+						
+						
+
+					<hr />
+				
+					<a name="onUpdate"> </a>
+					<div class="fixedFont">
+					
+					
+					<b>onUpdate</b>(e)
+					
+					</div>
+					<div class="description">
+						On update handler
+						
+						
+					</div>
+					
+					
+					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{<a href="../symbols/pike.events.Update.html">pike.events.Update</a>}</span> <b>e</b>
+									
+								</dt>
+								<dd></dd>
+							
+							</dl>
 						
 						
 						
@@ -927,7 +983,7 @@ ul.inheritsList
 					<div class="fixedFont">&lt;private&gt; 
 					
 					
-					<b>renderDirty_</b>()
+					<b>renderDirty_</b>(e)
 					
 					</div>
 					<div class="description">
@@ -938,6 +994,17 @@ ul.inheritsList
 					
 					
 					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{<a href="../symbols/pike.events.Render.html">pike.events.Render</a>}</span> <b>e</b>
+									
+								</dt>
+								<dd></dd>
+							
+							</dl>
 						
 						
 						
@@ -952,7 +1019,7 @@ ul.inheritsList
 					<div class="fixedFont">&lt;private&gt; 
 					
 					
-					<b>renderOffScreen_</b>()
+					<b>renderOffScreen_</b>(e)
 					
 					</div>
 					<div class="description">
@@ -963,6 +1030,17 @@ ul.inheritsList
 					
 					
 					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{<a href="../symbols/pike.events.Render.html">pike.events.Render</a>}</span> <b>e</b>
+									
+								</dt>
+								<dd></dd>
+							
+							</dl>
 						
 						
 						
@@ -977,7 +1055,7 @@ ul.inheritsList
 					<div class="fixedFont">&lt;private&gt; 
 					
 					
-					<b>renderScreen_</b>()
+					<b>renderScreen_</b>(e)
 					
 					</div>
 					<div class="description">
@@ -988,6 +1066,17 @@ ul.inheritsList
 					
 					
 					
+						
+							<dl class="detailList">
+							<dt class="heading">Parameters:</dt>
+							
+								<dt>
+									<span class="light fixedFont">{<a href="../symbols/pike.events.Render.html">pike.events.Render</a>}</span> <b>e</b>
+									
+								</dt>
+								<dd></dd>
+							
+							</dl>
 						
 						
 						
@@ -1208,7 +1297,7 @@ ul.inheritsList
 <!-- ============================== footer ================================= -->
 		<div class="fineprint" style="clear:both">
 			
-			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Sun Aug 11 2013 20:48:47 GMT+0200 (CEST)
+			Documentation generated by <a href="http://code.google.com/p/jsdoc-toolkit/" target="_blank">JsDoc Toolkit</a> 2.4.0 on Tue Aug 13 2013 20:48:57 GMT+0200 (CEST)
 		</div>
 	</body>
 </html>

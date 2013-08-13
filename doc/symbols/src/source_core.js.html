@@ -320,124 +320,134 @@
 <span class='line'>313</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>314</span> 
 <span class='line'>315</span> </span><span class="COMM">/**
-<span class='line'>316</span>  * onRender event handler
-<span class='line'>317</span>  * @param {pike.events.Render} e
+<span class='line'>316</span>  * On update event handler
+<span class='line'>317</span>  * @param {pike.events.Update} e
 <span class='line'>318</span>  */</span><span class="WHIT">
-<span class='line'>319</span> </span><span class="NAME">pike.core.Stage.prototype.onRender</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">e</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>319</span> </span><span class="NAME">pike.core.Stage.prototype.onUpdate</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">e</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
 <span class='line'>320</span> </span><span class="WHIT">	</span><span class="KEYW">for</span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">idx</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">idx</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">this.layers_.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">idx</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>321</span> </span><span class="WHIT">		</span><span class="NAME">this.layers_</span><span class="PUNC">[</span><span class="NAME">idx</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">onRender</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">			
+<span class='line'>321</span> </span><span class="WHIT">		</span><span class="NAME">this.layers_</span><span class="PUNC">[</span><span class="NAME">idx</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">onUpdate</span><span class="PUNC">(</span><span class="NAME">e</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">			
 <span class='line'>322</span> 	</span><span class="PUNC">}</span><span class="WHIT">
 <span class='line'>323</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>324</span> 
 <span class='line'>325</span> </span><span class="COMM">/**
-<span class='line'>326</span>  * on Viewport change size handler
-<span class='line'>327</span>  * @param {pike.events.ChangeSize} e
+<span class='line'>326</span>  * On render event handler
+<span class='line'>327</span>  * @param {pike.events.Render} e
 <span class='line'>328</span>  */</span><span class="WHIT">
-<span class='line'>329</span> </span><span class="NAME">pike.core.Stage.prototype.onViewportChangeSize</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">e</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>330</span> </span><span class="WHIT">	</span><span class="NAME">this.setViewportSize_</span><span class="PUNC">(</span><span class="NAME">e.w</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">e.h</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>331</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>332</span> 
-<span class='line'>333</span> </span><span class="COMM">/**
-<span class='line'>334</span>  * on Viewport change position handler
-<span class='line'>335</span>  * @param {pike.events.ChangePosition} e
-<span class='line'>336</span>  */</span><span class="WHIT">
-<span class='line'>337</span> </span><span class="NAME">pike.core.Stage.prototype.onViewportChangePosition</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">e</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>338</span> </span><span class="WHIT">	</span><span class="NAME">this.setViewportPosition_</span><span class="PUNC">(</span><span class="NAME">e.x</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">e.y</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>339</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>340</span> 
-<span class='line'>341</span> </span><span class="COMM">/**
-<span class='line'>342</span>  * on GameWorld change size handler
-<span class='line'>343</span>  * @param {pike.events.ChangeSize} e
-<span class='line'>344</span>  */</span><span class="WHIT">
-<span class='line'>345</span> </span><span class="NAME">pike.core.Stage.prototype.onGameWorldChangeSize</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">e</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>346</span> </span><span class="WHIT">	</span><span class="NAME">this.setGameWorldSize_</span><span class="PUNC">(</span><span class="NAME">e.w</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">e.h</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>347</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>348</span> 
-<span class='line'>349</span> </span><span class="COMM">/**
-<span class='line'>350</span>  * Create root element
-<span class='line'>351</span>  * @private
-<span class='line'>352</span>  */</span><span class="WHIT">
-<span class='line'>353</span> </span><span class="NAME">pike.core.Stage.prototype.createRootElement_</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>354</span> </span><span class="WHIT">	</span><span class="NAME">this.rootElement_</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">document.getElementById</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">pike.core.Stage.ELEMENT_ID</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">	
-<span class='line'>355</span> 	</span><span class="KEYW">if</span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">this.rootElement_</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>356</span> </span><span class="WHIT">		</span><span class="NAME">this.rootElement_</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">document.createElement</span><span class="PUNC">(</span><span class="STRN">"div"</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>357</span> </span><span class="WHIT">		</span><span class="NAME">this.rootElement_.setAttribute</span><span class="PUNC">(</span><span class="STRN">"id"</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">pike.core.Stage.ELEMENT_ID</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>358</span> </span><span class="WHIT">		</span><span class="NAME">document.getElementsByTagName</span><span class="PUNC">(</span><span class="STRN">"body"</span><span class="PUNC">)</span><span class="PUNC">[</span><span class="NUMB">0</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">appendChild</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">this.rootElement_</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">		
-<span class='line'>359</span> 	</span><span class="PUNC">}</span><span class="KEYW">else</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>360</span> </span><span class="WHIT">		</span><span class="NAME">this.rootElement_.innerHTML</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">''</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>361</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>362</span> </span><span class="WHIT">	
-<span class='line'>363</span> 	</span><span class="NAME">this.rootElement_.style.position</span><span class="WHIT">  </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">"relative"</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>364</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>365</span> 
-<span class='line'>366</span> </span><span class="COMM">/**
-<span class='line'>367</span>  * Sets the layer size
-<span class='line'>368</span>  * @param {pike.layers.Layer} layer
-<span class='line'>369</span>  * @private
-<span class='line'>370</span>  */</span><span class="WHIT">
-<span class='line'>371</span> </span><span class="NAME">pike.core.Stage.prototype.setLayerSize_</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">layer</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">	
-<span class='line'>372</span> 	</span><span class="NAME">layer.setViewportSize</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">this.viewport_.w</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this.viewport_.h</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>373</span> </span><span class="WHIT">	</span><span class="NAME">layer.setViewportPosition</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">this.viewport_.x</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this.viewport_.y</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>374</span> </span><span class="WHIT">	</span><span class="NAME">layer.setGameWorldSize</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">this.gameWorld_.w</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this.gameWorld_.h</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>375</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>376</span> 
-<span class='line'>377</span> </span><span class="COMM">/**
-<span class='line'>378</span>  * Set internal viewport size
-<span class='line'>379</span>  * @param {number} width
-<span class='line'>380</span>  * @param {number} height
-<span class='line'>381</span>  * @private
-<span class='line'>382</span>  */</span><span class="WHIT">
-<span class='line'>383</span> </span><span class="NAME">pike.core.Stage.prototype.setViewportSize_</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">width</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">height</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>384</span> </span><span class="WHIT">	</span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">this.viewport_.w</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">width</span><span class="WHIT">
-<span class='line'>385</span> </span><span class="WHIT">	</span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">this.viewport_.h</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">height</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>386</span> </span><span class="WHIT">		</span><span class="KEYW">return</span><span class="WHIT">
-<span class='line'>387</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>388</span> </span><span class="WHIT">	
-<span class='line'>389</span> 	</span><span class="NAME">this.viewport_.w</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">width</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>390</span> </span><span class="WHIT">	</span><span class="NAME">this.viewport_.h</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">height</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>391</span> </span><span class="WHIT">	
-<span class='line'>392</span> 	</span><span class="NAME">this.rootElement_.style.width</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.viewport_.w</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">"px"</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>393</span> </span><span class="WHIT">	</span><span class="NAME">this.rootElement_.style.height</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.viewport_.h</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">"px"</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>394</span> </span><span class="WHIT">	
-<span class='line'>395</span> 	</span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">this.gameWorld_.w</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">width</span><span class="WHIT"> 
-<span class='line'>396</span> 	</span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NAME">this.gameWorld_.h</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">height</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>397</span> </span><span class="WHIT">		</span><span class="NAME">this.setGameWorldSize_</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">width</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">height</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>398</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>399</span> </span><span class="WHIT">	
-<span class='line'>400</span> 	</span><span class="KEYW">for</span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">idx</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">idx</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">this.layers_.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">idx</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>401</span> </span><span class="WHIT">		</span><span class="NAME">this.setLayerSize_</span><span class="PUNC">(</span><span class="NAME">this.layers_</span><span class="PUNC">[</span><span class="NAME">idx</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>402</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>403</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>404</span> 
-<span class='line'>405</span> </span><span class="COMM">/**
-<span class='line'>406</span>  * Set internal gameWorld size
-<span class='line'>407</span>  * @param {number} width
-<span class='line'>408</span>  * @param {number} height
-<span class='line'>409</span>  * @private
-<span class='line'>410</span>  */</span><span class="WHIT">
-<span class='line'>411</span> </span><span class="NAME">pike.core.Stage.prototype.setGameWorldSize_</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">width</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">height</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>412</span> </span><span class="WHIT">	</span><span class="NAME">this.gameWorld_.w</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">Math.max</span><span class="PUNC">(</span><span class="NAME">width</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this.viewport_.w</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>413</span> </span><span class="WHIT">	</span><span class="NAME">this.gameWorld_.h</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">Math.max</span><span class="PUNC">(</span><span class="NAME">height</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this.viewport_.h</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>414</span> </span><span class="WHIT">	
-<span class='line'>415</span> 	</span><span class="KEYW">for</span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">idx</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">idx</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">this.layers_.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">idx</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>416</span> </span><span class="WHIT">		</span><span class="NAME">this.setLayerSize_</span><span class="PUNC">(</span><span class="NAME">this.layers_</span><span class="PUNC">[</span><span class="NAME">idx</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>417</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>418</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>419</span> 
-<span class='line'>420</span> </span><span class="COMM">/**
-<span class='line'>421</span>  * Set internal viewport position
-<span class='line'>422</span>  * @param {number} x
-<span class='line'>423</span>  * @param {number} y
-<span class='line'>424</span>  * @private
-<span class='line'>425</span>  */</span><span class="WHIT">
-<span class='line'>426</span> </span><span class="NAME">pike.core.Stage.prototype.setViewportPosition_</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">x</span><span class="PUNC">,</span><span class="NAME">y</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
-<span class='line'>427</span> </span><span class="WHIT">	</span><span class="NAME">this.viewport_.x</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">x</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>428</span> </span><span class="WHIT">	</span><span class="NAME">this.viewport_.y</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">y</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>429</span> </span><span class="WHIT">	
-<span class='line'>430</span> 	</span><span class="KEYW">for</span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">idx</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">idx</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">this.layers_.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">idx</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">		
-<span class='line'>431</span> 		</span><span class="NAME">this.layers_</span><span class="PUNC">[</span><span class="NAME">idx</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">setViewportPosition</span><span class="PUNC">(</span><span class="NAME">this.viewport_.x</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this.viewport_.y</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">							
-<span class='line'>432</span> 	</span><span class="PUNC">}</span><span class="WHIT">
-<span class='line'>433</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'>434</span> 
-<span class='line'>435</span> 
-<span class='line'>436</span> </span></pre></body></html>
+<span class='line'>329</span> </span><span class="NAME">pike.core.Stage.prototype.onRender</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">e</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>330</span> </span><span class="WHIT">	</span><span class="KEYW">for</span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">idx</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">idx</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">this.layers_.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">idx</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>331</span> </span><span class="WHIT">		</span><span class="NAME">this.layers_</span><span class="PUNC">[</span><span class="NAME">idx</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">onRender</span><span class="PUNC">(</span><span class="NAME">e</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">			
+<span class='line'>332</span> 	</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>333</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>334</span> 
+<span class='line'>335</span> </span><span class="COMM">/**
+<span class='line'>336</span>  * on Viewport change size handler
+<span class='line'>337</span>  * @param {pike.events.ChangeSize} e
+<span class='line'>338</span>  */</span><span class="WHIT">
+<span class='line'>339</span> </span><span class="NAME">pike.core.Stage.prototype.onViewportChangeSize</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">e</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>340</span> </span><span class="WHIT">	</span><span class="NAME">this.setViewportSize_</span><span class="PUNC">(</span><span class="NAME">e.w</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">e.h</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>341</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>342</span> 
+<span class='line'>343</span> </span><span class="COMM">/**
+<span class='line'>344</span>  * on Viewport change position handler
+<span class='line'>345</span>  * @param {pike.events.ChangePosition} e
+<span class='line'>346</span>  */</span><span class="WHIT">
+<span class='line'>347</span> </span><span class="NAME">pike.core.Stage.prototype.onViewportChangePosition</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">e</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>348</span> </span><span class="WHIT">	</span><span class="NAME">this.setViewportPosition_</span><span class="PUNC">(</span><span class="NAME">e.x</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">e.y</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>349</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>350</span> 
+<span class='line'>351</span> </span><span class="COMM">/**
+<span class='line'>352</span>  * on GameWorld change size handler
+<span class='line'>353</span>  * @param {pike.events.ChangeSize} e
+<span class='line'>354</span>  */</span><span class="WHIT">
+<span class='line'>355</span> </span><span class="NAME">pike.core.Stage.prototype.onGameWorldChangeSize</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">e</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>356</span> </span><span class="WHIT">	</span><span class="NAME">this.setGameWorldSize_</span><span class="PUNC">(</span><span class="NAME">e.w</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">e.h</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>357</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>358</span> 
+<span class='line'>359</span> </span><span class="COMM">/**
+<span class='line'>360</span>  * Create root element
+<span class='line'>361</span>  * @private
+<span class='line'>362</span>  */</span><span class="WHIT">
+<span class='line'>363</span> </span><span class="NAME">pike.core.Stage.prototype.createRootElement_</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>364</span> </span><span class="WHIT">	</span><span class="NAME">this.rootElement_</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">document.getElementById</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">pike.core.Stage.ELEMENT_ID</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">	
+<span class='line'>365</span> 	</span><span class="KEYW">if</span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">this.rootElement_</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>366</span> </span><span class="WHIT">		</span><span class="NAME">this.rootElement_</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">document.createElement</span><span class="PUNC">(</span><span class="STRN">"div"</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>367</span> </span><span class="WHIT">		</span><span class="NAME">this.rootElement_.setAttribute</span><span class="PUNC">(</span><span class="STRN">"id"</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">pike.core.Stage.ELEMENT_ID</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>368</span> </span><span class="WHIT">		</span><span class="NAME">document.getElementsByTagName</span><span class="PUNC">(</span><span class="STRN">"body"</span><span class="PUNC">)</span><span class="PUNC">[</span><span class="NUMB">0</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">appendChild</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">this.rootElement_</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">		
+<span class='line'>369</span> 	</span><span class="PUNC">}</span><span class="KEYW">else</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>370</span> </span><span class="WHIT">		</span><span class="NAME">this.rootElement_.innerHTML</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">''</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>371</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>372</span> </span><span class="WHIT">	
+<span class='line'>373</span> 	</span><span class="NAME">this.rootElement_.style.position</span><span class="WHIT">  </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">"relative"</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>374</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>375</span> 
+<span class='line'>376</span> </span><span class="COMM">/**
+<span class='line'>377</span>  * Sets the layer size
+<span class='line'>378</span>  * @param {pike.layers.Layer} layer
+<span class='line'>379</span>  * @private
+<span class='line'>380</span>  */</span><span class="WHIT">
+<span class='line'>381</span> </span><span class="NAME">pike.core.Stage.prototype.setLayerSize_</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">layer</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">	
+<span class='line'>382</span> 	</span><span class="NAME">layer.setViewportSize</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">this.viewport_.w</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this.viewport_.h</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>383</span> </span><span class="WHIT">	</span><span class="NAME">layer.setViewportPosition</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">this.viewport_.x</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this.viewport_.y</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>384</span> </span><span class="WHIT">	</span><span class="NAME">layer.setGameWorldSize</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">this.gameWorld_.w</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this.gameWorld_.h</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>385</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>386</span> 
+<span class='line'>387</span> </span><span class="COMM">/**
+<span class='line'>388</span>  * Set internal viewport size
+<span class='line'>389</span>  * @param {number} width
+<span class='line'>390</span>  * @param {number} height
+<span class='line'>391</span>  * @private
+<span class='line'>392</span>  */</span><span class="WHIT">
+<span class='line'>393</span> </span><span class="NAME">pike.core.Stage.prototype.setViewportSize_</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">width</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">height</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>394</span> </span><span class="WHIT">	</span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">this.viewport_.w</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">width</span><span class="WHIT">
+<span class='line'>395</span> </span><span class="WHIT">	</span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">this.viewport_.h</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">height</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>396</span> </span><span class="WHIT">		</span><span class="KEYW">return</span><span class="WHIT">
+<span class='line'>397</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>398</span> </span><span class="WHIT">	
+<span class='line'>399</span> 	</span><span class="NAME">this.viewport_.w</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">width</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>400</span> </span><span class="WHIT">	</span><span class="NAME">this.viewport_.h</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">height</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>401</span> </span><span class="WHIT">	
+<span class='line'>402</span> 	</span><span class="NAME">this.rootElement_.style.width</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.viewport_.w</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">"px"</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>403</span> </span><span class="WHIT">	</span><span class="NAME">this.rootElement_.style.height</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">this.viewport_.h</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">"px"</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>404</span> </span><span class="WHIT">	
+<span class='line'>405</span> 	</span><span class="KEYW">if</span><span class="PUNC">(</span><span class="NAME">this.gameWorld_.w</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">width</span><span class="WHIT"> 
+<span class='line'>406</span> 	</span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NAME">this.gameWorld_.h</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">height</span><span class="WHIT"> </span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>407</span> </span><span class="WHIT">		</span><span class="NAME">this.setGameWorldSize_</span><span class="PUNC">(</span><span class="WHIT"> </span><span class="NAME">width</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">height</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>408</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>409</span> </span><span class="WHIT">	
+<span class='line'>410</span> 	</span><span class="KEYW">for</span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">idx</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">idx</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">this.layers_.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">idx</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>411</span> </span><span class="WHIT">		</span><span class="NAME">this.setLayerSize_</span><span class="PUNC">(</span><span class="NAME">this.layers_</span><span class="PUNC">[</span><span class="NAME">idx</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>412</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>413</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>414</span> 
+<span class='line'>415</span> </span><span class="COMM">/**
+<span class='line'>416</span>  * Set internal gameWorld size
+<span class='line'>417</span>  * @param {number} width
+<span class='line'>418</span>  * @param {number} height
+<span class='line'>419</span>  * @private
+<span class='line'>420</span>  */</span><span class="WHIT">
+<span class='line'>421</span> </span><span class="NAME">pike.core.Stage.prototype.setGameWorldSize_</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">width</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">height</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>422</span> </span><span class="WHIT">	</span><span class="NAME">this.gameWorld_.w</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">Math.max</span><span class="PUNC">(</span><span class="NAME">width</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this.viewport_.w</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>423</span> </span><span class="WHIT">	</span><span class="NAME">this.gameWorld_.h</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">Math.max</span><span class="PUNC">(</span><span class="NAME">height</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this.viewport_.h</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>424</span> </span><span class="WHIT">	
+<span class='line'>425</span> 	</span><span class="KEYW">for</span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">idx</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">idx</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">this.layers_.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">idx</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>426</span> </span><span class="WHIT">		</span><span class="NAME">this.setLayerSize_</span><span class="PUNC">(</span><span class="NAME">this.layers_</span><span class="PUNC">[</span><span class="NAME">idx</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>427</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>428</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>429</span> 
+<span class='line'>430</span> </span><span class="COMM">/**
+<span class='line'>431</span>  * Set internal viewport position
+<span class='line'>432</span>  * @param {number} x
+<span class='line'>433</span>  * @param {number} y
+<span class='line'>434</span>  * @private
+<span class='line'>435</span>  */</span><span class="WHIT">
+<span class='line'>436</span> </span><span class="NAME">pike.core.Stage.prototype.setViewportPosition_</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">x</span><span class="PUNC">,</span><span class="NAME">y</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>437</span> </span><span class="WHIT">	</span><span class="NAME">this.viewport_.x</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">x</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>438</span> </span><span class="WHIT">	</span><span class="NAME">this.viewport_.y</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">y</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>439</span> </span><span class="WHIT">	
+<span class='line'>440</span> 	</span><span class="KEYW">for</span><span class="PUNC">(</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">idx</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">idx</span><span class="WHIT"> </span><span class="PUNC">&lt;</span><span class="WHIT"> </span><span class="NAME">this.layers_.length</span><span class="PUNC">;</span><span class="WHIT"> </span><span class="NAME">idx</span><span class="PUNC">++</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">		
+<span class='line'>441</span> 		</span><span class="NAME">this.layers_</span><span class="PUNC">[</span><span class="NAME">idx</span><span class="PUNC">]</span><span class="PUNC">.</span><span class="NAME">setViewportPosition</span><span class="PUNC">(</span><span class="NAME">this.viewport_.x</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this.viewport_.y</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">							
+<span class='line'>442</span> 	</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>443</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>444</span> 
+<span class='line'>445</span> 
+<span class='line'>446</span> </span></pre></body></html>

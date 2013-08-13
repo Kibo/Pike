@@ -313,12 +313,22 @@ pike.core.Stage.prototype.getRootElement = function(){
 };
 
 /**
- * onRender event handler
+ * On update event handler
+ * @param {pike.events.Update} e
+ */
+pike.core.Stage.prototype.onUpdate = function( e ){
+	for(var idx = 0; idx < this.layers_.length; idx++){
+		this.layers_[idx].onUpdate(e);			
+	}
+};
+
+/**
+ * On render event handler
  * @param {pike.events.Render} e
  */
 pike.core.Stage.prototype.onRender = function( e ){
 	for(var idx = 0; idx < this.layers_.length; idx++){
-		this.layers_[idx].onRender();			
+		this.layers_[idx].onRender(e);			
 	}
 };
 
