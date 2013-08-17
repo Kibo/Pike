@@ -138,7 +138,7 @@ pike.graphics.Rectangle.prototype.getOverlappingGridCells = function(cellW, cell
 //## Cluster #####################################
 /**
 * Cluster 
-* @param {number} clusterSize - side of the square in px
+* @param {number} clusterSize - side of the square in px. Must be dividable by width and height.
 * @param {number} width - total width of the clusters
 * @param {number} height - total height of the clusters
 * @constructor

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VERSION="0.3"
+VERSION="0.4"
 PATH_TO_BUILDER="../../closure-library/closure/bin/build/closurebuilder.py"
 PATH_TO_COMPILER="/usr/local/share/closure-compiler/compiler.jar"
 PATH_TO_CLOSURE_LIBRARY="../../closure-library"

@@ -1806,7 +1806,11 @@ pike.components.AStar = function(){
 	/**
 	 * Start walkning
 	 */
-	this.startWalking = function(){		
+	this.startWalking = function(){	
+		if( !this.pike_components_AStar_.path ){
+			return; //==========>
+		}
+		
 		var targetNode = this.pike_components_AStar_.path[0];
 		
 		this.startX_ = this.x;
@@ -1836,8 +1840,6 @@ pike.components.AStar = function(){
 			throw new Error("[pike.components.AStar] Graph is not set.");
 		}
 		
-		
-					
 		//Find the best path
 		this.pike_components_AStar_.path = this.graph_.findPath( this.getActualNode_(), destinationNode );		
 							

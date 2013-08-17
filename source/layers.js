@@ -315,12 +315,17 @@ pike.layers.Layer.prototype.dispatchEvent = function( e ){
 /**
  * Create a new Cluster layer
  * @param {string} name
- * @param {numner} clusterSize - px
+ * @param {numner} clusterSize - px. Must be dividable by layer.width and layer.height.
  * @constructor
  * @extends {pike.layers.Layer}
  * @example
  * ~~~
- *	var entityLayer = new pike.layers.ClusterLayer("entity", 250);
+ *  // ClusterSize must be dividable by layer.width and layer.height.
+ *  // Layer width is 1280. 1280 / 320 = 4 - OK
+ *  // Layer height is 1280. 1280 / 320 = 4 - OK
+ *  // Layer width is 1280. 1280 / 250 = 5.12 - BAD
+ *  // Layer height is 1280. 1280 / 250 = 5.12 - BAD
+ *	var entityLayer = new pike.layers.ClusterLayer("entity", 320);
  *	entityLayer.setDirtyManager( new pike.layers.DirtyManager() );
  *	entityLayer.addEntity( hero);										
  * ~~~

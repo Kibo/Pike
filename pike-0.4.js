@@ -7613,6 +7613,9 @@ pike.components.AStar = function() {
     this.isWalking_ = false
   };
   this.startWalking = function() {
+    if(!this.pike_components_AStar_.path) {
+      return
+    }
     var targetNode = this.pike_components_AStar_.path[0];
     this.startX_ = this.x;
     this.startY_ = this.y;
