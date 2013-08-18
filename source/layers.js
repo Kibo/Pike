@@ -315,17 +315,12 @@ pike.layers.Layer.prototype.dispatchEvent = function( e ){
 /**
  * Create a new Cluster layer
  * @param {string} name
- * @param {numner} clusterSize - px. Must be dividable by layer.width and layer.height.
+ * @param {numner} clusterSize - px.
  * @constructor
  * @extends {pike.layers.Layer}
  * @example
  * ~~~
- *  // ClusterSize must be dividable by layer.width and layer.height.
- *  // Layer width is 1280. 1280 / 320 = 4 - OK
- *  // Layer height is 1280. 1280 / 320 = 4 - OK
- *  // Layer width is 1280. 1280 / 250 = 5.12 - BAD
- *  // Layer height is 1280. 1280 / 250 = 5.12 - BAD
- *	var entityLayer = new pike.layers.ClusterLayer("entity", 320);
+ *	var entityLayer = new pike.layers.ClusterLayer("entity", 250);
  *	entityLayer.setDirtyManager( new pike.layers.DirtyManager() );
  *	entityLayer.addEntity( hero);										
  * ~~~
@@ -376,7 +371,7 @@ pike.layers.ClusterLayer.prototype.dispatchEvent = function( e ){
 	
 	for (var i = 0; i < this.cache_.length; i++) {
 		var entity = this.cache_[i];
-		if (entity.getBounds().intersects(this.viewport_)) {		
+		if (entity.getBounds().intersects(this.viewport_)) {			
 			entity.dispatchEvent(e);			
 		}
 	}
@@ -566,6 +561,16 @@ pike.layers.ClusterLayer.prototype.moveObjectBetweenClusters_ = function( entity
 		
 	} else {		
 		goog.array.remove(this.cache_, entity);
+	}
+};
+
+/**
+ * Draw boundary of clusters
+ * @param {pike.events.Render} e
+ */
+pike.layers.ClusterLayer.prototype.onClustersRender = function(e){
+	if( this.offScreen_.isDirty ){
+		this.clusters_.draw( this.offScreen_.context);
 	}
 };
 

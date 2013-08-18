@@ -5800,6 +5800,9 @@ pike.graphics.Cluster.prototype.getClusters = function() {
 pike.graphics.Cluster.prototype.getClusterSize = function() {
   return this.clusterSize_
 };
+pike.graphics.Cluster.prototype.getBounds = function() {
+  return this.bounds_
+};
 pike.graphics.Cluster.prototype.getIdToClusterBounds = function(id) {
   return this.idToClusterBounds_[id]
 };
@@ -5838,6 +5841,17 @@ pike.graphics.Cluster.prototype.removeFromClusters = function(entity, clusterBou
   if(goog.DEBUG) {
     window.console.log("[pike.graphics.Cluster] entity " + entity.id + " is removed from cluster " + clusterBounds)
   }
+};
+pike.graphics.Cluster.prototype.draw = function(context) {
+  for(var x = 0;x < this.bounds_.w;x += this.clusterSize_) {
+    context.moveTo(x, 0);
+    context.lineTo(x, this.bounds_.h)
+  }
+  for(var y = 0;y < this.bounds_.h;y += this.clusterSize_) {
+    context.moveTo(0, y);
+    context.lineTo(this.bounds_.w, y)
+  }
+  context.stroke()
 };
 // Input 35
 /*
@@ -6687,6 +6701,11 @@ pike.layers.ClusterLayer.prototype.moveObjectBetweenClusters_ = function(entity,
     goog.array.remove(this.cache_, entity)
   }
 };
+pike.layers.ClusterLayer.prototype.onClustersRender = function(e) {
+  if(this.offScreen_.isDirty) {
+    this.clusters_.draw(this.offScreen_.context)
+  }
+};
 pike.layers.ObstacleLayer = function(name) {
   pike.layers.Layer.call(this, name)
 };
@@ -6847,7 +6866,24 @@ pike.components.Collision = function() {
   };
   this.checkCollision = function(e) {
     var boundsInCluster = this.layer.getCluster().getIdToClusterBounds(this.id);
-    var entities = this.layer.getCluster().getClusters()[boundsInCluster.y][boundsInCluster.x];
+    var entities = null;
+    var count = 0;
+    if(this.checkCollisionOnAllClusters_) {
+      entities = [];
+      var cluster = this.layer.getCluster().getClusters();
+      for(var row = boundsInCluster.y;row < boundsInCluster.y + boundsInCluster.h;row++) {
+        for(var col = boundsInCluster.x;col < boundsInCluster.x + boundsInCluster.w;col++) {
+          entities = entities.concat(cluster[row][col]);
+          count++
+        }
+      }
+      goog.array.removeDuplicates(entities)
+    }else {
+      entities = this.layer.getCluster().getClusters()[boundsInCluster.y][boundsInCluster.x]
+    }
+    if(goog.DEBUG) {
+      window.console.log("[pike.components.Collision] Check " + (entities.length - 1) + " entities from " + (count ? count : 1) + " clusters")
+    }
     for(var idx = 0;idx < entities.length;idx++) {
       if(this.id == entities[idx].id) {
         continue
@@ -6870,7 +6906,7 @@ pike.components.Collision = function() {
   this.getCBounds = function() {
     return new pike.graphics.Rectangle(this.x + this.collisionBounds_.x, this.y + this.collisionBounds_.y, this.w - this.collisionBounds_.w, this.h - this.collisionBounds_.h)
   };
-  this.handler.listen(this, pike.events.ChangePosition.EVENT_TYPE, goog.bind(this.checkCollision, this))
+  this.handler.listen(this, pike.events.ChangePosition.EVENT_TYPE, this.checkCollision, false, this)
 };
 pike.components.Collision.NAME = "pike.components.Collision";
 pike.components.Sprite = function() {

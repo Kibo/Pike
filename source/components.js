@@ -78,13 +78,36 @@ pike.components.Collision = function(){
 	 */
 	this.checkCollision = function(e){
 		var boundsInCluster = this.layer.getCluster().getIdToClusterBounds( this.id );
-		var entities = this.layer.getCluster().getClusters()[boundsInCluster.y][boundsInCluster.x];
+			
+		var entities = null;
+		var count = 0;
 		
+		//Check collision on all overlapped clusters
+		if(this.checkCollisionOnAllClusters_){		
+			entities = [];			
+			var cluster = this.layer.getCluster().getClusters();				
+			for(var row = boundsInCluster.y; row < (boundsInCluster.y + boundsInCluster.h); row++ ){
+				for(var col = boundsInCluster.x; col < (boundsInCluster.x + boundsInCluster.w); col++ ){
+					entities = entities.concat( cluster[row][col]);						
+					count++;
+				}			
+			}		
+			goog.array.removeDuplicates(entities);
+							
+		}else{
+			// Check collision only on ONE cluster
+			// This can be a problem if the entity moves to the edge of the cluster
+			//@see pike.layers.ClusterLayer.drawClusters(true)
+			entities = this.layer.getCluster().getClusters()[boundsInCluster.y][boundsInCluster.x];
+		}
+				
+		if(goog.DEBUG) window.console.log("[pike.components.Collision] Check " + (entities.length - 1) + " entities from " + (count ? count : 1) + " clusters");
+										
 		for(var idx = 0; idx < entities.length; idx++){
 			if(this.id == entities[idx].id){
 				continue;
 			}
-			
+										
 			if(this.getCBounds().intersects( entities[idx].getCBounds() )){	
 				var entity = entities[idx];
 				var activeEvent = new pike.events.Collision(e.x, e.y, e.oldX, e.oldY, entity, this);
@@ -110,7 +133,7 @@ pike.components.Collision = function(){
 						
 	};
 	
-	this.handler.listen( this, pike.events.ChangePosition.EVENT_TYPE, goog.bind( this.checkCollision, this));	
+	this.handler.listen( this, pike.events.ChangePosition.EVENT_TYPE, this.checkCollision, false, this);	
 };
 /**
  * Component name

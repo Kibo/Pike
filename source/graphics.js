@@ -138,7 +138,7 @@ pike.graphics.Rectangle.prototype.getOverlappingGridCells = function(cellW, cell
 //## Cluster #####################################
 /**
 * Cluster 
-* @param {number} clusterSize - side of the square in px. Must be dividable by width and height.
+* @param {number} clusterSize - side of the square in px.
 * @param {number} width - total width of the clusters
 * @param {number} height - total height of the clusters
 * @constructor
@@ -179,6 +179,14 @@ pike.graphics.Cluster.prototype.getClusters = function(){
  */
 pike.graphics.Cluster.prototype.getClusterSize = function(){
 	return this.clusterSize_;
+};
+
+/**
+ * Get cluster bounds
+ * @return {pike.graphics.Rectangle}
+ */
+pike.graphics.Cluster.prototype.getBounds = function(){
+	return this.bounds_;
 };
 
 /**
@@ -224,7 +232,7 @@ pike.graphics.Cluster.prototype.addToClusters = function( entity, clusterBounds 
         this.clusterSize_, 
         this.clusters_[0].length, 
         this.clusters_.length);
-		 
+	
     for (var clusterY = clusterBounds.y; clusterY < clusterBounds.y + clusterBounds.h; clusterY++) {
         for (var clusterX = clusterBounds.x; clusterX < clusterBounds.x + clusterBounds.w; clusterX++) {
             this.clusters_[clusterY][clusterX].push( entity );              
@@ -250,5 +258,24 @@ pike.graphics.Cluster.prototype.removeFromClusters = function( entity, clusterBo
     }
     
     if(goog.DEBUG) window.console.log("[pike.graphics.Cluster] entity " + entity.id + " is removed from cluster " + clusterBounds);
+};
+
+/**
+ * Draw a boundary of clusters
+ * @param {Object} context - Canvas 2D context
+ */
+pike.graphics.Cluster.prototype.draw = function( context ){
+	
+	for (var x = 0; x < this.bounds_.w; x += this.clusterSize_) {
+		context.moveTo( x, 0);
+	    context.lineTo( x, this.bounds_.h);
+	}
+	
+	for (var y = 0; y < this.bounds_.h; y += this.clusterSize_) {
+		context.moveTo( 0, y);
+	    context.lineTo( this.bounds_.w, y);
+	}
+	
+	context.stroke();	
 };
 

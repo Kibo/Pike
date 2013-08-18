@@ -142,7 +142,7 @@
 				mouse.handler.listen(viewport, pike.events.ChangePosition.EVENT_TYPE, goog.bind(mouse.onViewportChangePosition, mouse));
 				mouse.setEventTarget( document.getElementById("curtain"));				
 		
-				viewport.setSize(800,600);
+				viewport.setSize(800,600);				
 				gameWorld.setSize(1280, 1280);
 											
 				//background						
@@ -162,6 +162,7 @@
 				var hero = new pike.core.Entity( pike.components.Sprite, pike.components.Watch, pike.components.Collision );
 				hero.x = 150;
 				hero.y = 200;
+																			
 				hero.setSprite( imageManager.get("entities"), 0, 0, 32, 32, 3, 124);
 				hero.setCollisionBounds(0, 16, 0, 16);
 				
@@ -250,8 +251,8 @@
 																								
 				hero.handler.listen(hero, pike.events.Render.EVENT_TYPE, goog.bind(hero.onSpriteRender, hero));
 														
-				cLayer.handler.listen(hero, pike.events.ChangePosition.EVENT_TYPE, cLayer.onEntityChangePosition, false, cLayer);
-					
+				cLayer.handler.listen(hero, pike.events.ChangePosition.EVENT_TYPE, cLayer.onEntityChangePosition, false, cLayer);				
+				
 				//## GUARD ###
 				var guard =  new pike.core.Entity( pike.components.Sprite, pike.components.Collision, pike.components.Dialogues, pike.components.Practice );
 				guard.x = 550;
@@ -291,62 +292,7 @@
 				};
 				
 				guard.handler.listen(guard, pike.events.Render.EVENT_TYPE, guard.onSpriteRender, false, guard);
-								
-				//## BOY ###
-				var boy =  new pike.core.Entity( pike.components.Sprite, pike.components.Collision, pike.components.AStar, pike.components.VisualizeGraph);
-				boy.x = 248;
-				boy.y = 276;
-				boy.setSprite( imageManager.get("entities"), 96, 0, 32, 32, 3, 300);
-				boy.setCollisionBounds(0, 16, 0, 16);				
-				boy.handler.listen(boy, pike.events.Render.EVENT_TYPE, boy.onSpriteRender, false, boy);
-								
-				var coords = [[248,276],[205,529],[592,430],[420,610], [95,610],[479,430],[420,216],[555,216]];
-				var matrix =
-						[[1, 1, 0, 0, 0, 0, 0, 0],
-						 [1, 1, 0, 1, 0, 0, 0, 0],
-						 [0, 0, 1, 1, 0, 1, 0, 0],
-						 [0, 1, 1, 1, 1, 1, 1, 0],
-						 [0, 0, 0, 1, 1, 0, 0, 0],
-				  	     [0, 0, 1, 1, 0, 1, 1, 0],
-						 [0, 0, 0, 1, 0, 1, 1, 1],
-						 [0, 0, 0, 0, 0, 0, 1, 1]];
-						
-				var nodes = [];
-				for (var i = 0; i < coords.length; i++) {
-					nodes.push(new pike.ai.path.Node(i, coords[i][0], coords[i][1]));
-				}
-				var graph = new pike.ai.path.Graph(nodes, matrix);
-								
-				//boy.handler.listen(boy, pike.events.Render.EVENT_TYPE, boy.onPathRender, false, boy);
-				boy.handler.listen( boy, pike.events.Update.EVENT_TYPE, boy.onAStartUpdate, false, boy);					
-				
-				boy.setGraph( graph );				
-				boy.setDestinationNode( nodes[1] );
-								
-				boy.handler.listen( boy, pike.events.ReachDestination.EVENT_TYPE, function(e){
-					var node = nodes[ Math.floor(Math.random() * this.getGraph().getNodes().length)];					
-					console.log("next destination: " + node.id);					
-					setTimeout( function(){
-						boy.setDestinationNode( node );				
-					} , 5000);
-				});
-				
-				boy.handler.listen(boy, pike.events.ChangePosition.EVENT_TYPE, function(e){	
-					
-					this.layer.setDirty( new pike.graphics.Rectangle(e.oldX, e.oldY, this.w, this.h));	
-					this.layer.setDirty( new pike.graphics.Rectangle(this.x, this.y, this.w, this.h));					
-					this.setSpriteRow(this.vx, this.vy);
-					
-				}, false, boy);
-				
-				boy.handler.listen(boy, pike.events.Collision.EVENT_TYPE, function(e){	
-					this.x = e.oldX;
-					this.y = e.oldY;	
-					
-					this.stopWalking();
-					
-				}, false, boy);
-				
+													
 				//## GATE ###
 				var gate =  new pike.core.Entity( pike.components.Sprite );
 				gate.x = 592;
@@ -355,7 +301,7 @@
 				gate.h = 48;
 				gate.setSprite( imageManager.get("entities"), 0, 128, 64, 48, 0, 0);				
 				gate.handler.listen(gate, pike.events.Render.EVENT_TYPE, gate.onSpriteRender, false, gate);
-				
+											
 				//## CHEESE ###
 				var cheese =  new pike.core.Entity( pike.components.Sprite, pike.components.Collision, pike.components.Backpack);
 				cheese.x = 150;
@@ -387,15 +333,16 @@
 				cheese.handler.listen( cheese, pike.events.Collision.EVENT_TYPE, goog.bind( cheese.onCollision, cheese) );	
 				//obsLayer.handler.listen(cheese, pike.events.ChangePosition.EVENT_TYPE, goog.bind(obsLayer.onEntityChangePosition, obsLayer));				
 																						
-				var clustaLayer = new pike.layers.ClusterLayer("Clusta", 250);
-				clustaLayer.setDirtyManager( new pike.layers.DirtyManager() );				
+				var clustaLayer = new pike.layers.ClusterLayer("Clusta", 500);				
+				clustaLayer.setDirtyManager( new pike.layers.DirtyManager() );			
 				clustaLayer.addEntity( hero );				
 				clustaLayer.addEntity( cheese );
-				clustaLayer.addEntity( guard );
-				clustaLayer.addEntity( boy );
-				clustaLayer.addEntity( gate );
-						
+				clustaLayer.addEntity( guard );				
+				clustaLayer.addEntity( gate );				
+							
 				stage.addLayer( clustaLayer );
+															
+				hero.watchMe(viewport, gameWorld);
 								
 				//Foreground					
 				stage.addLayer( new pike.layers.Layer("foreground"));

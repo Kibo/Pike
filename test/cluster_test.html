@@ -24,6 +24,11 @@ function testBuildClusters(){
 	clusters.build();
 	assertTrue( clusters.clusters_.length == 10 )
 	assertTrue( clusters.clusters_[0].length == 10 )
+	
+	clusters = new pike.graphics.Cluster(12,100,100);
+	clusters.build();
+	assertTrue( clusters.clusters_.length == 9 )
+	assertTrue( clusters.clusters_[0].length == 9 )
 };
 
 function testAddToClusters(){
@@ -32,7 +37,7 @@ function testAddToClusters(){
 	var ent = new pike.core.Entity();
 	ent.w = 9;
 	ent.h = 9;
-	
+		
 	ent.x = 0,
 	ent.y = 0;		
 	assertObjectEquals( new pike.graphics.Rectangle(0, 0, 1, 1), clusters.addToClusters( ent ) )
@@ -44,6 +49,13 @@ function testAddToClusters(){
 	ent.x = 5,
 	ent.y = 5;		
 	assertObjectEquals( new pike.graphics.Rectangle(0, 0, 2, 2), clusters.addToClusters( ent ) )	
+		
+	
+	var clusters = new pike.graphics.Cluster(250,1280,1280);
+	clusters.build();	
+	ent.x = 1260,
+	ent.y = 1260;
+	assertObjectEquals( new pike.graphics.Rectangle(5, 5, 1, 1), clusters.addToClusters( ent ) )
 };
 
 

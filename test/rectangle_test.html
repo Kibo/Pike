@@ -71,10 +71,12 @@ var testGetOverlappingGridCells = function(){
 	var rectangle1 = new pike.graphics.Rectangle(0, 0, 9, 9);
 	var rectangle2 = new pike.graphics.Rectangle(10, 10, 9, 9);
 	var rectangle3 = new pike.graphics.Rectangle(10, 10, 19, 19);
+	var rectangle4 = new pike.graphics.Rectangle(1260, 1260, 9, 9);
 	
 	assertObjectEquals( new pike.graphics.Rectangle(0, 0, 1, 1), rectangle1.getOverlappingGridCells(10,10,10,10));
 	assertObjectEquals( new pike.graphics.Rectangle(1, 1, 1, 1), rectangle2.getOverlappingGridCells(10,10,10,10));
-	assertObjectEquals( new pike.graphics.Rectangle(1, 1, 2, 2), rectangle3.getOverlappingGridCells(10,10,10,10));
+	assertObjectEquals( new pike.graphics.Rectangle(1, 1, 2, 2), rectangle3.getOverlappingGridCells(10,10,10,10));	
+	assertObjectEquals( new pike.graphics.Rectangle(5, 5, 1, 1), rectangle4.getOverlappingGridCells(250,250,6,6));
 };
 
 function tearDown(){}
