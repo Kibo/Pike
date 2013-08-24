@@ -6904,7 +6904,7 @@ pike.components.Collision = function() {
     }
   };
   this.getCBounds = function() {
-    return new pike.graphics.Rectangle(this.x + this.collisionBounds_.x, this.y + this.collisionBounds_.y, this.w - this.collisionBounds_.w, this.h - this.collisionBounds_.h)
+    return new pike.graphics.Rectangle(this.x + this.collisionBounds_.x, this.y + this.collisionBounds_.y, this.w + this.collisionBounds_.w, this.h + this.collisionBounds_.h)
   };
   this.handler.listen(this, pike.events.ChangePosition.EVENT_TYPE, this.checkCollision, false, this)
 };

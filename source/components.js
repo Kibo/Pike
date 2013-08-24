@@ -54,16 +54,16 @@ pike.components.Collision = function(){
 	 * Set collision boundary
 	 * @param {number} x - this.boundary().x + x
 	 * @param {number} y - this.boundary().y + y
-	 * @param {number} w - this.boundary().w - w
-	 * @param {number} h - this.boundary().h - h
+	 * @param {number} w - this.boundary().w + w
+	 * @param {number} h - this.boundary().h + h
 	 * @return this
 	 * 
 	 * @example
 	 * ~~~
-	 * this.setCollisionBounds(0,30,0,30)
+	 * this.setCollisionBounds(0,30,0,-30)
 	 * 
 	 * result:
-	 * [this.bounds().x + 0, this.bounds().y + 30, this.bounds().w - 0, this.bounds().h - 30]
+	 * [this.bounds().x + 0, this.bounds().y + 30, this.bounds().w + 0, this.bounds().h - 30]
 	 * ~~~
 	 */
 	this.setCollisionBounds = function(x,y,w,h){
@@ -128,8 +128,8 @@ pike.components.Collision = function(){
 		return new pike.graphics.Rectangle(
 				this.x + this.collisionBounds_.x,
 				this.y + this.collisionBounds_.y,
-				this.w - this.collisionBounds_.w,
-				this.h - this.collisionBounds_.h);			
+				this.w + this.collisionBounds_.w,
+				this.h + this.collisionBounds_.h);			
 						
 	};
 	

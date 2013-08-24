@@ -61,16 +61,16 @@
 <span class='line'> 54</span> 	 * Set collision boundary
 <span class='line'> 55</span> 	 * @param {number} x - this.boundary().x + x
 <span class='line'> 56</span> 	 * @param {number} y - this.boundary().y + y
-<span class='line'> 57</span> 	 * @param {number} w - this.boundary().w - w
-<span class='line'> 58</span> 	 * @param {number} h - this.boundary().h - h
+<span class='line'> 57</span> 	 * @param {number} w - this.boundary().w + w
+<span class='line'> 58</span> 	 * @param {number} h - this.boundary().h + h
 <span class='line'> 59</span> 	 * @return this
 <span class='line'> 60</span> 	 * 
 <span class='line'> 61</span> 	 * @example
 <span class='line'> 62</span> 	 * ~~~
-<span class='line'> 63</span> 	 * this.setCollisionBounds(0,30,0,30)
+<span class='line'> 63</span> 	 * this.setCollisionBounds(0,30,0,-30)
 <span class='line'> 64</span> 	 * 
 <span class='line'> 65</span> 	 * result:
-<span class='line'> 66</span> 	 * [this.bounds().x + 0, this.bounds().y + 30, this.bounds().w - 0, this.bounds().h - 30]
+<span class='line'> 66</span> 	 * [this.bounds().x + 0, this.bounds().y + 30, this.bounds().w + 0, this.bounds().h - 30]
 <span class='line'> 67</span> 	 * ~~~
 <span class='line'> 68</span> 	 */</span><span class="WHIT">
 <span class='line'> 69</span> </span><span class="WHIT">	</span><span class="NAME">this.setCollisionBounds</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">x</span><span class="PUNC">,</span><span class="NAME">y</span><span class="PUNC">,</span><span class="NAME">w</span><span class="PUNC">,</span><span class="NAME">h</span><span class="PUNC">)</span><span class="PUNC">{</span><span class="WHIT">
@@ -135,8 +135,8 @@
 <span class='line'>128</span> 		</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">pike.graphics.Rectangle</span><span class="PUNC">(</span><span class="WHIT">
 <span class='line'>129</span> </span><span class="WHIT">				</span><span class="NAME">this.x</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">this.collisionBounds_.x</span><span class="PUNC">,</span><span class="WHIT">
 <span class='line'>130</span> </span><span class="WHIT">				</span><span class="NAME">this.y</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">this.collisionBounds_.y</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>131</span> </span><span class="WHIT">				</span><span class="NAME">this.w</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">this.collisionBounds_.w</span><span class="PUNC">,</span><span class="WHIT">
-<span class='line'>132</span> </span><span class="WHIT">				</span><span class="NAME">this.h</span><span class="WHIT"> </span><span class="PUNC">-</span><span class="WHIT"> </span><span class="NAME">this.collisionBounds_.h</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">			
+<span class='line'>131</span> </span><span class="WHIT">				</span><span class="NAME">this.w</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">this.collisionBounds_.w</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>132</span> </span><span class="WHIT">				</span><span class="NAME">this.h</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">this.collisionBounds_.h</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">			
 <span class='line'>133</span> 						
 <span class='line'>134</span> 	</span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>135</span> </span><span class="WHIT">	
